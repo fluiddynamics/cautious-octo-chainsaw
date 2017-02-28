@@ -1,4 +1,4 @@
-# cautious-octo-chainsaw
+# CPDT和訳の成果物
 
 - [cpdt.pdf](cpdt.pdf)
 - html/
