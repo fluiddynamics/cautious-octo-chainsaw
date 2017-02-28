@@ -1,4 +1,4 @@
-# cpdt-japaneseの成果物
+# cautious-octo-chainsaw
 
 - [cpdt.pdf](cpdt.pdf)
 - html/
