@@ -1,0 +1,1997 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link href="coqdoc.css" rel="stylesheet" type="text/css" />
+<title>Cpdt.Reflection</title>
+</head>
+
+<body>
+
+<div id="page">
+
+<div id="header">
+</div>
+
+<div id="main">
+
+<h1 class="libtitle">Library Cpdt.Reflection</h1>
+
+<div class="code">
+
+<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+ 
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+最後の章では、証明に対する非常にヒューリスティックなアプローチが強調されていました。
+この章では、代替の技術、
+_proof by reflection <i>リフレクションによる証明</i>
+ を検討します。
+Gallinaによって、決定手続き(decision procedures、決定するための手続き)
+を正しさの証明とともに書いて、
+これらの手続きが非常に短い証明で書けることを示します(appeal)。
+
+<div class="paragraph"> </div>
+
+項の <i>reflection</i> <i>リフレクション</i> は、
+Gallinaの命題を構文が表す帰納型の値に変換する必要があるために、適用されます。
+それで、Gallinaプログラムがそれらを解析し、
+そのような項を元の形式に戻すことを <i>リフレクトする</i> (<i>reflecting</i> it) と呼びます。
+ 
+</div>
+<div class="code">
+
+<br/>
+</div>
+
+<div class="doc">
+<a name="lab84"></a><h1 class="section">偶数であることの証明</h1>
+
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+特定の自然数の定数が偶数であることを証明することは、確かに自動的にできることです。
+前章で学習したLtacプログラミング手法は、このような手順を簡単に実装できます。
+ 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Inductive</span> <a name="isEven"><span class="id" title="inductive">isEven</span></a> : <span class="id" title="inductive">nat</span> <span class="id" title="notation">→</span> <span class="id" title="keyword">Prop</span> :=<br/>
+| <a name="Even_O"><span class="id" title="constructor">Even_O</span></a> : <a class="idref" href="Cpdt.Reflection.html#isEven"><span class="id" title="inductive">isEven</span></a> <span class="id" title="constructor">O</span><br/>
+| <a name="Even_SS"><span class="id" title="constructor">Even_SS</span></a> : <span class="id" title="keyword">∀</span> <span class="id" title="var">n</span>, <a class="idref" href="Cpdt.Reflection.html#isEven"><span class="id" title="inductive">isEven</span></a> <a class="idref" href="Cpdt.Reflection.html#n"><span class="id" title="variable">n</span></a> <span class="id" title="notation">→</span> <a class="idref" href="Cpdt.Reflection.html#isEven"><span class="id" title="inductive">isEven</span></a> (<span class="id" title="constructor">S</span> (<span class="id" title="constructor">S</span> <a class="idref" href="Cpdt.Reflection.html#n"><span class="id" title="variable">n</span></a>)).<br/>
+
+<br/>
+<span class="id" title="keyword">Ltac</span> <span class="id" title="var">prove_even</span> := <span class="id" title="tactic">repeat</span> <span class="id" title="tactic">constructor</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Theorem</span> <a name="even_256"><span class="id" title="lemma">even_256</span></a> : <a class="idref" href="Cpdt.Reflection.html#isEven"><span class="id" title="inductive">isEven</span></a> 256.<br/>
+&nbsp;&nbsp;<span class="id" title="var">prove_even</span>.<br/>
+<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Print</span> <a class="idref" href="Cpdt.Reflection.html#even_256"><span class="id" title="lemma">even_256</span></a>.<br/>
+</div>
+
+<div class="doc">
+ <br/>
+<span class="inlinecode"><a class="idref" href="Cpdt.Reflection.html#even_256"><span class="id" title="lemma">even_256</span></a> = <br/>
+<a class="idref" href="Cpdt.Reflection.html#Even_SS"><span class="id" title="constructor">Even_SS</span></a><br/>
+&nbsp;&nbsp;(<a class="idref" href="Cpdt.Reflection.html#Even_SS"><span class="id" title="constructor">Even_SS</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<a class="idref" href="Cpdt.Reflection.html#Even_SS"><span class="id" title="constructor">Even_SS</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<a class="idref" href="Cpdt.Reflection.html#Even_SS"><span class="id" title="constructor">Even_SS</span></a>
+<div class="paragraph"> </div>
+
+</span>
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+    
+...等々。
+この手順は常に（少なくとも無限のリソースを持つマシンでは）機能しますが、
+重大な欠点があります。これは、256が偶数であるという証明を印刷(print)するときに表示されます。
+最終的な証明項は、入力値に対して長さが超線形(super-linear)です。
+Coqの暗黙的な引数の仕組みは、<span class="inlinecode"><a class="idref" href="Cpdt.Reflection.html#Even_SS"><span class="id" title="constructor">Even_SS</span></a></span>のパラメータ<span class="inlinecode"><a class="idref" href="Cpdt.MoreDep.html#dec_star.dec_star''.n"><span class="id" title="variable">n</span></a></span>に与えられた値を隠しているので、
+ここでは証明項はここでは線形にしか見えません。
+
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+また、証明項は内部的に構文木として表現され、ノード表現を共有する機会がありますが、
+この章では、ほぼ同等の2つの尺度、証明文の長さを簡単なテキストの長さとして、
+または、用語の構文木のノード数として測定します。
+
+<div class="paragraph"> </div>
+
+時には明らかに大きな証明項でも、内部では十分な共有を持っているため、
+予想以上のメモリを消費することはありませんが、
+共有のない(sharing-free)バージョンのサイズが十分に小さいことを保証することによって、
+そのような共有を推論する必要はありません。
+
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+定数の偶数性を検証するための自明で信頼できるプログラムを書くことができるので、
+超線形(Superlinear)な偶数性の証明項は残念なものに見えます。
+証明チェッカーは、必要に応じて私たちのプログラムを単に呼び出すことができます。
+
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+静的な型付けが、私たちのタクティクが常に適切に動作することを保証しないことも残念です。
+同様の手法の他の呼び出しは、動的な型エラーで失敗する可能性があり、
+十分に複雑なゴールを証明しようとするまで、
+これらのエラーの背後にあるバグについてはわかりません。
+
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+リフレクションによる証明の手法は、両方の不満に対処します。
+入力のサイズを超えて一定のサイズ(constant size)のオーバーヘッドを
+持つ上記の例のような証明を書くことができ、
+私たちはGallinaで書かれた検証された決定手続き(decision procedures)でそれを行います。
+
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+この例では、<span class="inlinecode"><span class="id" title="library">MoreSpecif</span></span> モジュール（この本のソースに含まれています）の型を使用して、
+認証された偶数性のチェッカーを作成します。
+ 
+</div>
+<div class="code">
+
+<br/>
+
+<br/>
+<span class="id" title="keyword">Print</span> <span class="id" title="inductive">partial</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+ <br/>
+<span class="inlinecode"><span class="id" title="keyword">Inductive</span> <span class="id" title="inductive">partial</span> (<a class="idref" href="Cpdt.ProgLang.html#Forall.P"><span class="id" title="variable">P</span></a> : <span class="id" title="keyword">Prop</span>) : <span class="id" title="keyword">Set</span> :=  <span class="id" title="constructor">Proved</span> : <a class="idref" href="Cpdt.ProgLang.html#Forall.P"><span class="id" title="variable">P</span></a> → [<a class="idref" href="Cpdt.ProgLang.html#Forall.P"><span class="id" title="variable">P</span></a>] | <span class="id" title="constructor">Uncertain</span> : [<a class="idref" href="Cpdt.ProgLang.html#Forall.P"><span class="id" title="variable">P</span></a>]
+<div class="paragraph"> </div>
+
+</span>
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+<span class="inlinecode"><span class="id" title="inductive">partial</span></span> <span class="inlinecode"><a class="idref" href="Cpdt.ProgLang.html#Forall.P"><span class="id" title="variable">P</span></a></span> の値は、<span class="inlinecode"><a class="idref" href="Cpdt.ProgLang.html#Forall.P"><span class="id" title="variable">P</span></a></span>のオプショナルな証明です。 表記<span class="inlinecode">[<a class="idref" href="Cpdt.ProgLang.html#Forall.P"><span class="id" title="variable">P</span></a>]</span>は<span class="inlinecode"><span class="id" title="inductive">partial</span></span> <span class="inlinecode"><a class="idref" href="Cpdt.ProgLang.html#Forall.P"><span class="id" title="variable">P</span></a></span>の略です。
+ 
+</div>
+<div class="code">
+
+<br/>
+
+<br/>
+<span class="id" title="keyword">Local Open</span> <span class="id" title="keyword">Scope</span> <span class="id" title="var">partial_scope</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+私たちは<span class="inlinecode"><span class="id" title="inductive">partial</span></span>型の表記をいくつか取り上げます。
+これらは、以前に、型の記述(specification types)で見た表記法の
+いくつかと重複しているため、別々に開くことが必要な別のスコープに配置されました。
+
+<div class="paragraph"> </div>
+
+ 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Definition</span> <a name="check_even"><span class="id" title="definition">check_even</span></a> : <span class="id" title="keyword">∀</span> <span class="id" title="var">n</span> : <span class="id" title="inductive">nat</span>, <span class="id" title="notation">[</span><a class="idref" href="Cpdt.Reflection.html#isEven"><span class="id" title="inductive">isEven</span></a> <a class="idref" href="Cpdt.Reflection.html#n"><span class="id" title="variable">n</span></a><span class="id" title="notation">]</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Hint Constructors</span> <a class="idref" href="Cpdt.Reflection.html#isEven"><span class="id" title="inductive">isEven</span></a>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">refine</span> (<span class="id" title="keyword">fix</span> <span class="id" title="var">F</span> (<span class="id" title="var">n</span> : <span class="id" title="inductive">nat</span>) : <span class="id" title="notation">[</span><a class="idref" href="Cpdt.Reflection.html#isEven"><span class="id" title="inductive">isEven</span></a> <a class="idref" href="Cpdt.Reflection.html#n"><span class="id" title="variable">n</span></a><span class="id" title="notation">]</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">match</span> <a class="idref" href="Cpdt.Reflection.html#n"><span class="id" title="variable">n</span></a> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| 0 ⇒ <span class="id" title="notation">Yes</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| 1 ⇒ <span class="id" title="notation">No</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="constructor">S</span> (<span class="id" title="constructor">S</span> <span class="id" title="var">n'</span>) ⇒ <span class="id" title="notation">Reduce</span> <span class="id" title="notation">(</span><a class="idref" href="Cpdt.Reflection.html#F"><span class="id" title="variable">F</span></a> <span class="id" title="var">n'</span><span class="id" title="notation">)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">end</span>); <span class="id" title="tactic">auto</span>.<br/>
+<span class="id" title="keyword">Defined</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+これで、依存パターンマッチング(dependent pattern-matching)を使用して、
+驚くべきことを行う関数を書くことができます。
+<span class="inlinecode"><span class="id" title="var">partialPut</span></span>が与えられている場合、<span class="inlinecode"><a class="idref" href="Cpdt.Reflection.html#partialOut"><span class="id" title="definition">partialOut</span></a></span>は<span class="inlinecode"><span class="id" title="inductive">partial</span></span>値に証明が含まれていれば<span class="inlinecode"><a class="idref" href="Cpdt.ProgLang.html#Forall.P"><span class="id" title="variable">P</span></a></span>の証明を返し、
+それ以外の場合は <span class="inlinecode"><span class="id" title="inductive">True</span></span> の（使用しないuseless)の証明を返します。
+MLとHaskellのプログラミングの観点からは、このような型を
+書くことは不可能ですが、<span class="inlinecode"><span class="id" title="keyword">return</span></span>アノテーションを使用すれば自明です。
+ 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Definition</span> <a name="partialOut"><span class="id" title="definition">partialOut</span></a> (<span class="id" title="var">P</span> : <span class="id" title="keyword">Prop</span>) (<span class="id" title="var">x</span> : <span class="id" title="notation">[</span><a class="idref" href="Cpdt.Reflection.html#P"><span class="id" title="variable">P</span></a><span class="id" title="notation">]</span>) :=<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">match</span> <a class="idref" href="Cpdt.Reflection.html#x"><span class="id" title="variable">x</span></a> <span class="id" title="keyword">return</span> (<span class="id" title="keyword">match</span> <a class="idref" href="Cpdt.Reflection.html#x"><span class="id" title="variable">x</span></a> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="constructor">Proved</span> <span class="id" title="var">_</span> ⇒ <a class="idref" href="Cpdt.Reflection.html#P"><span class="id" title="variable">P</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="constructor">Uncertain</span> ⇒ <span class="id" title="inductive">True</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">end</span>) <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="constructor">Proved</span> <span class="id" title="var">pf</span> ⇒ <span class="id" title="var">pf</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="constructor">Uncertain</span> ⇒ <span class="id" title="constructor">I</span><br/>
+&nbsp;&nbsp;<span class="id" title="keyword">end</span>.<br/>
+
+<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+このような関数を定義するのは奇妙に思えるかもしれませんが、
+以前の<span class="inlinecode"><span class="id" title="var">prove_even</span></span>タクティクのリフレクティブのバージョンを書くのに非常に便利です：*）
+
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Ltac</span> <span class="id" title="var">prove_even_reflective</span> :=<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">match</span> <span class="id" title="keyword">goal</span> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| [ |- <a class="idref" href="Cpdt.Reflection.html#isEven"><span class="id" title="inductive">isEven</span></a> ?<span class="id" title="var">N</span>] ⇒ <span class="id" title="tactic">exact</span> (<a class="idref" href="Cpdt.Reflection.html#partialOut"><span class="id" title="definition">partialOut</span></a> (<a class="idref" href="Cpdt.Reflection.html#check_even"><span class="id" title="definition">check_even</span></a> <span class="id" title="var">N</span>))<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">end</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+どの自然数を考えているのかを決め、適切な<span class="inlinecode"><a class="idref" href="Cpdt.Reflection.html#check_even"><span class="id" title="definition">check_even</span></a></span>の呼び出しから証明を引き出すことによって、
+その偶数性を「証明」します。
+正確に型 <span class="inlinecode"><a class="idref" href="Cpdt.ProgLang.html#Forall.P"><span class="id" title="variable">P</span></a></span> の証明項が与えられたとき、
+<span class="inlinecode"><span class="id" title="tactic">exact</span></span> タクティクは、
+命題 <span class="inlinecode"><a class="idref" href="Cpdt.ProgLang.html#Forall.P"><span class="id" title="variable">P</span></a></span> を証明します。
+ 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Theorem</span> <a name="even_256'"><span class="id" title="lemma">even_256'</span></a> : <a class="idref" href="Cpdt.Reflection.html#isEven"><span class="id" title="inductive">isEven</span></a> 256.<br/>
+&nbsp;&nbsp;<span class="id" title="var">prove_even_reflective</span>.<br/>
+<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Print</span> <a class="idref" href="Cpdt.Reflection.html#even_256'"><span class="id" title="lemma">even_256'</span></a>.<br/>
+</div>
+
+<div class="doc">
+ <br/>
+<span class="inlinecode"><a class="idref" href="Cpdt.Reflection.html#even_256'"><span class="id" title="lemma">even_256'</span></a> = <a class="idref" href="Cpdt.Reflection.html#partialOut"><span class="id" title="definition">partialOut</span></a> (<a class="idref" href="Cpdt.Reflection.html#check_even"><span class="id" title="definition">check_even</span></a> 256)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: <a class="idref" href="Cpdt.Reflection.html#isEven"><span class="id" title="inductive">isEven</span></a> 256
+<div class="paragraph"> </div>
+
+</span>
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+私たちは、証明のゴールの周りに一定のラッパーを見ることができます。
+偶数の場合は、この形式の証明で十分です。
+証明項のサイズは、チェックされている数では線形で、
+
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+その数の単項式の2つの繰り返しが含まれています。
+そのうちのひとつは<span class="inlinecode"><a class="idref" href="Cpdt.Reflection.html#partialOut"><span class="id" title="definition">partialOut</span></a></span>の暗黙の引数の上に隠されています。
+
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+奇数でこのタクティクを試してみたらどうなりますか？
+
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Theorem</span> <a name="even_255"><span class="id" title="lemma">even_255</span></a> : <a class="idref" href="Cpdt.Reflection.html#isEven"><span class="id" title="inductive">isEven</span></a> 255.<br/>
+</div>
+
+<div class="doc">
+<br/>
+<span class="inlinecode">&nbsp;&nbsp;<span class="id" title="var">prove_even_reflective</span>.
+<div class="paragraph"> </div>
+
+</span>
+<div class="paragraph"> </div>
+
+<pre>
+User error: No matching clauses for match goal
+</pre>
+
+<div class="paragraph"> </div>
+
+ありがたいことに、タクティクは失敗します。
+間違ったことをより正確に見るために、<span class="inlinecode"><span class="id" title="keyword">match</span></span>の本体を手動で実行することができます。
+
+<div class="paragraph"> </div>
+
+  <br/>
+<span class="inlinecode">&nbsp;&nbsp;<span class="id" title="tactic">exact</span> (<a class="idref" href="Cpdt.Reflection.html#partialOut"><span class="id" title="definition">partialOut</span></a> (<a class="idref" href="Cpdt.Reflection.html#check_even"><span class="id" title="definition">check_even</span></a> 255)).
+<div class="paragraph"> </div>
+
+</span>
+<div class="paragraph"> </div>
+
+<pre>
+  Error: The term "partialOut (check_even 255)" has type
+ "match check_even 255 with
+  | Yes =&gt; isEven 255
+  | No =&gt; True
+  end" while it is expected to have type "isEven 255"
+</pre>
+
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+いつものように、型チェッカーはエラーメッセージを単純化するために
+リダクション(式の簡約)を実行しません。
+最初の項を自分自身で簡約した場合、<span class="inlinecode"><a class="idref" href="Cpdt.Reflection.html#check_even"><span class="id" title="definition">check_even</span></a></span> <span class="inlinecode">255</span>は
+<tt>No</tt>に簡約され、
+最初の項
+は<span class="inlinecode"><span class="id" title="inductive">True</span></span>と等しく、
+<span class="inlinecode"><a class="idref" href="Cpdt.Reflection.html#isEven"><span class="id" title="inductive">isEven</span></a></span> <span class="inlinecode">255</span>とユニファイしないのは確かです。
+
+<div class="paragraph"> </div>
+
+
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Abort</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+タクティク<span class="inlinecode"><span class="id" title="var">prove_even_reflective</span></span>は、リフレクティブです。
+なぜなら、Gallina内の証明検索のプロセス（この場合は自明なもの）を実行するために、
+Ltacの唯一の使用は目標を<span class="inlinecode"><a class="idref" href="Cpdt.Reflection.html#check_even"><span class="id" title="definition">check_even</span></a></span>の適切な使用に変換するためです。
+
+</div>
+<div class="code">
+
+<br/>
+</div>
+
+<div class="doc">
+<a name="lab85"></a><h1 class="section">自明なトートロジーの言語の文法の具象化(reifying)</h1>
+
+</div>
+<div class="code">
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+このような自明なトートロジーのリフレクティブな証明をしたいかもしれません：
+
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Theorem</span> <a name="true_galore"><span class="id" title="lemma">true_galore</span></a> : <span class="id" title="notation">(</span><span class="id" title="inductive">True</span> <span class="id" title="notation">∧</span> <span class="id" title="inductive">True</span><span class="id" title="notation">)</span> <span class="id" title="notation">→</span> <span class="id" title="notation">(</span><span class="id" title="inductive">True</span> <span class="id" title="notation">∨</span> <span class="id" title="notation">(</span><span class="id" title="inductive">True</span> <span class="id" title="notation">∧</span> <span class="id" title="notation">(</span><span class="id" title="inductive">True</span> <span class="id" title="notation">→</span> <span class="id" title="inductive">True</span><span class="id" title="notation">)</span><span class="id" title="notation">)</span><span class="id" title="notation">)</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">tauto</span>.<br/>
+<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+
+<br/>
+<span class="id" title="keyword">Print</span> <a class="idref" href="Cpdt.Reflection.html#true_galore"><span class="id" title="lemma">true_galore</span></a>.<br/>
+</div>
+
+<div class="doc">
+ <br/>
+<span class="inlinecode"><a class="idref" href="Cpdt.Reflection.html#true_galore"><span class="id" title="lemma">true_galore</span></a> = <br/>
+<span class="id" title="keyword">fun</span> <a class="idref" href="Cpdt.GeneralRec.html#thunk_eq_coind.H"><span class="id" title="variable">H</span></a> : <span class="id" title="inductive">True</span> ∧ <span class="id" title="inductive">True</span> ⇒<br/>
+<span class="id" title="definition">and_ind</span> (<span class="id" title="keyword">fun</span> <span class="id" title="var">_</span> <span class="id" title="var">_</span> : <span class="id" title="inductive">True</span> ⇒ <a class="idref" href="Cpdt.Predicates.html#or_introl"><span class="id" title="constructor">or_introl</span></a> (<span class="id" title="inductive">True</span> ∧ (<span class="id" title="inductive">True</span> → <span class="id" title="inductive">True</span>)) <span class="id" title="constructor">I</span>) <a class="idref" href="Cpdt.GeneralRec.html#thunk_eq_coind.H"><span class="id" title="variable">H</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: <span class="id" title="inductive">True</span> ∧ <span class="id" title="inductive">True</span> → <span class="id" title="inductive">True</span> ∨ <span class="id" title="inductive">True</span> ∧ (<span class="id" title="inductive">True</span> → <span class="id" title="inductive">True</span>)
+<div class="paragraph"> </div>
+
+</span>
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+予想されるように、<span class="inlinecode"><span class="id" title="tactic">tauto</span></span> が作る証拠は、
+自然演繹規則の明示的な応用が含まれています。
+大きな式の場合、これは、入力のサイズを超える、
+証明のサイズの線形量のオーバーヘッドを追加する可能性があります。
+
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+このクラスのゴールに対してリフレクティブな手順を書くには、
+「リフレクティブによる証明」の実際の「リフレクティブ」な部分に入る必要があります。
+Gallinaのいかなるところでも、<span class="inlinecode"><span class="id" title="keyword">Prop</span></span> を条件分析(case-analyze)することは不可能です。
+<span class="inlinecode"><span class="id" title="keyword">Prop</span></span> を  <i>reify</i> <i>具象化</i> して、解析できる型にする必要があります。
+この帰納型は良い候補です：
+ 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Inductive</span> <a name="taut"><span class="id" title="inductive">taut</span></a> : <span class="id" title="keyword">Set</span> :=<br/>
+| <a name="TautTrue"><span class="id" title="constructor">TautTrue</span></a> : <a class="idref" href="Cpdt.Reflection.html#taut"><span class="id" title="inductive">taut</span></a><br/>
+| <a name="TautAnd"><span class="id" title="constructor">TautAnd</span></a> : <a class="idref" href="Cpdt.Reflection.html#taut"><span class="id" title="inductive">taut</span></a> <span class="id" title="notation">→</span> <a class="idref" href="Cpdt.Reflection.html#taut"><span class="id" title="inductive">taut</span></a> <span class="id" title="notation">→</span> <a class="idref" href="Cpdt.Reflection.html#taut"><span class="id" title="inductive">taut</span></a><br/>
+| <a name="TautOr"><span class="id" title="constructor">TautOr</span></a> : <a class="idref" href="Cpdt.Reflection.html#taut"><span class="id" title="inductive">taut</span></a> <span class="id" title="notation">→</span> <a class="idref" href="Cpdt.Reflection.html#taut"><span class="id" title="inductive">taut</span></a> <span class="id" title="notation">→</span> <a class="idref" href="Cpdt.Reflection.html#taut"><span class="id" title="inductive">taut</span></a><br/>
+| <a name="TautImp"><span class="id" title="constructor">TautImp</span></a> : <a class="idref" href="Cpdt.Reflection.html#taut"><span class="id" title="inductive">taut</span></a> <span class="id" title="notation">→</span> <a class="idref" href="Cpdt.Reflection.html#taut"><span class="id" title="inductive">taut</span></a> <span class="id" title="notation">→</span> <a class="idref" href="Cpdt.Reflection.html#taut"><span class="id" title="inductive">taut</span></a>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+この構文を <i>reflect</i> <i>リフレクト</i> して <span class="inlinecode"><span class="id" title="keyword">Prop</span></span>に戻すための再帰関数を書きます。
+このような関数は
+ <i>interpretation functions</i> <i>翻訳関数</i>
+とも呼ばれ、前の例で、小さなプログラミング言語に意味論を与えるために使用しています。
+ 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Fixpoint</span> <a name="tautDenote"><span class="id" title="definition">tautDenote</span></a> (<span class="id" title="var">t</span> : <a class="idref" href="Cpdt.Reflection.html#taut"><span class="id" title="inductive">taut</span></a>) : <span class="id" title="keyword">Prop</span> :=<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">match</span> <a class="idref" href="Cpdt.Reflection.html#t"><span class="id" title="variable">t</span></a> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <a class="idref" href="Cpdt.Reflection.html#TautTrue"><span class="id" title="constructor">TautTrue</span></a> ⇒ <span class="id" title="inductive">True</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <a class="idref" href="Cpdt.Reflection.html#TautAnd"><span class="id" title="constructor">TautAnd</span></a> <span class="id" title="var">t1</span> <span class="id" title="var">t2</span> ⇒ <a class="idref" href="Cpdt.Reflection.html#tautDenote"><span class="id" title="definition">tautDenote</span></a> <span class="id" title="var">t1</span> <span class="id" title="notation">∧</span> <a class="idref" href="Cpdt.Reflection.html#tautDenote"><span class="id" title="definition">tautDenote</span></a> <span class="id" title="var">t2</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <a class="idref" href="Cpdt.Reflection.html#TautOr"><span class="id" title="constructor">TautOr</span></a> <span class="id" title="var">t1</span> <span class="id" title="var">t2</span> ⇒ <a class="idref" href="Cpdt.Reflection.html#tautDenote"><span class="id" title="definition">tautDenote</span></a> <span class="id" title="var">t1</span> <span class="id" title="notation">∨</span> <a class="idref" href="Cpdt.Reflection.html#tautDenote"><span class="id" title="definition">tautDenote</span></a> <span class="id" title="var">t2</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <a class="idref" href="Cpdt.Reflection.html#TautImp"><span class="id" title="constructor">TautImp</span></a> <span class="id" title="var">t1</span> <span class="id" title="var">t2</span> ⇒ <a class="idref" href="Cpdt.Reflection.html#tautDenote"><span class="id" title="definition">tautDenote</span></a> <span class="id" title="var">t1</span> <span class="id" title="notation">→</span> <a class="idref" href="Cpdt.Reflection.html#tautDenote"><span class="id" title="definition">tautDenote</span></a> <span class="id" title="var">t2</span><br/>
+&nbsp;&nbsp;<span class="id" title="keyword">end</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+<span class="inlinecode"><a class="idref" href="Cpdt.Reflection.html#tautDenote"><span class="id" title="definition">tautDenote</span></a></span>の範囲のすべての式が真であることを証明するのは簡単です。
+
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Theorem</span> <a name="tautTrue"><span class="id" title="lemma">tautTrue</span></a> : <span class="id" title="keyword">∀</span> <span class="id" title="var">t</span>, <a class="idref" href="Cpdt.Reflection.html#tautDenote"><span class="id" title="definition">tautDenote</span></a> <a class="idref" href="Cpdt.Reflection.html#t"><span class="id" title="variable">t</span></a>.<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">induction</span> <span class="id" title="var">t</span>; <span class="id" title="var">crush</span>.<br/>
+<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+特定の式を証明するために<span class="inlinecode"><a class="idref" href="Cpdt.Reflection.html#tautTrue"><span class="id" title="lemma">tautTrue</span></a></span>を使用するには、
+その構文を具象化する手順(reification process)を実装する必要があります。
+再帰的なLtac関数がその仕事をします。
+ 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Ltac</span> <span class="id" title="var">tautReify</span> <span class="id" title="var">P</span> :=<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">match</span> <span class="id" title="var">P</span> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="inductive">True</span> ⇒ <span class="id" title="var">TautTrue</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| ?<span class="id" title="var">P1</span> <span class="id" title="notation">∧</span> ?<span class="id" title="var">P2</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">let</span> <span class="id" title="var">t1</span> := <span class="id" title="var">tautReify</span> <span class="id" title="var">P1</span> <span class="id" title="keyword">in</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">let</span> <span class="id" title="var">t2</span> := <span class="id" title="var">tautReify</span> <span class="id" title="var">P2</span> <span class="id" title="keyword">in</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">constr</span>:(<a class="idref" href="Cpdt.Reflection.html#TautAnd"><span class="id" title="constructor">TautAnd</span></a> <span class="id" title="var">t1</span> <span class="id" title="var">t2</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| ?<span class="id" title="var">P1</span> <span class="id" title="notation">∨</span> ?<span class="id" title="var">P2</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">let</span> <span class="id" title="var">t1</span> := <span class="id" title="var">tautReify</span> <span class="id" title="var">P1</span> <span class="id" title="keyword">in</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">let</span> <span class="id" title="var">t2</span> := <span class="id" title="var">tautReify</span> <span class="id" title="var">P2</span> <span class="id" title="keyword">in</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">constr</span>:(<a class="idref" href="Cpdt.Reflection.html#TautOr"><span class="id" title="constructor">TautOr</span></a> <span class="id" title="var">t1</span> <span class="id" title="var">t2</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| ?<span class="id" title="var">P1</span> <span class="id" title="notation">→</span> ?<span class="id" title="var">P2</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">let</span> <span class="id" title="var">t1</span> := <span class="id" title="var">tautReify</span> <span class="id" title="var">P1</span> <span class="id" title="keyword">in</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">let</span> <span class="id" title="var">t2</span> := <span class="id" title="var">tautReify</span> <span class="id" title="var">P2</span> <span class="id" title="keyword">in</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">constr</span>:(<a class="idref" href="Cpdt.Reflection.html#TautImp"><span class="id" title="constructor">TautImp</span></a> <span class="id" title="var">t1</span> <span class="id" title="var">t2</span>)<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">end</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+<span class="inlinecode"><span class="id" title="var">tautReify</span></span>が利用可能なので、
+リフレクティブなタクティクを終わらせるのは簡単です。
+ゴールの式を見て、それを具象化(reify)し、その具象化した式に<span class="inlinecode"><a class="idref" href="Cpdt.Reflection.html#tautTrue"><span class="id" title="lemma">tautTrue</span></a></span>を適用します。
+ 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Ltac</span> <span class="id" title="var">obvious</span> :=<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">match</span> <span class="id" title="keyword">goal</span> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| [ |- ?<span class="id" title="var">P</span> ] ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">let</span> <span class="id" title="var">t</span> := <span class="id" title="var">tautReify</span> <span class="id" title="var">P</span> <span class="id" title="keyword">in</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">exact</span> (<a class="idref" href="Cpdt.Reflection.html#tautTrue"><span class="id" title="lemma">tautTrue</span></a> <span class="id" title="var">t</span>)<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">end</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+証明項の詳細は言及せずに、
+<span class="inlinecode"><a class="idref" href="Cpdt.Predicates.html#obvious"><span class="id" title="lemma">obvious</span></a></span> がもとの例を解くことを証明することができます。
+
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Theorem</span> <a name="true_galore'"><span class="id" title="lemma">true_galore'</span></a> : <span class="id" title="notation">(</span><span class="id" title="inductive">True</span> <span class="id" title="notation">∧</span> <span class="id" title="inductive">True</span><span class="id" title="notation">)</span> <span class="id" title="notation">→</span> <span class="id" title="notation">(</span><span class="id" title="inductive">True</span> <span class="id" title="notation">∨</span> <span class="id" title="notation">(</span><span class="id" title="inductive">True</span> <span class="id" title="notation">∧</span> <span class="id" title="notation">(</span><span class="id" title="inductive">True</span> <span class="id" title="notation">→</span> <span class="id" title="inductive">True</span><span class="id" title="notation">)</span><span class="id" title="notation">)</span><span class="id" title="notation">)</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="var">obvious</span>.<br/>
+<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Print</span> <a class="idref" href="Cpdt.Reflection.html#true_galore'"><span class="id" title="lemma">true_galore'</span></a>.<br/>
+</div>
+
+<div class="doc">
+ <br/>
+<span class="inlinecode"><a class="idref" href="Cpdt.Reflection.html#true_galore'"><span class="id" title="lemma">true_galore'</span></a> = <br/>
+<a class="idref" href="Cpdt.Reflection.html#tautTrue"><span class="id" title="lemma">tautTrue</span></a><br/>
+&nbsp;&nbsp;(<a class="idref" href="Cpdt.Reflection.html#TautImp"><span class="id" title="constructor">TautImp</span></a> (<a class="idref" href="Cpdt.Reflection.html#TautAnd"><span class="id" title="constructor">TautAnd</span></a> <a class="idref" href="Cpdt.Reflection.html#TautTrue"><span class="id" title="constructor">TautTrue</span></a> <a class="idref" href="Cpdt.Reflection.html#TautTrue"><span class="id" title="constructor">TautTrue</span></a>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<a class="idref" href="Cpdt.Reflection.html#TautOr"><span class="id" title="constructor">TautOr</span></a> <a class="idref" href="Cpdt.Reflection.html#TautTrue"><span class="id" title="constructor">TautTrue</span></a> (<a class="idref" href="Cpdt.Reflection.html#TautAnd"><span class="id" title="constructor">TautAnd</span></a> <a class="idref" href="Cpdt.Reflection.html#TautTrue"><span class="id" title="constructor">TautTrue</span></a> (<a class="idref" href="Cpdt.Reflection.html#TautImp"><span class="id" title="constructor">TautImp</span></a> <a class="idref" href="Cpdt.Reflection.html#TautTrue"><span class="id" title="constructor">TautTrue</span></a> <a class="idref" href="Cpdt.Reflection.html#TautTrue"><span class="id" title="constructor">TautTrue</span></a>))))<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: <span class="id" title="inductive">True</span> ∧ <span class="id" title="inductive">True</span> → <span class="id" title="inductive">True</span> ∨ <span class="id" title="inductive">True</span> ∧ (<span class="id" title="inductive">True</span> → <span class="id" title="inductive">True</span>)
+<div class="paragraph"> </div>
+
+</span>
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+純粋なLtacによる実装で、リフレクティブなタクティクがどのように改善するかを考える価値があります。
+式の具象化の手順は以前と同じようにアドホックなので、
+そこではほとんど利益を得ることはできません。
+一般に、証明は数式の変換よりも複雑になります。
+ここで適用する「一般的な証明の規則 (generic proof rule)」は、
+再帰的なLtac関数よりもはるかに優れた正式な基礎に当てはまります。
+依存型の証明は、どの入力式でも「機能する」ことを保証します。
+この利点は、すでに見てきた、証明のサイズの改善に加えられます。
+
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+以前の例の偶数性のテストでは、
+検証された決定手続きが証明できない入力ゴールを
+健全に処理する(sound handling)ために関数<span class="inlinecode"><a class="idref" href="Cpdt.Reflection.html#partialOut"><span class="id" title="definition">partialOut</span></a></span>を使用していたことを指摘する価値があります。
+ここで、手続き <span class="inlinecode"><a class="idref" href="Cpdt.Reflection.html#tautTrue"><span class="id" title="lemma">tautTrue</span></a></span> 
+（帰納的証明は再帰的手続きと見なすことができることを思い出してください）
+は、<span class="inlinecode"><a class="idref" href="Cpdt.Reflection.html#taut"><span class="id" title="inductive">taut</span></a></span>で表現できるどんなゴールをも証明できるので、余分なステップは必要ありません。
+
+<div class="paragraph"> </div>
+
+ 
+</div>
+<div class="code">
+</div>
+
+<div class="doc">
+<a name="lab86"></a><h1 class="section">モノイド式の簡略化</h1>
+
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+リフレクションによる証明では、ゴールの中のすべての構文をエンコードする必要はありません。
+特殊な推論を適用できない場合でも、任意の断片が注入(injection)を許すために、
+構文の型に「変数」を挿入することができます。
+その可能性を、モノイドの等式(monoid equations)を正規化するための
+タクティクを書くことによって探求します。
+ 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Section</span> <a name="monoid"><span class="id" title="section">monoid</span></a>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Variable</span> <a name="monoid.A"><span class="id" title="variable">A</span></a> : <span class="id" title="keyword">Set</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Variable</span> <a name="monoid.e"><span class="id" title="variable">e</span></a> : <a class="idref" href="Cpdt.Reflection.html#monoid.A"><span class="id" title="variable">A</span></a>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Variable</span> <a name="monoid.f"><span class="id" title="variable">f</span></a> : <a class="idref" href="Cpdt.Reflection.html#monoid.A"><span class="id" title="variable">A</span></a> <span class="id" title="notation">→</span> <a class="idref" href="Cpdt.Reflection.html#monoid.A"><span class="id" title="variable">A</span></a> <span class="id" title="notation">→</span> <a class="idref" href="Cpdt.Reflection.html#monoid.A"><span class="id" title="variable">A</span></a>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Infix</span> <a name="7cafb07e26cd240f413c4e2b33e511fb"><span class="id" title="notation">&quot;</span></a>+" := <a class="idref" href="Cpdt.Reflection.html#monoid.f"><span class="id" title="variable">f</span></a>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Hypothesis</span> <a name="monoid.assoc"><span class="id" title="variable">assoc</span></a> : <span class="id" title="keyword">∀</span> <span class="id" title="var">a</span> <span class="id" title="var">b</span> <span class="id" title="var">c</span>, <a class="idref" href="Cpdt.Reflection.html#7cafb07e26cd240f413c4e2b33e511fb"><span class="id" title="notation">(</span></a><a class="idref" href="Cpdt.Reflection.html#a"><span class="id" title="variable">a</span></a> <a class="idref" href="Cpdt.Reflection.html#7cafb07e26cd240f413c4e2b33e511fb"><span class="id" title="notation">+</span></a> <a class="idref" href="Cpdt.Reflection.html#b"><span class="id" title="variable">b</span></a><a class="idref" href="Cpdt.Reflection.html#7cafb07e26cd240f413c4e2b33e511fb"><span class="id" title="notation">)</span></a> <a class="idref" href="Cpdt.Reflection.html#7cafb07e26cd240f413c4e2b33e511fb"><span class="id" title="notation">+</span></a> <a class="idref" href="Cpdt.Reflection.html#c"><span class="id" title="variable">c</span></a> <span class="id" title="notation">=</span> <a class="idref" href="Cpdt.Reflection.html#a"><span class="id" title="variable">a</span></a> <a class="idref" href="Cpdt.Reflection.html#7cafb07e26cd240f413c4e2b33e511fb"><span class="id" title="notation">+</span></a> <a class="idref" href="Cpdt.Reflection.html#7cafb07e26cd240f413c4e2b33e511fb"><span class="id" title="notation">(</span></a><a class="idref" href="Cpdt.Reflection.html#b"><span class="id" title="variable">b</span></a> <a class="idref" href="Cpdt.Reflection.html#7cafb07e26cd240f413c4e2b33e511fb"><span class="id" title="notation">+</span></a> <a class="idref" href="Cpdt.Reflection.html#c"><span class="id" title="variable">c</span></a><a class="idref" href="Cpdt.Reflection.html#7cafb07e26cd240f413c4e2b33e511fb"><span class="id" title="notation">)</span></a>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Hypothesis</span> <a name="monoid.identl"><span class="id" title="variable">identl</span></a> : <span class="id" title="keyword">∀</span> <span class="id" title="var">a</span>, <a class="idref" href="Cpdt.Reflection.html#monoid.e"><span class="id" title="variable">e</span></a> <a class="idref" href="Cpdt.Reflection.html#7cafb07e26cd240f413c4e2b33e511fb"><span class="id" title="notation">+</span></a> <a class="idref" href="Cpdt.Reflection.html#a"><span class="id" title="variable">a</span></a> <span class="id" title="notation">=</span> <a class="idref" href="Cpdt.Reflection.html#a"><span class="id" title="variable">a</span></a>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Hypothesis</span> <a name="monoid.identr"><span class="id" title="variable">identr</span></a> : <span class="id" title="keyword">∀</span> <span class="id" title="var">a</span>, <a class="idref" href="Cpdt.Reflection.html#a"><span class="id" title="variable">a</span></a> <a class="idref" href="Cpdt.Reflection.html#7cafb07e26cd240f413c4e2b33e511fb"><span class="id" title="notation">+</span></a> <a class="idref" href="Cpdt.Reflection.html#monoid.e"><span class="id" title="variable">e</span></a> <span class="id" title="notation">=</span> <a class="idref" href="Cpdt.Reflection.html#a"><span class="id" title="variable">a</span></a>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+モノイドの代数構造の任意のインスタンスを特徴付ける変数と仮説を追加します。
+結合法則を満たす(associative)2項演算子とそれに対する単位元があります。
+
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+モノイドの式についての木の型の式を定義するのは簡単です。
+<span class="inlinecode"><a class="idref" href="Cpdt.ProgLang.html#HigherOrder.Var"><span class="id" title="constructor">Var</span></a></span>コンストラクタは、私たちがモデル化できない部分式の「キャッチ・オール」ケースです。
+これらの部分式は、実際のGallina変数であるべきで、また、
+私たちのタクティクが理解できない関数を使うことができます。
+   
+</div>
+<div class="code">
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Inductive</span> <a name="mexp"><span class="id" title="inductive">mexp</span></a> : <span class="id" title="keyword">Set</span> :=<br/>
+&nbsp;&nbsp;| <a name="Ident"><span class="id" title="constructor">Ident</span></a> : <a class="idref" href="Cpdt.Reflection.html#mexp"><span class="id" title="inductive">mexp</span></a><br/>
+&nbsp;&nbsp;| <a name="Var"><span class="id" title="constructor">Var</span></a> : <a class="idref" href="Cpdt.Reflection.html#monoid.A"><span class="id" title="variable">A</span></a> <span class="id" title="notation">→</span> <a class="idref" href="Cpdt.Reflection.html#mexp"><span class="id" title="inductive">mexp</span></a><br/>
+&nbsp;&nbsp;| <a name="Op"><span class="id" title="constructor">Op</span></a> : <a class="idref" href="Cpdt.Reflection.html#mexp"><span class="id" title="inductive">mexp</span></a> <span class="id" title="notation">→</span> <a class="idref" href="Cpdt.Reflection.html#mexp"><span class="id" title="inductive">mexp</span></a> <span class="id" title="notation">→</span> <a class="idref" href="Cpdt.Reflection.html#mexp"><span class="id" title="inductive">mexp</span></a>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+次に、翻訳関数(interpretation function)を書きます。
+   
+</div>
+<div class="code">
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Fixpoint</span> <a name="mdenote"><span class="id" title="definition">mdenote</span></a> (<span class="id" title="var">me</span> : <a class="idref" href="Cpdt.Reflection.html#mexp"><span class="id" title="inductive">mexp</span></a>) : <a class="idref" href="Cpdt.Reflection.html#monoid.A"><span class="id" title="variable">A</span></a> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">match</span> <a class="idref" href="Cpdt.Reflection.html#me"><span class="id" title="variable">me</span></a> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <a class="idref" href="Cpdt.Reflection.html#Ident"><span class="id" title="constructor">Ident</span></a> ⇒ <a class="idref" href="Cpdt.Reflection.html#monoid.e"><span class="id" title="variable">e</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <a class="idref" href="Cpdt.Reflection.html#Var"><span class="id" title="constructor">Var</span></a> <span class="id" title="var">v</span> ⇒ <span class="id" title="var">v</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <a class="idref" href="Cpdt.Reflection.html#Op"><span class="id" title="constructor">Op</span></a> <span class="id" title="var">me1</span> <span class="id" title="var">me2</span> ⇒ <a class="idref" href="Cpdt.Reflection.html#mdenote"><span class="id" title="definition">mdenote</span></a> <span class="id" title="var">me1</span> <a class="idref" href="Cpdt.Reflection.html#7cafb07e26cd240f413c4e2b33e511fb"><span class="id" title="notation">+</span></a> <a class="idref" href="Cpdt.Reflection.html#mdenote"><span class="id" title="definition">mdenote</span></a> <span class="id" title="var">me2</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">end</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+結合法則を使って(via associativity)式をリストにフラット化(flattening)することで式を
+正規化するので、モノイドの値のリストのための表示関数(denotation function)があると便利です。
+   
+</div>
+<div class="code">
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Fixpoint</span> <a name="mldenote"><span class="id" title="definition">mldenote</span></a> (<span class="id" title="var">ls</span> : <span class="id" title="inductive">list</span> <a class="idref" href="Cpdt.Reflection.html#monoid.A"><span class="id" title="variable">A</span></a>) : <a class="idref" href="Cpdt.Reflection.html#monoid.A"><span class="id" title="variable">A</span></a> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">match</span> <a class="idref" href="Cpdt.Reflection.html#ls"><span class="id" title="variable">ls</span></a> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="constructor">nil</span> ⇒ <a class="idref" href="Cpdt.Reflection.html#monoid.e"><span class="id" title="variable">e</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="var">x</span> <span class="id" title="notation">::</span> <span class="id" title="var">ls'</span> ⇒ <span class="id" title="var">x</span> <a class="idref" href="Cpdt.Reflection.html#7cafb07e26cd240f413c4e2b33e511fb"><span class="id" title="notation">+</span></a> <a class="idref" href="Cpdt.Reflection.html#mldenote"><span class="id" title="definition">mldenote</span></a> <span class="id" title="var">ls'</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">end</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+フラット化関数は、それ自体、実装するのに簡単です。
+
+</div>
+<div class="code">
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Fixpoint</span> <a name="flatten"><span class="id" title="definition">flatten</span></a> (<span class="id" title="var">me</span> : <a class="idref" href="Cpdt.Reflection.html#mexp"><span class="id" title="inductive">mexp</span></a>) : <span class="id" title="inductive">list</span> <a class="idref" href="Cpdt.Reflection.html#monoid.A"><span class="id" title="variable">A</span></a> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">match</span> <a class="idref" href="Cpdt.Reflection.html#me"><span class="id" title="variable">me</span></a> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <a class="idref" href="Cpdt.Reflection.html#Ident"><span class="id" title="constructor">Ident</span></a> ⇒ <span class="id" title="constructor">nil</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <a class="idref" href="Cpdt.Reflection.html#Var"><span class="id" title="constructor">Var</span></a> <span class="id" title="var">x</span> ⇒ <span class="id" title="var">x</span> <span class="id" title="notation">::</span> <span class="id" title="constructor">nil</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <a class="idref" href="Cpdt.Reflection.html#Op"><span class="id" title="constructor">Op</span></a> <span class="id" title="var">me1</span> <span class="id" title="var">me2</span> ⇒ <a class="idref" href="Cpdt.Reflection.html#flatten"><span class="id" title="definition">flatten</span></a> <span class="id" title="var">me1</span> <span class="id" title="notation">++</span> <a class="idref" href="Cpdt.Reflection.html#flatten"><span class="id" title="definition">flatten</span></a> <span class="id" title="var">me2</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">end</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+  この関数は、私たちの <span class="inlinecode">表示(<a class="idref" href="Cpdt.Generic.html#denote"><span class="id" title="section">denote</span></a>)</span> 関数に関して簡単な正当性証明を持っています。
+
+</div>
+<div class="code">
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <a name="flatten_correct'"><span class="id" title="lemma">flatten_correct'</span></a> : <span class="id" title="keyword">∀</span> <span class="id" title="var">ml2</span> <span class="id" title="var">ml1</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="Cpdt.Reflection.html#mldenote"><span class="id" title="definition">mldenote</span></a> <a class="idref" href="Cpdt.Reflection.html#ml1"><span class="id" title="variable">ml1</span></a> <a class="idref" href="Cpdt.Reflection.html#7cafb07e26cd240f413c4e2b33e511fb"><span class="id" title="notation">+</span></a> <a class="idref" href="Cpdt.Reflection.html#mldenote"><span class="id" title="definition">mldenote</span></a> <a class="idref" href="Cpdt.Reflection.html#ml2"><span class="id" title="variable">ml2</span></a> <span class="id" title="notation">=</span> <a class="idref" href="Cpdt.Reflection.html#mldenote"><span class="id" title="definition">mldenote</span></a> (<a class="idref" href="Cpdt.Reflection.html#ml1"><span class="id" title="variable">ml1</span></a> <span class="id" title="notation">++</span> <a class="idref" href="Cpdt.Reflection.html#ml2"><span class="id" title="variable">ml2</span></a>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">induction</span> <span class="id" title="var">ml1</span>; <span class="id" title="var">crush</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Theorem</span> <a name="flatten_correct"><span class="id" title="lemma">flatten_correct</span></a> : <span class="id" title="keyword">∀</span> <span class="id" title="var">me</span>, <a class="idref" href="Cpdt.Reflection.html#mdenote"><span class="id" title="definition">mdenote</span></a> <a class="idref" href="Cpdt.Reflection.html#me"><span class="id" title="variable">me</span></a> <span class="id" title="notation">=</span> <a class="idref" href="Cpdt.Reflection.html#mldenote"><span class="id" title="definition">mldenote</span></a> (<a class="idref" href="Cpdt.Reflection.html#flatten"><span class="id" title="definition">flatten</span></a> <a class="idref" href="Cpdt.Reflection.html#me"><span class="id" title="variable">me</span></a>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Hint Resolve</span> <span class="id" title="var">flatten_correct'</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">induction</span> <span class="id" title="var">me</span>; <span class="id" title="var">crush</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+  
+<div class="paragraph"> </div>
+
+簡約化タクティクの主な道具となる定理を証明するのは簡単です。
+
+</div>
+<div class="code">
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Theorem</span> <a name="monoid_reflect"><span class="id" title="lemma">monoid_reflect</span></a> : <span class="id" title="keyword">∀</span> <span class="id" title="var">me1</span> <span class="id" title="var">me2</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="Cpdt.Reflection.html#mldenote"><span class="id" title="definition">mldenote</span></a> (<a class="idref" href="Cpdt.Reflection.html#flatten"><span class="id" title="definition">flatten</span></a> <a class="idref" href="Cpdt.Reflection.html#me1"><span class="id" title="variable">me1</span></a>) <span class="id" title="notation">=</span> <a class="idref" href="Cpdt.Reflection.html#mldenote"><span class="id" title="definition">mldenote</span></a> (<a class="idref" href="Cpdt.Reflection.html#flatten"><span class="id" title="definition">flatten</span></a> <a class="idref" href="Cpdt.Reflection.html#me2"><span class="id" title="variable">me2</span></a>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="notation">→</span> <a class="idref" href="Cpdt.Reflection.html#mdenote"><span class="id" title="definition">mdenote</span></a> <a class="idref" href="Cpdt.Reflection.html#me1"><span class="id" title="variable">me1</span></a> <span class="id" title="notation">=</span> <a class="idref" href="Cpdt.Reflection.html#mdenote"><span class="id" title="definition">mdenote</span></a> <a class="idref" href="Cpdt.Reflection.html#me2"><span class="id" title="variable">me2</span></a>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">intros</span>; <span class="id" title="tactic">repeat</span> <span class="id" title="tactic">rewrite</span> <a class="idref" href="Cpdt.Reflection.html#flatten_correct"><span class="id" title="lemma">flatten_correct</span></a>; <span class="id" title="tactic">assumption</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+  
+<div class="paragraph"> </div>
+
+<span class="inlinecode"><a class="idref" href="Cpdt.Reflection.html#mexp"><span class="id" title="inductive">mexp</span></a></span> 型への具象化を実装します。
+   
+</div>
+<div class="code">
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Ltac</span> <span class="id" title="var">reify</span> <span class="id" title="var">me</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">match</span> <span class="id" title="var">me</span> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <a class="idref" href="Cpdt.Reflection.html#monoid.e"><span class="id" title="variable">e</span></a> ⇒ <span class="id" title="var">Ident</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| ?<span class="id" title="var">me1</span> <a class="idref" href="Cpdt.Reflection.html#7cafb07e26cd240f413c4e2b33e511fb"><span class="id" title="notation">+</span></a> ?<span class="id" title="var">me2</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">let</span> <span class="id" title="var">r1</span> := <span class="id" title="var">reify</span> <span class="id" title="var">me1</span> <span class="id" title="keyword">in</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">let</span> <span class="id" title="var">r2</span> := <span class="id" title="var">reify</span> <span class="id" title="var">me2</span> <span class="id" title="keyword">in</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">constr</span>:(<a class="idref" href="Cpdt.Reflection.html#Op"><span class="id" title="constructor">Op</span></a> <span class="id" title="var">r1</span> <span class="id" title="var">r2</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="var">_</span> ⇒ <span class="id" title="keyword">constr</span>:(<a class="idref" href="Cpdt.Reflection.html#Var"><span class="id" title="constructor">Var</span></a> <span class="id" title="var">me</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">end</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+最終的な<span class="inlinecode"><a class="idref" href="Cpdt.Reflection.html#monoid"><span class="id" title="section">monoid</span></a></span>タクティクは、モノイドの項のふたつからなる等式のゴールに作用します。
+それぞれを具象化(reify)し、<span class="inlinecode"><a class="idref" href="Cpdt.Reflection.html#monoid_reflect"><span class="id" title="lemma">monoid_reflect</span></a></span>を適用し、<span class="inlinecode"><a class="idref" href="Cpdt.Reflection.html#mldenote"><span class="id" title="definition">mldenote</span></a></span>使って簡単化することで、
+ゴールが具現化したバージョンを参照するように変更します。
+<span class="inlinecode"><span class="id" title="tactic">change</span></span> タクティクは、
+結論の式を定義として等しいものに置き換えることを思い出してください。
+   
+</div>
+<div class="code">
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Ltac</span> <span class="id" title="var">monoid</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">match</span> <span class="id" title="keyword">goal</span> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| [ |- ?<span class="id" title="var">me1</span> <span class="id" title="notation">=</span> ?<span class="id" title="var">me2</span> ] ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">let</span> <span class="id" title="var">r1</span> := <span class="id" title="var">reify</span> <span class="id" title="var">me1</span> <span class="id" title="keyword">in</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">let</span> <span class="id" title="var">r2</span> := <span class="id" title="var">reify</span> <span class="id" title="var">me2</span> <span class="id" title="keyword">in</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">change</span> (<a class="idref" href="Cpdt.Reflection.html#mdenote"><span class="id" title="definition">mdenote</span></a> <span class="id" title="var">r1</span> <span class="id" title="notation">=</span> <a class="idref" href="Cpdt.Reflection.html#mdenote"><span class="id" title="definition">mdenote</span></a> <span class="id" title="var">r2</span>);<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">apply</span> <a class="idref" href="Cpdt.Reflection.html#monoid_reflect"><span class="id" title="lemma">monoid_reflect</span></a>; <span class="id" title="tactic">simpl</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">end</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+このような定理の短い作業をすることができます：
+
+</div>
+<div class="code">
+
+<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Theorem</span> <a name="t1"><span class="id" title="lemma">t1</span></a> : <span class="id" title="keyword">∀</span> <span class="id" title="var">a</span> <span class="id" title="var">b</span> <span class="id" title="var">c</span> <span class="id" title="var">d</span>, <a class="idref" href="Cpdt.Reflection.html#a"><span class="id" title="variable">a</span></a> <a class="idref" href="Cpdt.Reflection.html#7cafb07e26cd240f413c4e2b33e511fb"><span class="id" title="notation">+</span></a> <a class="idref" href="Cpdt.Reflection.html#b"><span class="id" title="variable">b</span></a> <a class="idref" href="Cpdt.Reflection.html#7cafb07e26cd240f413c4e2b33e511fb"><span class="id" title="notation">+</span></a> <a class="idref" href="Cpdt.Reflection.html#c"><span class="id" title="variable">c</span></a> <a class="idref" href="Cpdt.Reflection.html#7cafb07e26cd240f413c4e2b33e511fb"><span class="id" title="notation">+</span></a> <a class="idref" href="Cpdt.Reflection.html#d"><span class="id" title="variable">d</span></a> <span class="id" title="notation">=</span> <a class="idref" href="Cpdt.Reflection.html#a"><span class="id" title="variable">a</span></a> <a class="idref" href="Cpdt.Reflection.html#7cafb07e26cd240f413c4e2b33e511fb"><span class="id" title="notation">+</span></a> <a class="idref" href="Cpdt.Reflection.html#7cafb07e26cd240f413c4e2b33e511fb"><span class="id" title="notation">(</span></a><a class="idref" href="Cpdt.Reflection.html#b"><span class="id" title="variable">b</span></a> <a class="idref" href="Cpdt.Reflection.html#7cafb07e26cd240f413c4e2b33e511fb"><span class="id" title="notation">+</span></a> <a class="idref" href="Cpdt.Reflection.html#c"><span class="id" title="variable">c</span></a><a class="idref" href="Cpdt.Reflection.html#7cafb07e26cd240f413c4e2b33e511fb"><span class="id" title="notation">)</span></a> <a class="idref" href="Cpdt.Reflection.html#7cafb07e26cd240f413c4e2b33e511fb"><span class="id" title="notation">+</span></a> <a class="idref" href="Cpdt.Reflection.html#d"><span class="id" title="variable">d</span></a>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">intros</span>; <span class="id" title="var">monoid</span>.<br/>
+</div>
+
+<div class="doc">
+<br/>
+<span class="inlinecode">&nbsp;&nbsp;============================<br/>
+&nbsp;&nbsp;&nbsp;<a class="idref" href="Cpdt.GeneralRec.html#a"><span class="id" title="variable">a</span></a> + (<a class="idref" href="Cpdt.StackMachine.html#b"><span class="id" title="variable">b</span></a> + (<a class="idref" href="Cpdt.Coinductive.html#c"><span class="id" title="variable">c</span></a> + (<a class="idref" href="Cpdt.MoreDep.html#d"><span class="id" title="variable">d</span></a> + <a class="idref" href="Cpdt.Reflection.html#monoid.e"><span class="id" title="variable">e</span></a>))) = <a class="idref" href="Cpdt.GeneralRec.html#a"><span class="id" title="variable">a</span></a> + (<a class="idref" href="Cpdt.StackMachine.html#b"><span class="id" title="variable">b</span></a> + (<a class="idref" href="Cpdt.Coinductive.html#c"><span class="id" title="variable">c</span></a> + (<a class="idref" href="Cpdt.MoreDep.html#d"><span class="id" title="variable">d</span></a> + <a class="idref" href="Cpdt.Reflection.html#monoid.e"><span class="id" title="variable">e</span></a>)))<br/>
+&nbsp;
+<div class="paragraph"> </div>
+
+</span>
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+monoidタクティクは、等式の両辺を正準化(canonicalized)しているので、
+反射性(reflexivity)によって証明を完成させることができます。
+
+</div>
+<div class="code">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">reflexivity</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+証明の形式(the form)を見るのは面白いです。
+
+</div>
+<div class="code">
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Print</span> <a class="idref" href="Cpdt.Reflection.html#t1"><span class="id" title="lemma">t1</span></a>.<br/>
+</div>
+
+<div class="doc">
+ <br/>
+<span class="inlinecode"><a class="idref" href="Cpdt.Reflection.html#t1"><span class="id" title="lemma">t1</span></a> = <br/>
+<span class="id" title="keyword">fun</span> <a class="idref" href="Cpdt.GeneralRec.html#a"><span class="id" title="variable">a</span></a> <a class="idref" href="Cpdt.StackMachine.html#b"><span class="id" title="variable">b</span></a> <a class="idref" href="Cpdt.Coinductive.html#c"><span class="id" title="variable">c</span></a> <a class="idref" href="Cpdt.MoreDep.html#d"><span class="id" title="variable">d</span></a> : <a class="idref" href="Cpdt.ProgLang.html#Forall.A"><span class="id" title="variable">A</span></a> ⇒<br/>
+<a class="idref" href="Cpdt.Reflection.html#monoid_reflect"><span class="id" title="lemma">monoid_reflect</span></a> (<a class="idref" href="Cpdt.Reflection.html#Op"><span class="id" title="constructor">Op</span></a> (<a class="idref" href="Cpdt.Reflection.html#Op"><span class="id" title="constructor">Op</span></a> (<a class="idref" href="Cpdt.Reflection.html#Op"><span class="id" title="constructor">Op</span></a> (<a class="idref" href="Cpdt.ProgLang.html#HigherOrder.Var"><span class="id" title="constructor">Var</span></a> <a class="idref" href="Cpdt.GeneralRec.html#a"><span class="id" title="variable">a</span></a>) (<a class="idref" href="Cpdt.ProgLang.html#HigherOrder.Var"><span class="id" title="constructor">Var</span></a> <a class="idref" href="Cpdt.StackMachine.html#b"><span class="id" title="variable">b</span></a>)) (<a class="idref" href="Cpdt.ProgLang.html#HigherOrder.Var"><span class="id" title="constructor">Var</span></a> <a class="idref" href="Cpdt.Coinductive.html#c"><span class="id" title="variable">c</span></a>)) (<a class="idref" href="Cpdt.ProgLang.html#HigherOrder.Var"><span class="id" title="constructor">Var</span></a> <a class="idref" href="Cpdt.MoreDep.html#d"><span class="id" title="variable">d</span></a>))<br/>
+&nbsp;&nbsp;(<a class="idref" href="Cpdt.Reflection.html#Op"><span class="id" title="constructor">Op</span></a> (<a class="idref" href="Cpdt.Reflection.html#Op"><span class="id" title="constructor">Op</span></a> (<a class="idref" href="Cpdt.ProgLang.html#HigherOrder.Var"><span class="id" title="constructor">Var</span></a> <a class="idref" href="Cpdt.GeneralRec.html#a"><span class="id" title="variable">a</span></a>) (<a class="idref" href="Cpdt.Reflection.html#Op"><span class="id" title="constructor">Op</span></a> (<a class="idref" href="Cpdt.ProgLang.html#HigherOrder.Var"><span class="id" title="constructor">Var</span></a> <a class="idref" href="Cpdt.StackMachine.html#b"><span class="id" title="variable">b</span></a>) (<a class="idref" href="Cpdt.ProgLang.html#HigherOrder.Var"><span class="id" title="constructor">Var</span></a> <a class="idref" href="Cpdt.Coinductive.html#c"><span class="id" title="variable">c</span></a>))) (<a class="idref" href="Cpdt.ProgLang.html#HigherOrder.Var"><span class="id" title="constructor">Var</span></a> <a class="idref" href="Cpdt.MoreDep.html#d"><span class="id" title="variable">d</span></a>))<br/>
+&nbsp;&nbsp;(<a class="idref" href="Cpdt.Predicates.html#eq_refl"><span class="id" title="constructor">eq_refl</span></a> (<a class="idref" href="Cpdt.GeneralRec.html#a"><span class="id" title="variable">a</span></a> + (<a class="idref" href="Cpdt.StackMachine.html#b"><span class="id" title="variable">b</span></a> + (<a class="idref" href="Cpdt.Coinductive.html#c"><span class="id" title="variable">c</span></a> + (<a class="idref" href="Cpdt.MoreDep.html#d"><span class="id" title="variable">d</span></a> + <a class="idref" href="Cpdt.Reflection.html#monoid.e"><span class="id" title="variable">e</span></a>)))))<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: <span class="id" title="keyword">∀</span> <a class="idref" href="Cpdt.GeneralRec.html#a"><span class="id" title="variable">a</span></a> <a class="idref" href="Cpdt.StackMachine.html#b"><span class="id" title="variable">b</span></a> <a class="idref" href="Cpdt.Coinductive.html#c"><span class="id" title="variable">c</span></a> <a class="idref" href="Cpdt.MoreDep.html#d"><span class="id" title="variable">d</span></a> : <a class="idref" href="Cpdt.ProgLang.html#Forall.A"><span class="id" title="variable">A</span></a>, <a class="idref" href="Cpdt.GeneralRec.html#a"><span class="id" title="variable">a</span></a> + <a class="idref" href="Cpdt.StackMachine.html#b"><span class="id" title="variable">b</span></a> + <a class="idref" href="Cpdt.Coinductive.html#c"><span class="id" title="variable">c</span></a> + <a class="idref" href="Cpdt.MoreDep.html#d"><span class="id" title="variable">d</span></a> = <a class="idref" href="Cpdt.GeneralRec.html#a"><span class="id" title="variable">a</span></a> + (<a class="idref" href="Cpdt.StackMachine.html#b"><span class="id" title="variable">b</span></a> + <a class="idref" href="Cpdt.Coinductive.html#c"><span class="id" title="variable">c</span></a>) + <a class="idref" href="Cpdt.MoreDep.html#d"><span class="id" title="variable">d</span></a>
+<div class="paragraph"> </div>
+
+</span>
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+証明項は、具現化された形式の等式のオペランドの再記述だけを含み、
+共有された(shared)正準形(canonical form)への反射性の使用が続きます。
+   
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">End</span> <a class="idref" href="Cpdt.Reflection.html#monoid"><span class="id" title="section">monoid</span></a>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+この基本的なアプローチの拡張は、Coqでパッケージ化された、
+<span class="inlinecode"><span class="id" title="tactic">ring</span></span> と <span class="inlinecode"><span class="id" title="tactic">field</span></span> タクティク
+の実装で使われています。
+
+</div>
+<div class="code">
+
+<br/>
+</div>
+
+<div class="doc">
+<a name="lab87"></a><h1 class="section">賢いトートロジー・ソルバー</h1>
+
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+これで、以前のトートロジー・ソルバーの例を再検討する準備が整いました。 
+私たちは、真理が構文的に明らかでない式を含むようにタクティクの範囲を広げたいと考えています。
+最後の例で任意のモノイド式を許可したのと同じように、
+任意の式の注入(injection)を許可したいと思うでしょう。
+私たちはより豊かな理論で作業しているので、
+注入された異なる式の間で等値を使用できることが重要です。
+例えば、Gallina関数は、ふたつの<span class="inlinecode"><a class="idref" href="Cpdt.ProgLang.html#Forall.P"><span class="id" title="variable">P</span></a></span>が等しいかどうかを比較する方法がないため、
+式を<span class="inlinecode"><a class="idref" href="Cpdt.Reflection.html#Imp"><span class="id" title="constructor">Imp</span></a></span> <span class="inlinecode">(<a class="idref" href="Cpdt.ProgLang.html#HigherOrder.Var"><span class="id" title="constructor">Var</span></a></span> <span class="inlinecode"><a class="idref" href="Cpdt.ProgLang.html#Forall.P"><span class="id" title="variable">P</span></a>)</span> <span class="inlinecode">(<a class="idref" href="Cpdt.ProgLang.html#HigherOrder.Var"><span class="id" title="constructor">Var</span></a></span> <span class="inlinecode"><a class="idref" href="Cpdt.ProgLang.html#Forall.P"><span class="id" title="variable">P</span></a>)</span>のような値に変換することによって<span class="inlinecode"><a class="idref" href="Cpdt.ProgLang.html#Forall.P"><span class="id" title="variable">P</span></a></span> <span class="inlinecode">→</span> <span class="inlinecode"><a class="idref" href="Cpdt.ProgLang.html#Forall.P"><span class="id" title="variable">P</span></a></span>を証明することはできません。
+
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+これらの基準を満たす素晴らしい実装に到達するために、
+<span class="inlinecode"><span class="id" title="tactic">quote</span></span>
+タクティクとそれに関連するライブラリを紹介します。 
+ 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <span class="id" title="library">Quote</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Inductive</span> <a name="formula"><span class="id" title="inductive">formula</span></a> : <span class="id" title="keyword">Set</span> :=<br/>
+| <a name="Atomic"><span class="id" title="constructor">Atomic</span></a> : <span class="id" title="inductive">index</span> <span class="id" title="notation">→</span> <a class="idref" href="Cpdt.Reflection.html#formula"><span class="id" title="inductive">formula</span></a>                 <br/>
+| <a name="Truth"><span class="id" title="constructor">Truth</span></a> : <a class="idref" href="Cpdt.Reflection.html#formula"><span class="id" title="inductive">formula</span></a><br/>
+| <a name="Falsehood"><span class="id" title="constructor">Falsehood</span></a> : <a class="idref" href="Cpdt.Reflection.html#formula"><span class="id" title="inductive">formula</span></a><br/>
+| <a name="And"><span class="id" title="constructor">And</span></a> : <a class="idref" href="Cpdt.Reflection.html#formula"><span class="id" title="inductive">formula</span></a> <span class="id" title="notation">→</span> <a class="idref" href="Cpdt.Reflection.html#formula"><span class="id" title="inductive">formula</span></a> <span class="id" title="notation">→</span> <a class="idref" href="Cpdt.Reflection.html#formula"><span class="id" title="inductive">formula</span></a><br/>
+| <a name="Or"><span class="id" title="constructor">Or</span></a> : <a class="idref" href="Cpdt.Reflection.html#formula"><span class="id" title="inductive">formula</span></a> <span class="id" title="notation">→</span> <a class="idref" href="Cpdt.Reflection.html#formula"><span class="id" title="inductive">formula</span></a> <span class="id" title="notation">→</span> <a class="idref" href="Cpdt.Reflection.html#formula"><span class="id" title="inductive">formula</span></a><br/>
+| <a name="Imp"><span class="id" title="constructor">Imp</span></a> : <a class="idref" href="Cpdt.Reflection.html#formula"><span class="id" title="inductive">formula</span></a> <span class="id" title="notation">→</span> <a class="idref" href="Cpdt.Reflection.html#formula"><span class="id" title="inductive">formula</span></a> <span class="id" title="notation">→</span> <a class="idref" href="Cpdt.Reflection.html#formula"><span class="id" title="inductive">formula</span></a>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+<span class="inlinecode"><span class="id" title="tactic">quote</span></span> タクティクは<span class="inlinecode"><span class="id" title="keyword">Prop</span></span>から<span class="inlinecode"><span class="id" title="var">Formula</span></span>への単射(injection)を実装しますが、
+望むほどスマートではありません。 
+特に、関数型を特別に扱いたいので、
+関数型が構文的に符号化したい構造体の一部であれば混乱(confused)します。
+論理的な意味を表現するために関数型を使用することに気づかないように
+<span class="inlinecode"><span class="id" title="tactic">quote</span></span>することをトリックするには、
+最後の章で行ったように、含意のラッパー定義を宣言する必要があります。
+ 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Definition</span> <a name="imp"><span class="id" title="definition">imp</span></a> (<span class="id" title="var">P1</span> <span class="id" title="var">P2</span> : <span class="id" title="keyword">Prop</span>) := <a class="idref" href="Cpdt.Reflection.html#P1"><span class="id" title="variable">P1</span></a> <span class="id" title="notation">→</span> <a class="idref" href="Cpdt.Reflection.html#P2"><span class="id" title="variable">P2</span></a>.<br/>
+<span class="id" title="keyword">Infix</span> <a name="db9d5d46ef2ab5995e0c0739081666c1"><span class="id" title="notation">&quot;</span></a>--&gt;" := <a class="idref" href="Cpdt.Reflection.html#imp"><span class="id" title="definition">imp</span></a> (<span class="id" title="keyword">no</span> <span class="id" title="keyword">associativity</span>, <span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 95).<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+ここでは、表示関数(denotation function)を定義することができます。
+ 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Definition</span> <a name="asgn"><span class="id" title="definition">asgn</span></a> := <span class="id" title="inductive">varmap</span> <span class="id" title="keyword">Prop</span>. 
+<br/>
+<span class="id" title="keyword">Fixpoint</span> <a name="formulaDenote"><span class="id" title="definition">formulaDenote</span></a> (<span class="id" title="var">atomics</span> : <a class="idref" href="Cpdt.Reflection.html#asgn"><span class="id" title="definition">asgn</span></a>) (<span class="id" title="var">f</span> : <a class="idref" href="Cpdt.Reflection.html#formula"><span class="id" title="inductive">formula</span></a>) : <span class="id" title="keyword">Prop</span> :=<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">match</span> <a class="idref" href="Cpdt.Reflection.html#f"><span class="id" title="variable">f</span></a> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <a class="idref" href="Cpdt.Reflection.html#Atomic"><span class="id" title="constructor">Atomic</span></a> <span class="id" title="var">v</span> ⇒ <span class="id" title="definition">varmap_find</span> <span class="id" title="inductive">False</span> <span class="id" title="var">v</span> <a class="idref" href="Cpdt.Reflection.html#atomics"><span class="id" title="variable">atomics</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <a class="idref" href="Cpdt.Reflection.html#Truth"><span class="id" title="constructor">Truth</span></a> ⇒ <span class="id" title="inductive">True</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <a class="idref" href="Cpdt.Reflection.html#Falsehood"><span class="id" title="constructor">Falsehood</span></a> ⇒ <span class="id" title="inductive">False</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <a class="idref" href="Cpdt.Reflection.html#And"><span class="id" title="constructor">And</span></a> <span class="id" title="var">f1</span> <span class="id" title="var">f2</span> ⇒ <a class="idref" href="Cpdt.Reflection.html#formulaDenote"><span class="id" title="definition">formulaDenote</span></a> <a class="idref" href="Cpdt.Reflection.html#atomics"><span class="id" title="variable">atomics</span></a> <span class="id" title="var">f1</span> <span class="id" title="notation">∧</span> <a class="idref" href="Cpdt.Reflection.html#formulaDenote"><span class="id" title="definition">formulaDenote</span></a> <a class="idref" href="Cpdt.Reflection.html#atomics"><span class="id" title="variable">atomics</span></a> <span class="id" title="var">f2</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <a class="idref" href="Cpdt.Reflection.html#Or"><span class="id" title="constructor">Or</span></a> <span class="id" title="var">f1</span> <span class="id" title="var">f2</span> ⇒ <a class="idref" href="Cpdt.Reflection.html#formulaDenote"><span class="id" title="definition">formulaDenote</span></a> <a class="idref" href="Cpdt.Reflection.html#atomics"><span class="id" title="variable">atomics</span></a> <span class="id" title="var">f1</span> <span class="id" title="notation">∨</span> <a class="idref" href="Cpdt.Reflection.html#formulaDenote"><span class="id" title="definition">formulaDenote</span></a> <a class="idref" href="Cpdt.Reflection.html#atomics"><span class="id" title="variable">atomics</span></a> <span class="id" title="var">f2</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <a class="idref" href="Cpdt.Reflection.html#Imp"><span class="id" title="constructor">Imp</span></a> <span class="id" title="var">f1</span> <span class="id" title="var">f2</span> ⇒ <a class="idref" href="Cpdt.Reflection.html#formulaDenote"><span class="id" title="definition">formulaDenote</span></a> <a class="idref" href="Cpdt.Reflection.html#atomics"><span class="id" title="variable">atomics</span></a> <span class="id" title="var">f1</span> <a class="idref" href="Cpdt.Reflection.html#db9d5d46ef2ab5995e0c0739081666c1"><span class="id" title="notation">--&gt;</span></a> <a class="idref" href="Cpdt.Reflection.html#formulaDenote"><span class="id" title="definition">formulaDenote</span></a> <a class="idref" href="Cpdt.Reflection.html#atomics"><span class="id" title="variable">atomics</span></a> <span class="id" title="var">f2</span><br/>
+&nbsp;&nbsp;<span class="id" title="keyword">end</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+<span class="inlinecode"><span class="id" title="inductive">varmap</span></span> のファミリーは、
+<span class="inlinecode"><span class="id" title="inductive">index</span></span> の値から map を実装します。
+この場合、変数から <span class="inlinecode"><span class="id" title="keyword">Prop</span></span> への map として代入を定義します。
+翻訳関数(interpretation function) <span class="inlinecode"><a class="idref" href="Cpdt.Reflection.html#formulaDenote"><span class="id" title="definition">formulaDenote</span></a></span>は代入として動作し、
+<span class="inlinecode"><span class="id" title="definition">varmap_find</span></span>関数を使って<span class="inlinecode"><a class="idref" href="Cpdt.Reflection.html#Atomic"><span class="id" title="constructor">Atomic</span></a></span>の場合の代入を調べます。
+<span class="inlinecode"><span class="id" title="definition">varmap_find</span></span>の最初の引数は、変数が見つからない場合のデフォルト値です。
+ 
+</div>
+<div class="code">
+
+<br/>
+
+<br/>
+<span class="id" title="keyword">Section</span> <a name="my_tauto"><span class="id" title="section">my_tauto</span></a>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Variable</span> <a name="my_tauto.atomics"><span class="id" title="variable">atomics</span></a> : <a class="idref" href="Cpdt.Reflection.html#asgn"><span class="id" title="definition">asgn</span></a>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <a name="holds"><span class="id" title="definition">holds</span></a> (<span class="id" title="var">v</span> : <span class="id" title="inductive">index</span>) := <span class="id" title="definition">varmap_find</span> <span class="id" title="inductive">False</span> <a class="idref" href="Cpdt.Reflection.html#v"><span class="id" title="variable">v</span></a> <a class="idref" href="Cpdt.Reflection.html#my_tauto.atomics"><span class="id" title="variable">atomics</span></a>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+特定の変数が真であるためにいくつかの省略形を定義し、
+標準ライブラリの<span class="inlinecode"><span class="id" title="library">ListSet</span></span>モジュールに基づいて、
+（驚くことではありませんが）リストを集合として見ることを提供する、
+便利な関数を定義する準備が整いました。
+   
+</div>
+<div class="code">
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <span class="id" title="library">ListSet</span>. 
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <a name="index_eq"><span class="id" title="definition">index_eq</span></a> : <span class="id" title="keyword">∀</span> <span class="id" title="var">x</span> <span class="id" title="var">y</span> : <span class="id" title="inductive">index</span>, <span class="id" title="notation">{</span><a class="idref" href="Cpdt.Reflection.html#x"><span class="id" title="variable">x</span></a> <span class="id" title="notation">=</span> <a class="idref" href="Cpdt.Reflection.html#y"><span class="id" title="variable">y</span></a><span class="id" title="notation">}</span> <span class="id" title="notation">+</span> <span class="id" title="notation">{</span><a class="idref" href="Cpdt.Reflection.html#x"><span class="id" title="variable">x</span></a> <span class="id" title="notation">≠</span> <a class="idref" href="Cpdt.Reflection.html#y"><span class="id" title="variable">y</span></a><span class="id" title="notation">}</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">decide</span> <span class="id" title="var">equality</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Defined</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <a name="add"><span class="id" title="definition">add</span></a> (<span class="id" title="var">s</span> : <span class="id" title="definition">set</span> <span class="id" title="inductive">index</span>) (<span class="id" title="var">v</span> : <span class="id" title="inductive">index</span>) := <span class="id" title="definition">set_add</span> <a class="idref" href="Cpdt.Reflection.html#index_eq"><span class="id" title="definition">index_eq</span></a> <a class="idref" href="Cpdt.Reflection.html#v"><span class="id" title="variable">v</span></a> <a class="idref" href="Cpdt.Reflection.html#s"><span class="id" title="variable">s</span></a>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <a name="In_dec"><span class="id" title="definition">In_dec</span></a> : <span class="id" title="keyword">∀</span> <span class="id" title="var">v</span> (<span class="id" title="var">s</span> : <span class="id" title="definition">set</span> <span class="id" title="inductive">index</span>), <span class="id" title="notation">{</span><span class="id" title="definition">In</span> <a class="idref" href="Cpdt.Reflection.html#v"><span class="id" title="variable">v</span></a> <a class="idref" href="Cpdt.Reflection.html#s"><span class="id" title="variable">s</span></a><span class="id" title="notation">}</span> <span class="id" title="notation">+</span> <span class="id" title="notation">{</span><span class="id" title="notation">¬</span> <span class="id" title="definition">In</span> <a class="idref" href="Cpdt.Reflection.html#v"><span class="id" title="variable">v</span></a> <a class="idref" href="Cpdt.Reflection.html#s"><span class="id" title="variable">s</span></a><span class="id" title="notation">}</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Local Open</span> <span class="id" title="keyword">Scope</span> <span class="id" title="var">specif_scope</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">intro</span>; <span class="id" title="tactic">refine</span> (<span class="id" title="keyword">fix</span> <span class="id" title="var">F</span> (<span class="id" title="var">s</span> : <span class="id" title="definition">set</span> <span class="id" title="inductive">index</span>) : <span class="id" title="notation">{</span><span class="id" title="definition">In</span> <span class="id" title="var">v</span> <a class="idref" href="Cpdt.Reflection.html#s"><span class="id" title="variable">s</span></a><span class="id" title="notation">}</span> <span class="id" title="notation">+</span> <span class="id" title="notation">{</span><span class="id" title="notation">¬</span> <span class="id" title="definition">In</span> <span class="id" title="var">v</span> <a class="idref" href="Cpdt.Reflection.html#s"><span class="id" title="variable">s</span></a><span class="id" title="notation">}</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">match</span> <a class="idref" href="Cpdt.Reflection.html#s"><span class="id" title="variable">s</span></a> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="constructor">nil</span> ⇒ <span class="id" title="notation">No</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="var">v'</span> <span class="id" title="notation">::</span> <span class="id" title="var">s'</span> ⇒ <a class="idref" href="Cpdt.Reflection.html#index_eq"><span class="id" title="definition">index_eq</span></a> <span class="id" title="var">v'</span> <span class="id" title="var">v</span> <span class="id" title="notation">||</span> <a class="idref" href="Cpdt.Reflection.html#F"><span class="id" title="variable">F</span></a> <span class="id" title="var">s'</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">end</span>); <span class="id" title="var">crush</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Defined</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+index の集合のすべてのメンバーに対して真となる命題を表わすもの
+を定義し、
+この表記についてのいくつかの補題を証明します。
+
+</div>
+<div class="code">
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Fixpoint</span> <a name="allTrue"><span class="id" title="definition">allTrue</span></a> (<span class="id" title="var">s</span> : <span class="id" title="definition">set</span> <span class="id" title="inductive">index</span>) : <span class="id" title="keyword">Prop</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">match</span> <a class="idref" href="Cpdt.Reflection.html#s"><span class="id" title="variable">s</span></a> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="constructor">nil</span> ⇒ <span class="id" title="inductive">True</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="var">v</span> <span class="id" title="notation">::</span> <span class="id" title="var">s'</span> ⇒ <a class="idref" href="Cpdt.Reflection.html#holds"><span class="id" title="definition">holds</span></a> <span class="id" title="var">v</span> <span class="id" title="notation">∧</span> <a class="idref" href="Cpdt.Reflection.html#allTrue"><span class="id" title="definition">allTrue</span></a> <span class="id" title="var">s'</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">end</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Theorem</span> <a name="allTrue_add"><span class="id" title="lemma">allTrue_add</span></a> : <span class="id" title="keyword">∀</span> <span class="id" title="var">v</span> <span class="id" title="var">s</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="Cpdt.Reflection.html#allTrue"><span class="id" title="definition">allTrue</span></a> <a class="idref" href="Cpdt.Reflection.html#s"><span class="id" title="variable">s</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="notation">→</span> <a class="idref" href="Cpdt.Reflection.html#holds"><span class="id" title="definition">holds</span></a> <a class="idref" href="Cpdt.Reflection.html#v"><span class="id" title="variable">v</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="notation">→</span> <a class="idref" href="Cpdt.Reflection.html#allTrue"><span class="id" title="definition">allTrue</span></a> (<a class="idref" href="Cpdt.Reflection.html#add"><span class="id" title="definition">add</span></a> <a class="idref" href="Cpdt.Reflection.html#s"><span class="id" title="variable">s</span></a> <a class="idref" href="Cpdt.Reflection.html#v"><span class="id" title="variable">v</span></a>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">induction</span> <span class="id" title="var">s</span>; <span class="id" title="var">crush</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">match</span> <span class="id" title="keyword">goal</span> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| [ |- <span class="id" title="keyword">context</span>[<span class="id" title="keyword">if</span> ?<span class="id" title="var">E</span> <span class="id" title="keyword">then</span> <span class="id" title="var">_</span> <span class="id" title="keyword">else</span> <span class="id" title="var">_</span>] ] ⇒ <span class="id" title="tactic">destruct</span> <span class="id" title="var">E</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">end</span>; <span class="id" title="var">crush</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Theorem</span> <a name="allTrue_In"><span class="id" title="lemma">allTrue_In</span></a> : <span class="id" title="keyword">∀</span> <span class="id" title="var">v</span> <span class="id" title="var">s</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="Cpdt.Reflection.html#allTrue"><span class="id" title="definition">allTrue</span></a> <a class="idref" href="Cpdt.Reflection.html#s"><span class="id" title="variable">s</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="notation">→</span> <span class="id" title="definition">set_In</span> <a class="idref" href="Cpdt.Reflection.html#v"><span class="id" title="variable">v</span></a> <a class="idref" href="Cpdt.Reflection.html#s"><span class="id" title="variable">s</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="notation">→</span> <span class="id" title="definition">varmap_find</span> <span class="id" title="inductive">False</span> <a class="idref" href="Cpdt.Reflection.html#v"><span class="id" title="variable">v</span></a> <a class="idref" href="Cpdt.Reflection.html#my_tauto.atomics"><span class="id" title="variable">atomics</span></a>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">induction</span> <span class="id" title="var">s</span>; <span class="id" title="var">crush</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Hint Resolve</span> <span class="id" title="var">allTrue_add</span> <span class="id" title="var">allTrue_In</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Local Open</span> <span class="id" title="keyword">Scope</span> <span class="id" title="var">partial_scope</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+ここで、仮説の分解(deconstruction)を実装する関数 <span class="inlinecode"><a class="idref" href="Cpdt.Reflection.html#forward"><span class="id" title="definition">forward</span></a></span> を書くことができ、
+複合式を、<span class="inlinecode"><a class="idref" href="Cpdt.Reflection.html#Or"><span class="id" title="constructor">Or</span></a></span>を使って導入された可能性のあるすべての場合(case)をカバーする
+一連のアトミックな論理式の集合に
+展開することができます。
+
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+複数のケースの考慮を処理するために、この関数は継続引数(continuation argument
+)を取ります。
+これはそれぞれのケースに対して1回呼び出されます。
+
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+<span class="inlinecode"><a class="idref" href="Cpdt.Reflection.html#forward"><span class="id" title="definition">forward</span></a></span>関数は、第6章のスタイルで依存性の型を持ち、正確さを保証します。
+<span class="inlinecode"><a class="idref" href="Cpdt.Reflection.html#forward"><span class="id" title="definition">forward</span></a></span>のへの引数は、ゴールの式<span class="inlinecode"><a class="idref" href="Cpdt.Large.html#Int.f"><span class="id" title="definition">f</span></a></span>、
+真であると仮定してもよい原子式の集合<span class="inlinecode"><a class="idref" href="Cpdt.Reflection.html#known"><span class="id" title="variable">known</span></a></span>、
+仮定の式<span class="inlinecode"><a class="idref" href="Cpdt.Reflection.html#hyp"><span class="id" title="variable">hyp</span></a></span>、
+および、<span class="inlinecode"><a class="idref" href="Cpdt.Reflection.html#hyp"><span class="id" title="variable">hyp</span></a></span>によって含意される新しい真実を保持するために
+<span class="inlinecode"><a class="idref" href="Cpdt.Reflection.html#known"><span class="id" title="variable">known</span></a></span> を拡張するときに呼び出す次への継続(success continuation) <span class="inlinecode"><a class="idref" href="Cpdt.Reflection.html#cont"><span class="id" title="variable">cont</span></a></span> です。
+   
+</div>
+<div class="code">
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <a name="forward"><span class="id" title="definition">forward</span></a> : <span class="id" title="keyword">∀</span> (<span class="id" title="var">f</span> : <a class="idref" href="Cpdt.Reflection.html#formula"><span class="id" title="inductive">formula</span></a>) (<span class="id" title="var">known</span> : <span class="id" title="definition">set</span> <span class="id" title="inductive">index</span>) (<span class="id" title="var">hyp</span> : <a class="idref" href="Cpdt.Reflection.html#formula"><span class="id" title="inductive">formula</span></a>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">cont</span> : <span class="id" title="keyword">∀</span> <span class="id" title="var">known'</span>, <span class="id" title="notation">[</span><a class="idref" href="Cpdt.Reflection.html#allTrue"><span class="id" title="definition">allTrue</span></a> <a class="idref" href="Cpdt.Reflection.html#known'"><span class="id" title="variable">known'</span></a> <span class="id" title="notation">→</span> <a class="idref" href="Cpdt.Reflection.html#formulaDenote"><span class="id" title="definition">formulaDenote</span></a> <a class="idref" href="Cpdt.Reflection.html#my_tauto.atomics"><span class="id" title="variable">atomics</span></a> <a class="idref" href="Cpdt.Reflection.html#f"><span class="id" title="variable">f</span></a><span class="id" title="notation">]</span>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="notation">[</span><a class="idref" href="Cpdt.Reflection.html#allTrue"><span class="id" title="definition">allTrue</span></a> <a class="idref" href="Cpdt.Reflection.html#known"><span class="id" title="variable">known</span></a> <span class="id" title="notation">→</span> <a class="idref" href="Cpdt.Reflection.html#formulaDenote"><span class="id" title="definition">formulaDenote</span></a> <a class="idref" href="Cpdt.Reflection.html#my_tauto.atomics"><span class="id" title="variable">atomics</span></a> <a class="idref" href="Cpdt.Reflection.html#hyp"><span class="id" title="variable">hyp</span></a> <span class="id" title="notation">→</span> <a class="idref" href="Cpdt.Reflection.html#formulaDenote"><span class="id" title="definition">formulaDenote</span></a> <a class="idref" href="Cpdt.Reflection.html#my_tauto.atomics"><span class="id" title="variable">atomics</span></a> <a class="idref" href="Cpdt.Reflection.html#f"><span class="id" title="variable">f</span></a><span class="id" title="notation">]</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">refine</span> (<span class="id" title="keyword">fix</span> <span class="id" title="var">F</span> (<span class="id" title="var">f</span> : <a class="idref" href="Cpdt.Reflection.html#formula"><span class="id" title="inductive">formula</span></a>) (<span class="id" title="var">known</span> : <span class="id" title="definition">set</span> <span class="id" title="inductive">index</span>) (<span class="id" title="var">hyp</span> : <a class="idref" href="Cpdt.Reflection.html#formula"><span class="id" title="inductive">formula</span></a>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">cont</span> : <span class="id" title="keyword">∀</span> <span class="id" title="var">known'</span>, <span class="id" title="notation">[</span><a class="idref" href="Cpdt.Reflection.html#allTrue"><span class="id" title="definition">allTrue</span></a> <a class="idref" href="Cpdt.Reflection.html#known'"><span class="id" title="variable">known'</span></a> <span class="id" title="notation">→</span> <a class="idref" href="Cpdt.Reflection.html#formulaDenote"><span class="id" title="definition">formulaDenote</span></a> <a class="idref" href="Cpdt.Reflection.html#my_tauto.atomics"><span class="id" title="variable">atomics</span></a> <a class="idref" href="Cpdt.Reflection.html#f"><span class="id" title="variable">f</span></a><span class="id" title="notation">]</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: <span class="id" title="notation">[</span><a class="idref" href="Cpdt.Reflection.html#allTrue"><span class="id" title="definition">allTrue</span></a> <a class="idref" href="Cpdt.Reflection.html#known"><span class="id" title="variable">known</span></a> <span class="id" title="notation">→</span> <a class="idref" href="Cpdt.Reflection.html#formulaDenote"><span class="id" title="definition">formulaDenote</span></a> <a class="idref" href="Cpdt.Reflection.html#my_tauto.atomics"><span class="id" title="variable">atomics</span></a> <a class="idref" href="Cpdt.Reflection.html#hyp"><span class="id" title="variable">hyp</span></a> <span class="id" title="notation">→</span> <a class="idref" href="Cpdt.Reflection.html#formulaDenote"><span class="id" title="definition">formulaDenote</span></a> <a class="idref" href="Cpdt.Reflection.html#my_tauto.atomics"><span class="id" title="variable">atomics</span></a> <a class="idref" href="Cpdt.Reflection.html#f"><span class="id" title="variable">f</span></a><span class="id" title="notation">]</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">match</span> <a class="idref" href="Cpdt.Reflection.html#hyp"><span class="id" title="variable">hyp</span></a> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <a class="idref" href="Cpdt.Reflection.html#Atomic"><span class="id" title="constructor">Atomic</span></a> <span class="id" title="var">v</span> ⇒ <span class="id" title="notation">Reduce</span> <span class="id" title="notation">(</span><a class="idref" href="Cpdt.Reflection.html#cont"><span class="id" title="variable">cont</span></a> (<a class="idref" href="Cpdt.Reflection.html#add"><span class="id" title="definition">add</span></a> <a class="idref" href="Cpdt.Reflection.html#known"><span class="id" title="variable">known</span></a> <span class="id" title="var">v</span>)<span class="id" title="notation">)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <a class="idref" href="Cpdt.Reflection.html#Truth"><span class="id" title="constructor">Truth</span></a> ⇒ <span class="id" title="notation">Reduce</span> <span class="id" title="notation">(</span><a class="idref" href="Cpdt.Reflection.html#cont"><span class="id" title="variable">cont</span></a> <a class="idref" href="Cpdt.Reflection.html#known"><span class="id" title="variable">known</span></a><span class="id" title="notation">)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <a class="idref" href="Cpdt.Reflection.html#Falsehood"><span class="id" title="constructor">Falsehood</span></a> ⇒ <span class="id" title="notation">Yes</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <a class="idref" href="Cpdt.Reflection.html#And"><span class="id" title="constructor">And</span></a> <span class="id" title="var">h1</span> <span class="id" title="var">h2</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="notation">Reduce</span> <span class="id" title="notation">(</span><a class="idref" href="Cpdt.Reflection.html#F"><span class="id" title="variable">F</span></a> (<a class="idref" href="Cpdt.Reflection.html#Imp"><span class="id" title="constructor">Imp</span></a> <span class="id" title="var">h2</span> <a class="idref" href="Cpdt.Reflection.html#f"><span class="id" title="variable">f</span></a>) <a class="idref" href="Cpdt.Reflection.html#known"><span class="id" title="variable">known</span></a> <span class="id" title="var">h1</span> (<span class="id" title="keyword">fun</span> <span class="id" title="var">known'</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="notation">Reduce</span> <span class="id" title="notation">(</span><a class="idref" href="Cpdt.Reflection.html#F"><span class="id" title="variable">F</span></a> <a class="idref" href="Cpdt.Reflection.html#f"><span class="id" title="variable">f</span></a> <a class="idref" href="Cpdt.Reflection.html#known'"><span class="id" title="variable">known'</span></a> <span class="id" title="var">h2</span> <a class="idref" href="Cpdt.Reflection.html#cont"><span class="id" title="variable">cont</span></a><span class="id" title="notation">)</span>)<span class="id" title="notation">)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <a class="idref" href="Cpdt.Reflection.html#Or"><span class="id" title="constructor">Or</span></a> <span class="id" title="var">h1</span> <span class="id" title="var">h2</span> ⇒ <a class="idref" href="Cpdt.Reflection.html#F"><span class="id" title="variable">F</span></a> <a class="idref" href="Cpdt.Reflection.html#f"><span class="id" title="variable">f</span></a> <a class="idref" href="Cpdt.Reflection.html#known"><span class="id" title="variable">known</span></a> <span class="id" title="var">h1</span> <a class="idref" href="Cpdt.Reflection.html#cont"><span class="id" title="variable">cont</span></a> <span class="id" title="notation">&amp;&amp;</span> <a class="idref" href="Cpdt.Reflection.html#F"><span class="id" title="variable">F</span></a> <a class="idref" href="Cpdt.Reflection.html#f"><span class="id" title="variable">f</span></a> <a class="idref" href="Cpdt.Reflection.html#known"><span class="id" title="variable">known</span></a> <span class="id" title="var">h2</span> <a class="idref" href="Cpdt.Reflection.html#cont"><span class="id" title="variable">cont</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <a class="idref" href="Cpdt.Reflection.html#Imp"><span class="id" title="constructor">Imp</span></a> <span class="id" title="var">_</span> <span class="id" title="var">_</span> ⇒ <span class="id" title="notation">Reduce</span> <span class="id" title="notation">(</span><a class="idref" href="Cpdt.Reflection.html#cont"><span class="id" title="variable">cont</span></a> <a class="idref" href="Cpdt.Reflection.html#known"><span class="id" title="variable">known</span></a><span class="id" title="notation">)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">end</span>); <span class="id" title="var">crush</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Defined</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+<span class="inlinecode"><a class="idref" href="Cpdt.Reflection.html#backward"><span class="id" title="definition">backward</span></a></span>関数は、最終のゴールの分析を実装します。
+含意を扱うために<span class="inlinecode"><a class="idref" href="Cpdt.Reflection.html#forward"><span class="id" title="definition">forward</span></a></span>を呼び出します。
+   
+</div>
+<div class="code">
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <a name="backward"><span class="id" title="definition">backward</span></a> : <span class="id" title="keyword">∀</span> (<span class="id" title="var">known</span> : <span class="id" title="definition">set</span> <span class="id" title="inductive">index</span>) (<span class="id" title="var">f</span> : <a class="idref" href="Cpdt.Reflection.html#formula"><span class="id" title="inductive">formula</span></a>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="notation">[</span><a class="idref" href="Cpdt.Reflection.html#allTrue"><span class="id" title="definition">allTrue</span></a> <a class="idref" href="Cpdt.Reflection.html#known"><span class="id" title="variable">known</span></a> <span class="id" title="notation">→</span> <a class="idref" href="Cpdt.Reflection.html#formulaDenote"><span class="id" title="definition">formulaDenote</span></a> <a class="idref" href="Cpdt.Reflection.html#my_tauto.atomics"><span class="id" title="variable">atomics</span></a> <a class="idref" href="Cpdt.Reflection.html#f"><span class="id" title="variable">f</span></a><span class="id" title="notation">]</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">refine</span> (<span class="id" title="keyword">fix</span> <span class="id" title="var">F</span> (<span class="id" title="var">known</span> : <span class="id" title="definition">set</span> <span class="id" title="inductive">index</span>) (<span class="id" title="var">f</span> : <a class="idref" href="Cpdt.Reflection.html#formula"><span class="id" title="inductive">formula</span></a>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: <span class="id" title="notation">[</span><a class="idref" href="Cpdt.Reflection.html#allTrue"><span class="id" title="definition">allTrue</span></a> <a class="idref" href="Cpdt.Reflection.html#known"><span class="id" title="variable">known</span></a> <span class="id" title="notation">→</span> <a class="idref" href="Cpdt.Reflection.html#formulaDenote"><span class="id" title="definition">formulaDenote</span></a> <a class="idref" href="Cpdt.Reflection.html#my_tauto.atomics"><span class="id" title="variable">atomics</span></a> <a class="idref" href="Cpdt.Reflection.html#f"><span class="id" title="variable">f</span></a><span class="id" title="notation">]</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">match</span> <a class="idref" href="Cpdt.Reflection.html#f"><span class="id" title="variable">f</span></a> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <a class="idref" href="Cpdt.Reflection.html#Atomic"><span class="id" title="constructor">Atomic</span></a> <span class="id" title="var">v</span> ⇒ <span class="id" title="notation">Reduce</span> <span class="id" title="notation">(</span><a class="idref" href="Cpdt.Reflection.html#In_dec"><span class="id" title="definition">In_dec</span></a> <span class="id" title="var">v</span> <a class="idref" href="Cpdt.Reflection.html#known"><span class="id" title="variable">known</span></a><span class="id" title="notation">)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <a class="idref" href="Cpdt.Reflection.html#Truth"><span class="id" title="constructor">Truth</span></a> ⇒ <span class="id" title="notation">Yes</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <a class="idref" href="Cpdt.Reflection.html#Falsehood"><span class="id" title="constructor">Falsehood</span></a> ⇒ <span class="id" title="notation">No</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <a class="idref" href="Cpdt.Reflection.html#And"><span class="id" title="constructor">And</span></a> <span class="id" title="var">f1</span> <span class="id" title="var">f2</span> ⇒ <a class="idref" href="Cpdt.Reflection.html#F"><span class="id" title="variable">F</span></a> <a class="idref" href="Cpdt.Reflection.html#known"><span class="id" title="variable">known</span></a> <span class="id" title="var">f1</span> <span class="id" title="notation">&amp;&amp;</span> <a class="idref" href="Cpdt.Reflection.html#F"><span class="id" title="variable">F</span></a> <a class="idref" href="Cpdt.Reflection.html#known"><span class="id" title="variable">known</span></a> <span class="id" title="var">f2</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <a class="idref" href="Cpdt.Reflection.html#Or"><span class="id" title="constructor">Or</span></a> <span class="id" title="var">f1</span> <span class="id" title="var">f2</span> ⇒ <a class="idref" href="Cpdt.Reflection.html#F"><span class="id" title="variable">F</span></a> <a class="idref" href="Cpdt.Reflection.html#known"><span class="id" title="variable">known</span></a> <span class="id" title="var">f1</span> <span class="id" title="notation">||</span> <a class="idref" href="Cpdt.Reflection.html#F"><span class="id" title="variable">F</span></a> <a class="idref" href="Cpdt.Reflection.html#known"><span class="id" title="variable">known</span></a> <span class="id" title="var">f2</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <a class="idref" href="Cpdt.Reflection.html#Imp"><span class="id" title="constructor">Imp</span></a> <span class="id" title="var">f1</span> <span class="id" title="var">f2</span> ⇒ <a class="idref" href="Cpdt.Reflection.html#forward"><span class="id" title="definition">forward</span></a> <span class="id" title="var">f2</span> <a class="idref" href="Cpdt.Reflection.html#known"><span class="id" title="variable">known</span></a> <span class="id" title="var">f1</span> (<span class="id" title="keyword">fun</span> <span class="id" title="var">known'</span> ⇒ <a class="idref" href="Cpdt.Reflection.html#F"><span class="id" title="variable">F</span></a> <a class="idref" href="Cpdt.Reflection.html#known'"><span class="id" title="variable">known'</span></a> <span class="id" title="var">f2</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">end</span>); <span class="id" title="var">crush</span>; <span class="id" title="tactic">eauto</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Defined</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+<span class="inlinecode"><a class="idref" href="Cpdt.Reflection.html#backward"><span class="id" title="definition">backward</span></a></span>の周りの単純なラッパーは、部分的な決定のための手続きの通常のタイプを与えます。
+   
+</div>
+<div class="code">
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <a name="my_tauto"><span class="id" title="definition">my_tauto</span></a> : <span class="id" title="keyword">∀</span> <span class="id" title="var">f</span> : <a class="idref" href="Cpdt.Reflection.html#formula"><span class="id" title="inductive">formula</span></a>, <span class="id" title="notation">[</span><a class="idref" href="Cpdt.Reflection.html#formulaDenote"><span class="id" title="definition">formulaDenote</span></a> <a class="idref" href="Cpdt.Reflection.html#my_tauto.atomics"><span class="id" title="variable">atomics</span></a> <a class="idref" href="Cpdt.Reflection.html#f"><span class="id" title="variable">f</span></a><span class="id" title="notation">]</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">intro</span>; <span class="id" title="tactic">refine</span> (<span class="id" title="notation">Reduce</span> <span class="id" title="notation">(</span><a class="idref" href="Cpdt.Reflection.html#backward"><span class="id" title="definition">backward</span></a> <span class="id" title="constructor">nil</span> <span class="id" title="var">f</span><span class="id" title="notation">)</span>); <span class="id" title="var">crush</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Defined</span>.<br/>
+<span class="id" title="keyword">End</span> <a class="idref" href="Cpdt.Reflection.html#my_tauto"><span class="id" title="section">my_tauto</span></a>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+最終的なタクティクの実装はかなり簡単です。
+まず、<span class="inlinecode"><span class="id" title="keyword">Prop</span></span> の束縛しないすべての量化子を <span class="inlinecode"><span class="id" title="tactic">intro</span></span> します。
+次に、具象化を実装する<span class="inlinecode"><span class="id" title="tactic">quote</span></span>タクティクを呼び出します。 
+最後に、<span class="inlinecode"><a class="idref" href="Cpdt.Reflection.html#partialOut"><span class="id" title="definition">partialOut</span></a></span>と<span class="inlinecode"><a class="idref" href="Cpdt.Reflection.html#my_tauto"><span class="id" title="definition">my_tauto</span></a></span> のGallina関数を使用して正確な証明を構築します。
+
+<div class="paragraph"> </div>
+
+  
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Ltac</span> <span class="id" title="var">my_tauto</span> :=<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">repeat</span> <span class="id" title="keyword">match</span> <span class="id" title="keyword">goal</span> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| [ |- <span class="id" title="keyword">∀</span> <span class="id" title="var">x</span> : ?<span class="id" title="var">P</span>, <span class="id" title="var">_</span> ] ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">match</span> <span class="id" title="var">type</span> <span class="id" title="var">of</span> <span class="id" title="var">P</span> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="keyword">Prop</span> ⇒ <span class="id" title="tactic">fail</span> 1      <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="var">_</span> ⇒ <span class="id" title="tactic">intro</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">end</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">end</span>;<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">quote</span> <span class="id" title="var">formulaDenote</span>;<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">match</span> <span class="id" title="keyword">goal</span> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| [ |- <a class="idref" href="Cpdt.Reflection.html#formulaDenote"><span class="id" title="definition">formulaDenote</span></a> ?<span class="id" title="var">m</span> ?<span class="id" title="var">f</span> ] ⇒ <span class="id" title="tactic">exact</span> (<a class="idref" href="Cpdt.Reflection.html#partialOut"><span class="id" title="definition">partialOut</span></a> (<a class="idref" href="Cpdt.Reflection.html#my_tauto"><span class="id" title="definition">my_tauto</span></a> <span class="id" title="var">m</span> <span class="id" title="var">f</span>))<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">end</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+いくつかの例は、タクティクがどのように機能するかを示しています。
+
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Theorem</span> <a name="mt1"><span class="id" title="lemma">mt1</span></a> : <span class="id" title="inductive">True</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="var">my_tauto</span>.<br/>
+<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Print</span> <a class="idref" href="Cpdt.Reflection.html#mt1"><span class="id" title="lemma">mt1</span></a>.<br/>
+</div>
+
+<div class="doc">
+ <br/>
+<span class="inlinecode"><a class="idref" href="Cpdt.Reflection.html#mt1"><span class="id" title="lemma">mt1</span></a> = <a class="idref" href="Cpdt.Reflection.html#partialOut"><span class="id" title="definition">partialOut</span></a> (<a class="idref" href="Cpdt.Reflection.html#my_tauto"><span class="id" title="definition">my_tauto</span></a> (<span class="id" title="constructor">Empty_vm</span> <span class="id" title="keyword">Prop</span>) <a class="idref" href="Cpdt.Reflection.html#Truth"><span class="id" title="constructor">Truth</span></a>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: <span class="id" title="inductive">True</span>
+<div class="paragraph"> </div>
+
+</span>
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+すべての部分式は<span class="inlinecode"><a class="idref" href="Cpdt.Reflection.html#formulaDenote"><span class="id" title="definition">formulaDenote</span></a></span>によって処理されるため、
+<span class="inlinecode"><a class="idref" href="Cpdt.Reflection.html#my_tauto"><span class="id" title="definition">my_tauto</span></a></span>に空の<span class="inlinecode"><span class="id" title="inductive">varmap</span></span>  が適用されていることがわかります。
+ 
+</div>
+<div class="code">
+
+<br/>
+
+<br/>
+<span class="id" title="keyword">Theorem</span> <a name="mt2"><span class="id" title="lemma">mt2</span></a> : <span class="id" title="keyword">∀</span> <span class="id" title="var">x</span> <span class="id" title="var">y</span> : <span class="id" title="inductive">nat</span>, <a class="idref" href="Cpdt.Reflection.html#x"><span class="id" title="variable">x</span></a> <span class="id" title="notation">=</span> <a class="idref" href="Cpdt.Reflection.html#y"><span class="id" title="variable">y</span></a> <a class="idref" href="Cpdt.Reflection.html#db9d5d46ef2ab5995e0c0739081666c1"><span class="id" title="notation">--&gt;</span></a> <a class="idref" href="Cpdt.Reflection.html#x"><span class="id" title="variable">x</span></a> <span class="id" title="notation">=</span> <a class="idref" href="Cpdt.Reflection.html#y"><span class="id" title="variable">y</span></a>.<br/>
+&nbsp;&nbsp;<span class="id" title="var">my_tauto</span>.<br/>
+<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+
+<br/>
+<span class="id" title="keyword">Print</span> <a class="idref" href="Cpdt.Reflection.html#mt2"><span class="id" title="lemma">mt2</span></a>.<br/>
+</div>
+
+<div class="doc">
+ <br/>
+<span class="inlinecode"><a class="idref" href="Cpdt.Reflection.html#mt2"><span class="id" title="lemma">mt2</span></a> = <br/>
+<span class="id" title="keyword">fun</span> <a class="idref" href="Cpdt.MoreDep.html#insert.x"><span class="id" title="variable">x</span></a> <a class="idref" href="Cpdt.Predicates.html#y"><span class="id" title="variable">y</span></a> : <a class="idref" href="Cpdt.InductiveTypes.html#nat"><span class="id" title="inductive">nat</span></a> ⇒<br/>
+<a class="idref" href="Cpdt.Reflection.html#partialOut"><span class="id" title="definition">partialOut</span></a><br/>
+&nbsp;&nbsp;(<a class="idref" href="Cpdt.Reflection.html#my_tauto"><span class="id" title="definition">my_tauto</span></a> (<span class="id" title="constructor">Node_vm</span> (<a class="idref" href="Cpdt.MoreDep.html#insert.x"><span class="id" title="variable">x</span></a> = <a class="idref" href="Cpdt.Predicates.html#y"><span class="id" title="variable">y</span></a>) (<span class="id" title="constructor">Empty_vm</span> <span class="id" title="keyword">Prop</span>) (<span class="id" title="constructor">Empty_vm</span> <span class="id" title="keyword">Prop</span>))<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<a class="idref" href="Cpdt.Reflection.html#Imp"><span class="id" title="constructor">Imp</span></a> (<a class="idref" href="Cpdt.Reflection.html#Atomic"><span class="id" title="constructor">Atomic</span></a> <span class="id" title="constructor">End_idx</span>) (<a class="idref" href="Cpdt.Reflection.html#Atomic"><span class="id" title="constructor">Atomic</span></a> <span class="id" title="constructor">End_idx</span>)))<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: <span class="id" title="keyword">∀</span> <a class="idref" href="Cpdt.MoreDep.html#insert.x"><span class="id" title="variable">x</span></a> <a class="idref" href="Cpdt.Predicates.html#y"><span class="id" title="variable">y</span></a> : <a class="idref" href="Cpdt.InductiveTypes.html#nat"><span class="id" title="inductive">nat</span></a>, <a class="idref" href="Cpdt.MoreDep.html#insert.x"><span class="id" title="variable">x</span></a> = <a class="idref" href="Cpdt.Predicates.html#y"><span class="id" title="variable">y</span></a> --&gt; <a class="idref" href="Cpdt.MoreDep.html#insert.x"><span class="id" title="variable">x</span></a> = <a class="idref" href="Cpdt.Predicates.html#y"><span class="id" title="variable">y</span></a>
+<div class="paragraph"> </div>
+
+</span>
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+重要なことに、<span class="inlinecode"><a class="idref" href="Cpdt.MoreDep.html#insert.x"><span class="id" title="variable">x</span></a></span> <span class="inlinecode">=</span> <span class="inlinecode"><a class="idref" href="Cpdt.Predicates.html#y"><span class="id" title="variable">y</span></a></span>の両方のインスタンスは同じインデックス<span class="inlinecode"><span class="id" title="constructor">End_idx</span></span>で表されます。
+このインデックスの値は<span class="inlinecode"><span class="id" title="inductive">varmap</span></span>に1回だけ現れなければならず、
+<span class="inlinecode"><span class="id" title="inductive">varmap</span></span>は、
+<span class="inlinecode"><span class="id" title="inductive">index</span></span> の値が木の根から葉までのパスを示す、
+二進木(binary trees) として表現されます。
+ 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Theorem</span> <a name="mt3"><span class="id" title="lemma">mt3</span></a> : <span class="id" title="keyword">∀</span> <span class="id" title="var">x</span> <span class="id" title="var">y</span> <span class="id" title="var">z</span>,<br/>
+&nbsp;&nbsp;<span class="id" title="notation">(</span><a class="idref" href="Cpdt.Reflection.html#x"><span class="id" title="variable">x</span></a> <span class="id" title="notation">&lt;</span> <a class="idref" href="Cpdt.Reflection.html#y"><span class="id" title="variable">y</span></a> <span class="id" title="notation">∧</span> <a class="idref" href="Cpdt.Reflection.html#y"><span class="id" title="variable">y</span></a> <span class="id" title="notation">&gt;</span> <a class="idref" href="Cpdt.Reflection.html#z"><span class="id" title="variable">z</span></a><span class="id" title="notation">)</span> <span class="id" title="notation">∨</span> <span class="id" title="notation">(</span><a class="idref" href="Cpdt.Reflection.html#y"><span class="id" title="variable">y</span></a> <span class="id" title="notation">&gt;</span> <a class="idref" href="Cpdt.Reflection.html#z"><span class="id" title="variable">z</span></a> <span class="id" title="notation">∧</span> <a class="idref" href="Cpdt.Reflection.html#x"><span class="id" title="variable">x</span></a> <span class="id" title="notation">&lt;</span> <span class="id" title="constructor">S</span> <a class="idref" href="Cpdt.Reflection.html#y"><span class="id" title="variable">y</span></a><span class="id" title="notation">)</span><br/>
+&nbsp;&nbsp;<a class="idref" href="Cpdt.Reflection.html#db9d5d46ef2ab5995e0c0739081666c1"><span class="id" title="notation">--&gt;</span></a> <a class="idref" href="Cpdt.Reflection.html#y"><span class="id" title="variable">y</span></a> <span class="id" title="notation">&gt;</span> <a class="idref" href="Cpdt.Reflection.html#z"><span class="id" title="variable">z</span></a> <span class="id" title="notation">∧</span> <span class="id" title="notation">(</span><a class="idref" href="Cpdt.Reflection.html#x"><span class="id" title="variable">x</span></a> <span class="id" title="notation">&lt;</span> <a class="idref" href="Cpdt.Reflection.html#y"><span class="id" title="variable">y</span></a> <span class="id" title="notation">∨</span> <a class="idref" href="Cpdt.Reflection.html#x"><span class="id" title="variable">x</span></a> <span class="id" title="notation">&lt;</span> <span class="id" title="constructor">S</span> <a class="idref" href="Cpdt.Reflection.html#y"><span class="id" title="variable">y</span></a><span class="id" title="notation">)</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="var">my_tauto</span>.<br/>
+<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Print</span> <a class="idref" href="Cpdt.Reflection.html#mt3"><span class="id" title="lemma">mt3</span></a>.<br/>
+</div>
+
+<div class="doc">
+ <br/>
+<span class="inlinecode"><span class="id" title="keyword">fun</span> <a class="idref" href="Cpdt.MoreDep.html#insert.x"><span class="id" title="variable">x</span></a> <a class="idref" href="Cpdt.Predicates.html#y"><span class="id" title="variable">y</span></a> <a class="idref" href="Cpdt.MoreDep.html#insert.present.z"><span class="id" title="variable">z</span></a> : <a class="idref" href="Cpdt.InductiveTypes.html#nat"><span class="id" title="inductive">nat</span></a> ⇒<br/>
+<a class="idref" href="Cpdt.Reflection.html#partialOut"><span class="id" title="definition">partialOut</span></a><br/>
+&nbsp;&nbsp;(<a class="idref" href="Cpdt.Reflection.html#my_tauto"><span class="id" title="definition">my_tauto</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="constructor">Node_vm</span> (<a class="idref" href="Cpdt.MoreDep.html#insert.x"><span class="id" title="variable">x</span></a> &lt; <a class="idref" href="Cpdt.Large.html#slow.S"><span class="id" title="variable">S</span></a> <a class="idref" href="Cpdt.Predicates.html#y"><span class="id" title="variable">y</span></a>) (<span class="id" title="constructor">Node_vm</span> (<a class="idref" href="Cpdt.MoreDep.html#insert.x"><span class="id" title="variable">x</span></a> &lt; <a class="idref" href="Cpdt.Predicates.html#y"><span class="id" title="variable">y</span></a>) (<span class="id" title="constructor">Empty_vm</span> <span class="id" title="keyword">Prop</span>) (<span class="id" title="constructor">Empty_vm</span> <span class="id" title="keyword">Prop</span>))<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="constructor">Node_vm</span> (<a class="idref" href="Cpdt.Predicates.html#y"><span class="id" title="variable">y</span></a> &gt; <a class="idref" href="Cpdt.MoreDep.html#insert.present.z"><span class="id" title="variable">z</span></a>) (<span class="id" title="constructor">Empty_vm</span> <span class="id" title="keyword">Prop</span>) (<span class="id" title="constructor">Empty_vm</span> <span class="id" title="keyword">Prop</span>)))<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<a class="idref" href="Cpdt.Reflection.html#Imp"><span class="id" title="constructor">Imp</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<a class="idref" href="Cpdt.Reflection.html#Or"><span class="id" title="constructor">Or</span></a> (<a class="idref" href="Cpdt.Reflection.html#And"><span class="id" title="constructor">And</span></a> (<a class="idref" href="Cpdt.Reflection.html#Atomic"><span class="id" title="constructor">Atomic</span></a> (<span class="id" title="constructor">Left_idx</span> <span class="id" title="constructor">End_idx</span>)) (<a class="idref" href="Cpdt.Reflection.html#Atomic"><span class="id" title="constructor">Atomic</span></a> (<span class="id" title="constructor">Right_idx</span> <span class="id" title="constructor">End_idx</span>)))<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<a class="idref" href="Cpdt.Reflection.html#And"><span class="id" title="constructor">And</span></a> (<a class="idref" href="Cpdt.Reflection.html#Atomic"><span class="id" title="constructor">Atomic</span></a> (<span class="id" title="constructor">Right_idx</span> <span class="id" title="constructor">End_idx</span>)) (<a class="idref" href="Cpdt.Reflection.html#Atomic"><span class="id" title="constructor">Atomic</span></a> <span class="id" title="constructor">End_idx</span>)))<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<a class="idref" href="Cpdt.Reflection.html#And"><span class="id" title="constructor">And</span></a> (<a class="idref" href="Cpdt.Reflection.html#Atomic"><span class="id" title="constructor">Atomic</span></a> (<span class="id" title="constructor">Right_idx</span> <span class="id" title="constructor">End_idx</span>))<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<a class="idref" href="Cpdt.Reflection.html#Or"><span class="id" title="constructor">Or</span></a> (<a class="idref" href="Cpdt.Reflection.html#Atomic"><span class="id" title="constructor">Atomic</span></a> (<span class="id" title="constructor">Left_idx</span> <span class="id" title="constructor">End_idx</span>)) (<a class="idref" href="Cpdt.Reflection.html#Atomic"><span class="id" title="constructor">Atomic</span></a> <span class="id" title="constructor">End_idx</span>)))))<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: <span class="id" title="keyword">∀</span> <a class="idref" href="Cpdt.MoreDep.html#insert.x"><span class="id" title="variable">x</span></a> <a class="idref" href="Cpdt.Predicates.html#y"><span class="id" title="variable">y</span></a> <a class="idref" href="Cpdt.MoreDep.html#insert.present.z"><span class="id" title="variable">z</span></a> : <a class="idref" href="Cpdt.InductiveTypes.html#nat"><span class="id" title="inductive">nat</span></a>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="Cpdt.MoreDep.html#insert.x"><span class="id" title="variable">x</span></a> &lt; <a class="idref" href="Cpdt.Predicates.html#y"><span class="id" title="variable">y</span></a> ∧ <a class="idref" href="Cpdt.Predicates.html#y"><span class="id" title="variable">y</span></a> &gt; <a class="idref" href="Cpdt.MoreDep.html#insert.present.z"><span class="id" title="variable">z</span></a> ∨ <a class="idref" href="Cpdt.Predicates.html#y"><span class="id" title="variable">y</span></a> &gt; <a class="idref" href="Cpdt.MoreDep.html#insert.present.z"><span class="id" title="variable">z</span></a> ∧ <a class="idref" href="Cpdt.MoreDep.html#insert.x"><span class="id" title="variable">x</span></a> &lt; <a class="idref" href="Cpdt.Large.html#slow.S"><span class="id" title="variable">S</span></a> <a class="idref" href="Cpdt.Predicates.html#y"><span class="id" title="variable">y</span></a> --&gt; <a class="idref" href="Cpdt.Predicates.html#y"><span class="id" title="variable">y</span></a> &gt; <a class="idref" href="Cpdt.MoreDep.html#insert.present.z"><span class="id" title="variable">z</span></a> ∧ (<a class="idref" href="Cpdt.MoreDep.html#insert.x"><span class="id" title="variable">x</span></a> &lt; <a class="idref" href="Cpdt.Predicates.html#y"><span class="id" title="variable">y</span></a> ∨ <a class="idref" href="Cpdt.MoreDep.html#insert.x"><span class="id" title="variable">x</span></a> &lt; <a class="idref" href="Cpdt.Large.html#slow.S"><span class="id" title="variable">S</span></a> <a class="idref" href="Cpdt.Predicates.html#y"><span class="id" title="variable">y</span></a>)
+<div class="paragraph"> </div>
+
+</span>
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+ゴールにはみっつの異なる原子式が含まれていて、
+3要素の「varmap」が生成されていることがわかります。
+
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+特に自明な定理のために<span class="inlinecode"><a class="idref" href="Cpdt.Reflection.html#my_tauto"><span class="id" title="definition">my_tauto</span></a></span>と<span class="inlinecode"><span class="id" title="tactic">tauto</span></span>によって生成される証明項の反復の
+レベルの違いを観察することは面白いかもしれません。
+ 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Theorem</span> <a name="mt4"><span class="id" title="lemma">mt4</span></a> : <span class="id" title="inductive">True</span> <span class="id" title="notation">∧</span> <span class="id" title="inductive">True</span> <span class="id" title="notation">∧</span> <span class="id" title="inductive">True</span> <span class="id" title="notation">∧</span> <span class="id" title="inductive">True</span> <span class="id" title="notation">∧</span> <span class="id" title="inductive">True</span> <span class="id" title="notation">∧</span> <span class="id" title="inductive">True</span> <span class="id" title="notation">∧</span> <span class="id" title="inductive">False</span> <a class="idref" href="Cpdt.Reflection.html#db9d5d46ef2ab5995e0c0739081666c1"><span class="id" title="notation">--&gt;</span></a> <span class="id" title="inductive">False</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="var">my_tauto</span>.<br/>
+<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Print</span> <a class="idref" href="Cpdt.Reflection.html#mt4"><span class="id" title="lemma">mt4</span></a>.<br/>
+</div>
+
+<div class="doc">
+ <br/>
+<span class="inlinecode"><a class="idref" href="Cpdt.Reflection.html#mt4"><span class="id" title="lemma">mt4</span></a> = <br/>
+<a class="idref" href="Cpdt.Reflection.html#partialOut"><span class="id" title="definition">partialOut</span></a><br/>
+&nbsp;&nbsp;(<a class="idref" href="Cpdt.Reflection.html#my_tauto"><span class="id" title="definition">my_tauto</span></a> (<span class="id" title="constructor">Empty_vm</span> <span class="id" title="keyword">Prop</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<a class="idref" href="Cpdt.Reflection.html#Imp"><span class="id" title="constructor">Imp</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<a class="idref" href="Cpdt.Reflection.html#And"><span class="id" title="constructor">And</span></a> <a class="idref" href="Cpdt.Reflection.html#Truth"><span class="id" title="constructor">Truth</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<a class="idref" href="Cpdt.Reflection.html#And"><span class="id" title="constructor">And</span></a> <a class="idref" href="Cpdt.Reflection.html#Truth"><span class="id" title="constructor">Truth</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<a class="idref" href="Cpdt.Reflection.html#And"><span class="id" title="constructor">And</span></a> <a class="idref" href="Cpdt.Reflection.html#Truth"><span class="id" title="constructor">Truth</span></a> (<a class="idref" href="Cpdt.Reflection.html#And"><span class="id" title="constructor">And</span></a> <a class="idref" href="Cpdt.Reflection.html#Truth"><span class="id" title="constructor">Truth</span></a> (<a class="idref" href="Cpdt.Reflection.html#And"><span class="id" title="constructor">And</span></a> <a class="idref" href="Cpdt.Reflection.html#Truth"><span class="id" title="constructor">Truth</span></a> (<a class="idref" href="Cpdt.Reflection.html#And"><span class="id" title="constructor">And</span></a> <a class="idref" href="Cpdt.Reflection.html#Truth"><span class="id" title="constructor">Truth</span></a> <a class="idref" href="Cpdt.Reflection.html#Falsehood"><span class="id" title="constructor">Falsehood</span></a>))))))<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="Cpdt.Reflection.html#Falsehood"><span class="id" title="constructor">Falsehood</span></a>))<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: <span class="id" title="inductive">True</span> ∧ <span class="id" title="inductive">True</span> ∧ <span class="id" title="inductive">True</span> ∧ <span class="id" title="inductive">True</span> ∧ <span class="id" title="inductive">True</span> ∧ <span class="id" title="inductive">True</span> ∧ <span class="id" title="inductive">False</span> --&gt; <span class="id" title="inductive">False</span>
+<div class="paragraph"> </div>
+
+</span>    
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Theorem</span> <a name="mt4'"><span class="id" title="lemma">mt4'</span></a> : <span class="id" title="inductive">True</span> <span class="id" title="notation">∧</span> <span class="id" title="inductive">True</span> <span class="id" title="notation">∧</span> <span class="id" title="inductive">True</span> <span class="id" title="notation">∧</span> <span class="id" title="inductive">True</span> <span class="id" title="notation">∧</span> <span class="id" title="inductive">True</span> <span class="id" title="notation">∧</span> <span class="id" title="inductive">True</span> <span class="id" title="notation">∧</span> <span class="id" title="inductive">False</span> <span class="id" title="notation">→</span> <span class="id" title="inductive">False</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">tauto</span>.<br/>
+<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+
+<br/>
+<span class="id" title="keyword">Print</span> <a class="idref" href="Cpdt.Reflection.html#mt4'"><span class="id" title="lemma">mt4'</span></a>.<br/>
+</div>
+
+<div class="doc">
+ <br/>
+<span class="inlinecode"><a class="idref" href="Cpdt.Reflection.html#mt4'"><span class="id" title="lemma">mt4'</span></a> = <br/>
+<span class="id" title="keyword">fun</span> <a class="idref" href="Cpdt.GeneralRec.html#thunk_eq_coind.H"><span class="id" title="variable">H</span></a> : <span class="id" title="inductive">True</span> ∧ <span class="id" title="inductive">True</span> ∧ <span class="id" title="inductive">True</span> ∧ <span class="id" title="inductive">True</span> ∧ <span class="id" title="inductive">True</span> ∧ <span class="id" title="inductive">True</span> ∧ <span class="id" title="inductive">False</span> ⇒<br/>
+<span class="id" title="definition">and_ind</span><br/>
+&nbsp;&nbsp;(<span class="id" title="keyword">fun</span> (<span class="id" title="var">_</span> : <span class="id" title="inductive">True</span>) (<a class="idref" href="Cpdt.Large.html#slow.H1"><span class="id" title="variable">H1</span></a> : <span class="id" title="inductive">True</span> ∧ <span class="id" title="inductive">True</span> ∧ <span class="id" title="inductive">True</span> ∧ <span class="id" title="inductive">True</span> ∧ <span class="id" title="inductive">True</span> ∧ <span class="id" title="inductive">False</span>) ⇒<br/>
+&nbsp;&nbsp;&nbsp;<span class="id" title="definition">and_ind</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="keyword">fun</span> (<span class="id" title="var">_</span> : <span class="id" title="inductive">True</span>) (<a class="idref" href="Cpdt.Large.html#slow.H3"><span class="id" title="variable">H3</span></a> : <span class="id" title="inductive">True</span> ∧ <span class="id" title="inductive">True</span> ∧ <span class="id" title="inductive">True</span> ∧ <span class="id" title="inductive">True</span> ∧ <span class="id" title="inductive">False</span>) ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="definition">and_ind</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="keyword">fun</span> (<span class="id" title="var">_</span> : <span class="id" title="inductive">True</span>) (<span class="id" title="var">H5</span> : <span class="id" title="inductive">True</span> ∧ <span class="id" title="inductive">True</span> ∧ <span class="id" title="inductive">True</span> ∧ <span class="id" title="inductive">False</span>) ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="definition">and_ind</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="keyword">fun</span> (<span class="id" title="var">_</span> : <span class="id" title="inductive">True</span>) (<span class="id" title="var">H7</span> : <span class="id" title="inductive">True</span> ∧ <span class="id" title="inductive">True</span> ∧ <span class="id" title="inductive">False</span>) ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="definition">and_ind</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="keyword">fun</span> (<span class="id" title="var">_</span> : <span class="id" title="inductive">True</span>) (<span class="id" title="var">H9</span> : <span class="id" title="inductive">True</span> ∧ <span class="id" title="inductive">False</span>) ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="definition">and_ind</span> (<span class="id" title="keyword">fun</span> (<span class="id" title="var">_</span> : <span class="id" title="inductive">True</span>) (<span class="id" title="var">H11</span> : <span class="id" title="inductive">False</span>) ⇒ <span class="id" title="definition">False_ind</span> <span class="id" title="inductive">False</span> <span class="id" title="var">H11</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">H9</span>) <span class="id" title="var">H7</span>) <span class="id" title="var">H5</span>) <a class="idref" href="Cpdt.Large.html#slow.H3"><span class="id" title="variable">H3</span></a>) <a class="idref" href="Cpdt.Large.html#slow.H1"><span class="id" title="variable">H1</span></a>) <a class="idref" href="Cpdt.GeneralRec.html#thunk_eq_coind.H"><span class="id" title="variable">H</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: <span class="id" title="inductive">True</span> ∧ <span class="id" title="inductive">True</span> ∧ <span class="id" title="inductive">True</span> ∧ <span class="id" title="inductive">True</span> ∧ <span class="id" title="inductive">True</span> ∧ <span class="id" title="inductive">True</span> ∧ <span class="id" title="inductive">False</span> → <span class="id" title="inductive">False</span>
+<div class="paragraph"> </div>
+
+</span>
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+伝統的な<span class="inlinecode"><span class="id" title="tactic">tauto</span></span>タクティクは、
+証明項のサイズの2次(quadratic)的な「爆発(blow-up)」を導入するのに対し、<span class="inlinecode"><a class="idref" href="Cpdt.Reflection.html#my_tauto"><span class="id" title="definition">my_tauto</span></a></span>によって生成される証明は常に線形の大きさを持ちます。 
+</div>
+<div class="code">
+
+<br/>
+</div>
+
+<div class="doc">
+<a name="lab88"></a><h2 class="section">変数を持つ項の手動の具象化</h2>
+
+</div>
+<div class="code">
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+上記の<span class="inlinecode"><span class="id" title="tactic">quote</span></span> タクティクの動作は手品のように見えます。
+どういうわけか、それは任意の型の副項(subterms)どうしが等しいかどうかの比較(equality comparison)
+を実行するので、これらの副項は同じ具象化された(reified)変数でされるでしょう。
+
+<div class="paragraph"> </div>
+
+<span class="inlinecode"><span class="id" title="tactic">quote</span></span>はOCamlで実装されていますが、具象化のプロセス(reification process)
+をLtacで完全にコードすることができます。
+仕事をより簡単にするために、変数を<span class="inlinecode"><a class="idref" href="Cpdt.InductiveTypes.html#nat"><span class="id" title="inductive">nat</span></a></span>として表現し、
+参照される変数の値からなる単純なリストにインデックスを付けます。
+
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+プロセスの最初のステップは、項をクロールし、
+エンコードする位置に表示されるすべての値の重複のないリストを変数として構築することです。
+便利な補助関数(helper function)は、重複を防止ながら、要素をリストに追加ます。
+Ltacのパターンマッチングを使用してGallina項についての等値のテスト
+(equality test)を実装する方法に注意してください。
+これは単純な文法的な等値(syntactic equality)であり、
+より豊かな定義による等値(definitional equality)ではありません。
+また、異なるリストの要素が異なるGallinaに型を持つことを可能にするために、
+ネストされたタプルとしてリストを表現します。
+
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Ltac</span> <span class="id" title="var">inList</span> <span class="id" title="var">x</span> <span class="id" title="var">xs</span> :=<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">match</span> <span class="id" title="var">xs</span> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="constructor">tt</span> ⇒ <span class="id" title="var">false</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="notation">(</span><span class="id" title="var">x</span><span class="id" title="notation">,</span> <span class="id" title="var">_</span><span class="id" title="notation">)</span> ⇒ <span class="id" title="var">true</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="notation">(</span><span class="id" title="var">_</span><span class="id" title="notation">,</span> ?<span class="id" title="var">xs'</span><span class="id" title="notation">)</span> ⇒ <span class="id" title="var">inList</span> <span class="id" title="var">x</span> <span class="id" title="var">xs'</span><br/>
+&nbsp;&nbsp;<span class="id" title="keyword">end</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Ltac</span> <span class="id" title="var">addToList</span> <span class="id" title="var">x</span> <span class="id" title="var">xs</span> :=<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">let</span> <span class="id" title="var">b</span> := <span class="id" title="var">inList</span> <span class="id" title="var">x</span> <span class="id" title="var">xs</span> <span class="id" title="keyword">in</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">match</span> <span class="id" title="var">b</span> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="constructor">true</span> ⇒ <span class="id" title="var">xs</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="constructor">false</span> ⇒ <span class="id" title="keyword">constr</span>:<span class="id" title="notation">(</span><span class="id" title="var">x</span><span class="id" title="notation">,</span> <span class="id" title="var">xs</span><span class="id" title="notation">)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">end</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+ここで、項を表すために使用する変数値のリストを計算する再帰関数を書くことができます。
+ 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Ltac</span> <span class="id" title="var">allVars</span> <span class="id" title="var">xs</span> <span class="id" title="var">e</span> :=<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">match</span> <span class="id" title="var">e</span> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="inductive">True</span> ⇒ <span class="id" title="var">xs</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="inductive">False</span> ⇒ <span class="id" title="var">xs</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| ?<span class="id" title="var">e1</span> <span class="id" title="notation">∧</span> ?<span class="id" title="var">e2</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">let</span> <span class="id" title="var">xs</span> := <span class="id" title="var">allVars</span> <span class="id" title="var">xs</span> <span class="id" title="var">e1</span> <span class="id" title="keyword">in</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">allVars</span> <span class="id" title="var">xs</span> <span class="id" title="var">e2</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| ?<span class="id" title="var">e1</span> <span class="id" title="notation">∨</span> ?<span class="id" title="var">e2</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">let</span> <span class="id" title="var">xs</span> := <span class="id" title="var">allVars</span> <span class="id" title="var">xs</span> <span class="id" title="var">e1</span> <span class="id" title="keyword">in</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">allVars</span> <span class="id" title="var">xs</span> <span class="id" title="var">e2</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| ?<span class="id" title="var">e1</span> <span class="id" title="notation">→</span> ?<span class="id" title="var">e2</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">let</span> <span class="id" title="var">xs</span> := <span class="id" title="var">allVars</span> <span class="id" title="var">xs</span> <span class="id" title="var">e1</span> <span class="id" title="keyword">in</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">allVars</span> <span class="id" title="var">xs</span> <span class="id" title="var">e2</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="var">_</span> ⇒ <span class="id" title="var">addToList</span> <span class="id" title="var">e</span> <span class="id" title="var">xs</span><br/>
+&nbsp;&nbsp;<span class="id" title="keyword">end</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+値をリストの内の位置にマップする方法も必要です。
+ 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Ltac</span> <span class="id" title="var">lookup</span> <span class="id" title="var">x</span> <span class="id" title="var">xs</span> :=<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">match</span> <span class="id" title="var">xs</span> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="notation">(</span><span class="id" title="var">x</span><span class="id" title="notation">,</span> <span class="id" title="var">_</span><span class="id" title="notation">)</span> ⇒ <span class="id" title="var">O</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="notation">(</span><span class="id" title="var">_</span><span class="id" title="notation">,</span> ?<span class="id" title="var">xs'</span><span class="id" title="notation">)</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">let</span> <span class="id" title="var">n</span> := <span class="id" title="var">lookup</span> <span class="id" title="var">x</span> <span class="id" title="var">xs'</span> <span class="id" title="keyword">in</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">constr</span>:(<span class="id" title="constructor">S</span> <span class="id" title="var">n</span>)<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">end</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+次の構成要素(building block)は、許可されたすべての変数値のリストを指定して、
+項を具象化する手順です。
+
+<div class="paragraph"> </div>
+
+変数のリストに含まれていない副項(subterm)を含む項の具象化を試みると、
+タクティクの失敗が引き起こされる可能性があるため、
+この手続きは部分的(partial)になります(free to make this procedure partial)。
+出力項の型は、<span class="inlinecode"><span class="id" title="inductive">index</span></span>が<span class="inlinecode"><a class="idref" href="Cpdt.InductiveTypes.html#nat"><span class="id" title="inductive">nat</span></a></span>に置き換えられた<span class="inlinecode"><a class="idref" href="Cpdt.Reflection.html#formula"><span class="id" title="inductive">formula</span></a></span>のコピーで、
+アトミックな式のコンストラクタの型です。
+ 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Inductive</span> <a name="formula'"><span class="id" title="inductive">formula'</span></a> : <span class="id" title="keyword">Set</span> :=<br/>
+| <a name="Atomic'"><span class="id" title="constructor">Atomic'</span></a> : <span class="id" title="inductive">nat</span> <span class="id" title="notation">→</span> <a class="idref" href="Cpdt.Reflection.html#formula'"><span class="id" title="inductive">formula'</span></a><br/>
+| <a name="Truth'"><span class="id" title="constructor">Truth'</span></a> : <a class="idref" href="Cpdt.Reflection.html#formula'"><span class="id" title="inductive">formula'</span></a><br/>
+| <a name="Falsehood'"><span class="id" title="constructor">Falsehood'</span></a> : <a class="idref" href="Cpdt.Reflection.html#formula'"><span class="id" title="inductive">formula'</span></a><br/>
+| <a name="And'"><span class="id" title="constructor">And'</span></a> : <a class="idref" href="Cpdt.Reflection.html#formula'"><span class="id" title="inductive">formula'</span></a> <span class="id" title="notation">→</span> <a class="idref" href="Cpdt.Reflection.html#formula'"><span class="id" title="inductive">formula'</span></a> <span class="id" title="notation">→</span> <a class="idref" href="Cpdt.Reflection.html#formula'"><span class="id" title="inductive">formula'</span></a><br/>
+| <a name="Or'"><span class="id" title="constructor">Or'</span></a> : <a class="idref" href="Cpdt.Reflection.html#formula'"><span class="id" title="inductive">formula'</span></a> <span class="id" title="notation">→</span> <a class="idref" href="Cpdt.Reflection.html#formula'"><span class="id" title="inductive">formula'</span></a> <span class="id" title="notation">→</span> <a class="idref" href="Cpdt.Reflection.html#formula'"><span class="id" title="inductive">formula'</span></a><br/>
+| <a name="Imp'"><span class="id" title="constructor">Imp'</span></a> : <a class="idref" href="Cpdt.Reflection.html#formula'"><span class="id" title="inductive">formula'</span></a> <span class="id" title="notation">→</span> <a class="idref" href="Cpdt.Reflection.html#formula'"><span class="id" title="inductive">formula'</span></a> <span class="id" title="notation">→</span> <a class="idref" href="Cpdt.Reflection.html#formula'"><span class="id" title="inductive">formula'</span></a>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+私たち自身のLtac手続きを書くときは、ラッパーを導入する必要はなく、
+通常の<span class="inlinecode">→</span>演算子で直接作業することができます。
+ 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Ltac</span> <span class="id" title="var">reifyTerm</span> <span class="id" title="var">xs</span> <span class="id" title="var">e</span> :=<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">match</span> <span class="id" title="var">e</span> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="inductive">True</span> ⇒ <span class="id" title="keyword">constr</span>:<a class="idref" href="Cpdt.Reflection.html#Truth'"><span class="id" title="constructor">Truth'</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="inductive">False</span> ⇒ <span class="id" title="keyword">constr</span>:<a class="idref" href="Cpdt.Reflection.html#Falsehood'"><span class="id" title="constructor">Falsehood'</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| ?<span class="id" title="var">e1</span> <span class="id" title="notation">∧</span> ?<span class="id" title="var">e2</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">let</span> <span class="id" title="var">p1</span> := <span class="id" title="var">reifyTerm</span> <span class="id" title="var">xs</span> <span class="id" title="var">e1</span> <span class="id" title="keyword">in</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">let</span> <span class="id" title="var">p2</span> := <span class="id" title="var">reifyTerm</span> <span class="id" title="var">xs</span> <span class="id" title="var">e2</span> <span class="id" title="keyword">in</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">constr</span>:(<a class="idref" href="Cpdt.Reflection.html#And'"><span class="id" title="constructor">And'</span></a> <span class="id" title="var">p1</span> <span class="id" title="var">p2</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| ?<span class="id" title="var">e1</span> <span class="id" title="notation">∨</span> ?<span class="id" title="var">e2</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">let</span> <span class="id" title="var">p1</span> := <span class="id" title="var">reifyTerm</span> <span class="id" title="var">xs</span> <span class="id" title="var">e1</span> <span class="id" title="keyword">in</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">let</span> <span class="id" title="var">p2</span> := <span class="id" title="var">reifyTerm</span> <span class="id" title="var">xs</span> <span class="id" title="var">e2</span> <span class="id" title="keyword">in</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">constr</span>:(<a class="idref" href="Cpdt.Reflection.html#Or'"><span class="id" title="constructor">Or'</span></a> <span class="id" title="var">p1</span> <span class="id" title="var">p2</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| ?<span class="id" title="var">e1</span> <span class="id" title="notation">→</span> ?<span class="id" title="var">e2</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">let</span> <span class="id" title="var">p1</span> := <span class="id" title="var">reifyTerm</span> <span class="id" title="var">xs</span> <span class="id" title="var">e1</span> <span class="id" title="keyword">in</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">let</span> <span class="id" title="var">p2</span> := <span class="id" title="var">reifyTerm</span> <span class="id" title="var">xs</span> <span class="id" title="var">e2</span> <span class="id" title="keyword">in</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">constr</span>:(<a class="idref" href="Cpdt.Reflection.html#Imp'"><span class="id" title="constructor">Imp'</span></a> <span class="id" title="var">p1</span> <span class="id" title="var">p2</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="var">_</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">let</span> <span class="id" title="var">n</span> := <span class="id" title="var">lookup</span> <span class="id" title="var">e</span> <span class="id" title="var">xs</span> <span class="id" title="keyword">in</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">constr</span>:(<a class="idref" href="Cpdt.Reflection.html#Atomic'"><span class="id" title="constructor">Atomic'</span></a> <span class="id" title="var">n</span>)<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">end</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+最後に、すべての作品をまとめています。
+
+</div>
+<div class="code">
+<span class="id" title="keyword">Ltac</span> <span class="id" title="var">reify</span> :=<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">match</span> <span class="id" title="keyword">goal</span> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| [ |- ?<span class="id" title="var">G</span> ] ⇒ <span class="id" title="keyword">let</span> <span class="id" title="var">xs</span> := <span class="id" title="var">allVars</span> <span class="id" title="var">tt</span> <span class="id" title="var">G</span> <span class="id" title="keyword">in</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">let</span> <span class="id" title="var">p</span> := <span class="id" title="var">reifyTerm</span> <span class="id" title="var">xs</span> <span class="id" title="var">G</span> <span class="id" title="keyword">in</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">pose</span> <span class="id" title="var">p</span><br/>
+&nbsp;&nbsp;<span class="id" title="keyword">end</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+クイックテストは、私たちが正しく具象化(reification)を行っていることを検証します。
+
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Theorem</span> <a name="mt3'"><span class="id" title="lemma">mt3'</span></a> : <span class="id" title="keyword">∀</span> <span class="id" title="var">x</span> <span class="id" title="var">y</span> <span class="id" title="var">z</span>,<br/>
+&nbsp;&nbsp;<span class="id" title="notation">(</span><a class="idref" href="Cpdt.Reflection.html#x"><span class="id" title="variable">x</span></a> <span class="id" title="notation">&lt;</span> <a class="idref" href="Cpdt.Reflection.html#y"><span class="id" title="variable">y</span></a> <span class="id" title="notation">∧</span> <a class="idref" href="Cpdt.Reflection.html#y"><span class="id" title="variable">y</span></a> <span class="id" title="notation">&gt;</span> <a class="idref" href="Cpdt.Reflection.html#z"><span class="id" title="variable">z</span></a><span class="id" title="notation">)</span> <span class="id" title="notation">∨</span> <span class="id" title="notation">(</span><a class="idref" href="Cpdt.Reflection.html#y"><span class="id" title="variable">y</span></a> <span class="id" title="notation">&gt;</span> <a class="idref" href="Cpdt.Reflection.html#z"><span class="id" title="variable">z</span></a> <span class="id" title="notation">∧</span> <a class="idref" href="Cpdt.Reflection.html#x"><span class="id" title="variable">x</span></a> <span class="id" title="notation">&lt;</span> <span class="id" title="constructor">S</span> <a class="idref" href="Cpdt.Reflection.html#y"><span class="id" title="variable">y</span></a><span class="id" title="notation">)</span><br/>
+&nbsp;&nbsp;<span class="id" title="notation">→</span> <a class="idref" href="Cpdt.Reflection.html#y"><span class="id" title="variable">y</span></a> <span class="id" title="notation">&gt;</span> <a class="idref" href="Cpdt.Reflection.html#z"><span class="id" title="variable">z</span></a> <span class="id" title="notation">∧</span> <span class="id" title="notation">(</span><a class="idref" href="Cpdt.Reflection.html#x"><span class="id" title="variable">x</span></a> <span class="id" title="notation">&lt;</span> <a class="idref" href="Cpdt.Reflection.html#y"><span class="id" title="variable">y</span></a> <span class="id" title="notation">∨</span> <a class="idref" href="Cpdt.Reflection.html#x"><span class="id" title="variable">x</span></a> <span class="id" title="notation">&lt;</span> <span class="id" title="constructor">S</span> <a class="idref" href="Cpdt.Reflection.html#y"><span class="id" title="variable">y</span></a><span class="id" title="notation">)</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">do</span> 3 <span class="id" title="tactic">intro</span>; <span class="id" title="var">reify</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+私たちの簡単なタクティクは、変換された項を新しい変数として追加します：
+
+<div class="paragraph"> </div>
+
+<br/>
+<span class="inlinecode"><a class="idref" href="Cpdt.Large.html#Int.f"><span class="id" title="definition">f</span></a> := <a class="idref" href="Cpdt.Reflection.html#Imp'"><span class="id" title="constructor">Imp'</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<a class="idref" href="Cpdt.Reflection.html#Or'"><span class="id" title="constructor">Or'</span></a> (<a class="idref" href="Cpdt.Reflection.html#And'"><span class="id" title="constructor">And'</span></a> (<a class="idref" href="Cpdt.Reflection.html#Atomic'"><span class="id" title="constructor">Atomic'</span></a> 2) (<a class="idref" href="Cpdt.Reflection.html#Atomic'"><span class="id" title="constructor">Atomic'</span></a> 1)) (<a class="idref" href="Cpdt.Reflection.html#And'"><span class="id" title="constructor">And'</span></a> (<a class="idref" href="Cpdt.Reflection.html#Atomic'"><span class="id" title="constructor">Atomic'</span></a> 1) (<a class="idref" href="Cpdt.Reflection.html#Atomic'"><span class="id" title="constructor">Atomic'</span></a> 0)))<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<a class="idref" href="Cpdt.Reflection.html#And'"><span class="id" title="constructor">And'</span></a> (<a class="idref" href="Cpdt.Reflection.html#Atomic'"><span class="id" title="constructor">Atomic'</span></a> 1) (<a class="idref" href="Cpdt.Reflection.html#Or'"><span class="id" title="constructor">Or'</span></a> (<a class="idref" href="Cpdt.Reflection.html#Atomic'"><span class="id" title="constructor">Atomic'</span></a> 2) (<a class="idref" href="Cpdt.Reflection.html#Atomic'"><span class="id" title="constructor">Atomic'</span></a> 0))) : <a class="idref" href="Cpdt.Reflection.html#formula'"><span class="id" title="inductive">formula'</span></a>
+<div class="paragraph"> </div>
+
+</span>
+</div>
+<div class="code">
+<span class="id" title="keyword">Abort</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+新しい構文型と式の実際の意味を結びつけなければならないので、
+リフレクティブなタクティクを完成させるためにはもっと多くの作業が必要ですが、
+詳細は以前の<span class="inlinecode"><span class="id" title="tactic">quote</span></span>による実装と同じです。
+
+</div>
+<div class="code">
+
+<br/>
+
+<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a name="lab89"></a><h1 class="section">束縛のもとで再帰する具象化タクティクを作る</h1>
+
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+これまでのすべての例では、量化子や、<span class="inlinecode"><span class="id" title="keyword">fun</span></span>による関数抽象などの項の構文を具現化する形式
+から離れていました。
+そのような場合は、
+異なる副項が自由変数の異なる集合を参照することを許されるという事実によって複雑になります。
+このようなハードルを解消するためにはいくつかの巧妙さが必要ですが、
+すこしの単純なパターンで十分です。
+関数抽象の本体が便利にCoqの関数で表されている単純な依存型の言語の例を考えてみましょう。
+ 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Inductive</span> <a name="type"><span class="id" title="inductive">type</span></a> : <span class="id" title="keyword">Type</span> :=<br/>
+| <a name="Nat"><span class="id" title="constructor">Nat</span></a> : <a class="idref" href="Cpdt.Reflection.html#type"><span class="id" title="inductive">type</span></a><br/>
+| <a name="NatFunc"><span class="id" title="constructor">NatFunc</span></a> : <a class="idref" href="Cpdt.Reflection.html#type"><span class="id" title="inductive">type</span></a> <span class="id" title="notation">→</span> <a class="idref" href="Cpdt.Reflection.html#type"><span class="id" title="inductive">type</span></a>.<br/>
+
+<br/>
+<span class="id" title="keyword">Inductive</span> <a name="term"><span class="id" title="inductive">term</span></a> : <a class="idref" href="Cpdt.Reflection.html#type"><span class="id" title="inductive">type</span></a> <span class="id" title="notation">→</span> <span class="id" title="keyword">Type</span> :=<br/>
+| <a name="Const"><span class="id" title="constructor">Const</span></a> : <span class="id" title="inductive">nat</span> <span class="id" title="notation">→</span> <a class="idref" href="Cpdt.Reflection.html#term"><span class="id" title="inductive">term</span></a> <a class="idref" href="Cpdt.Reflection.html#Nat"><span class="id" title="constructor">Nat</span></a><br/>
+| <a name="Plus"><span class="id" title="constructor">Plus</span></a> : <a class="idref" href="Cpdt.Reflection.html#term"><span class="id" title="inductive">term</span></a> <a class="idref" href="Cpdt.Reflection.html#Nat"><span class="id" title="constructor">Nat</span></a> <span class="id" title="notation">→</span> <a class="idref" href="Cpdt.Reflection.html#term"><span class="id" title="inductive">term</span></a> <a class="idref" href="Cpdt.Reflection.html#Nat"><span class="id" title="constructor">Nat</span></a> <span class="id" title="notation">→</span> <a class="idref" href="Cpdt.Reflection.html#term"><span class="id" title="inductive">term</span></a> <a class="idref" href="Cpdt.Reflection.html#Nat"><span class="id" title="constructor">Nat</span></a><br/>
+| <a name="Abs"><span class="id" title="constructor">Abs</span></a> : <span class="id" title="keyword">∀</span> <span class="id" title="var">t</span>, <span class="id" title="notation">(</span><span class="id" title="inductive">nat</span> <span class="id" title="notation">→</span> <a class="idref" href="Cpdt.Reflection.html#term"><span class="id" title="inductive">term</span></a> <a class="idref" href="Cpdt.Reflection.html#t"><span class="id" title="variable">t</span></a><span class="id" title="notation">)</span> <span class="id" title="notation">→</span> <a class="idref" href="Cpdt.Reflection.html#term"><span class="id" title="inductive">term</span></a> (<a class="idref" href="Cpdt.Reflection.html#NatFunc"><span class="id" title="constructor">NatFunc</span></a> <a class="idref" href="Cpdt.Reflection.html#t"><span class="id" title="variable">t</span></a>).<br/>
+
+<br/>
+<span class="id" title="keyword">Fixpoint</span> <a name="typeDenote"><span class="id" title="definition">typeDenote</span></a> (<span class="id" title="var">t</span> : <a class="idref" href="Cpdt.Reflection.html#type"><span class="id" title="inductive">type</span></a>) : <span class="id" title="keyword">Type</span> :=<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">match</span> <a class="idref" href="Cpdt.Reflection.html#t"><span class="id" title="variable">t</span></a> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <a class="idref" href="Cpdt.Reflection.html#Nat"><span class="id" title="constructor">Nat</span></a> ⇒ <span class="id" title="inductive">nat</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <a class="idref" href="Cpdt.Reflection.html#NatFunc"><span class="id" title="constructor">NatFunc</span></a> <span class="id" title="var">t</span> ⇒ <span class="id" title="inductive">nat</span> <span class="id" title="notation">→</span> <a class="idref" href="Cpdt.Reflection.html#typeDenote"><span class="id" title="definition">typeDenote</span></a> <a class="idref" href="Cpdt.Reflection.html#t"><span class="id" title="variable">t</span></a><br/>
+&nbsp;&nbsp;<span class="id" title="keyword">end</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Fixpoint</span> <a name="termDenote"><span class="id" title="definition">termDenote</span></a> <span class="id" title="var">t</span> (<span class="id" title="var">e</span> : <a class="idref" href="Cpdt.Reflection.html#term"><span class="id" title="inductive">term</span></a> <a class="idref" href="Cpdt.Reflection.html#t"><span class="id" title="variable">t</span></a>) : <a class="idref" href="Cpdt.Reflection.html#typeDenote"><span class="id" title="definition">typeDenote</span></a> <a class="idref" href="Cpdt.Reflection.html#t"><span class="id" title="variable">t</span></a> :=<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">match</span> <a class="idref" href="Cpdt.Reflection.html#e"><span class="id" title="variable">e</span></a> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <a class="idref" href="Cpdt.Reflection.html#Const"><span class="id" title="constructor">Const</span></a> <span class="id" title="var">n</span> ⇒ <span class="id" title="var">n</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <a class="idref" href="Cpdt.Reflection.html#Plus"><span class="id" title="constructor">Plus</span></a> <span class="id" title="var">e1</span> <span class="id" title="var">e2</span> ⇒ <a class="idref" href="Cpdt.Reflection.html#termDenote"><span class="id" title="definition">termDenote</span></a> <span class="id" title="var">e1</span> <span class="id" title="notation">+</span> <a class="idref" href="Cpdt.Reflection.html#termDenote"><span class="id" title="definition">termDenote</span></a> <span class="id" title="var">e2</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <a class="idref" href="Cpdt.Reflection.html#Abs"><span class="id" title="constructor">Abs</span></a> <span class="id" title="var">_</span> <span class="id" title="var">e1</span> ⇒ <span class="id" title="keyword">fun</span> <span class="id" title="var">x</span> ⇒ <a class="idref" href="Cpdt.Reflection.html#termDenote"><span class="id" title="definition">termDenote</span></a> (<span class="id" title="var">e1</span> <a class="idref" href="Cpdt.Reflection.html#x"><span class="id" title="variable">x</span></a>)<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">end</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+ここでは、具象化のタクティクで素朴(naive)な最初の試みがあります。
+
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Ltac</span> <span class="id" title="var">refl'</span> <span class="id" title="var">e</span> :=<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">match</span> <span class="id" title="var">e</span> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| ?<span class="id" title="var">E1</span> <span class="id" title="notation">+</span> ?<span class="id" title="var">E2</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">let</span> <span class="id" title="var">r1</span> := <span class="id" title="var">refl'</span> <span class="id" title="var">E1</span> <span class="id" title="keyword">in</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">let</span> <span class="id" title="var">r2</span> := <span class="id" title="var">refl'</span> <span class="id" title="var">E2</span> <span class="id" title="keyword">in</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">constr</span>:(<a class="idref" href="Cpdt.Reflection.html#Plus"><span class="id" title="constructor">Plus</span></a> <span class="id" title="var">r1</span> <span class="id" title="var">r2</span>)<br/>
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="keyword">fun</span> <span class="id" title="var">x</span> : <span class="id" title="inductive">nat</span> ⇒ ?<span class="id" title="var">E1</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">let</span> <span class="id" title="var">r1</span> := <span class="id" title="var">refl'</span> <span class="id" title="var">E1</span> <span class="id" title="keyword">in</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">constr</span>:(<a class="idref" href="Cpdt.Reflection.html#Abs"><span class="id" title="constructor">Abs</span></a> (<span class="id" title="keyword">fun</span> <span class="id" title="var">x</span> ⇒ <span class="id" title="var">r1</span> <a class="idref" href="Cpdt.Reflection.html#x"><span class="id" title="variable">x</span></a>))<br/>
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="var">_</span> ⇒ <span class="id" title="keyword">constr</span>:(<a class="idref" href="Cpdt.Reflection.html#Const"><span class="id" title="constructor">Const</span></a> <span class="id" title="var">e</span>)<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">end</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+関数を一般的に扱うために、パターンの変数の形式 <span class="inlinecode">@?<span class="id" title="var">X</span></span>を使用して、
+明示的に宣言された新しく導入された変数について<span class="inlinecode"><span class="id" title="var">X</span></span>が言及するようにします。
+<span class="inlinecode">@?<span class="id" title="var">X</span></span>の使用のあとには、言及する可能性のあるローカル変数のリストを続ける必要があります。 
+
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+変数<span class="inlinecode"><span class="id" title="var">X</span></span>は、それらの変数の値に渡ってGallina関数を表します。 例えば：
+ 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Reset</span> <span class="id" title="var">refl'</span>.<br/>
+<span class="id" title="keyword">Ltac</span> <span class="id" title="var">refl'</span> <span class="id" title="var">e</span> :=<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">match</span> <span class="id" title="var">e</span> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| ?<span class="id" title="var">E1</span> <span class="id" title="notation">+</span> ?<span class="id" title="var">E2</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">let</span> <span class="id" title="var">r1</span> := <span class="id" title="var">refl'</span> <span class="id" title="var">E1</span> <span class="id" title="keyword">in</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">let</span> <span class="id" title="var">r2</span> := <span class="id" title="var">refl'</span> <span class="id" title="var">E2</span> <span class="id" title="keyword">in</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">constr</span>:(<a class="idref" href="Cpdt.Reflection.html#Plus"><span class="id" title="constructor">Plus</span></a> <span class="id" title="var">r1</span> <span class="id" title="var">r2</span>)<br/>
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="keyword">fun</span> <span class="id" title="var">x</span> : <span class="id" title="inductive">nat</span> ⇒ @?<span class="id" title="var">E1</span> <a class="idref" href="Cpdt.Reflection.html#x"><span class="id" title="variable">x</span></a> ⇒              <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">let</span> <span class="id" title="var">r1</span> := <span class="id" title="var">refl'</span> <span class="id" title="var">E1</span> <span class="id" title="keyword">in</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">constr</span>:(<a class="idref" href="Cpdt.Reflection.html#Abs"><span class="id" title="constructor">Abs</span></a> <span class="id" title="var">r1</span>)<br/>
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="var">_</span> ⇒ <span class="id" title="keyword">constr</span>:(<a class="idref" href="Cpdt.Reflection.html#Const"><span class="id" title="constructor">Const</span></a> <span class="id" title="var">e</span>)<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">end</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+抽象化の場合<span class="inlinecode"><span class="id" title="var">E1</span></span>を、<span class="inlinecode"><a class="idref" href="Cpdt.MoreDep.html#insert.x"><span class="id" title="variable">x</span></a></span>の値から抽象化した本体の値への関数に、束縛します。
+残念ながら、再帰呼び出しは成功すると決まったわけではありません。
+
+<div class="paragraph"> </div>
+
+同じ抽象パターンに一致し、別の再帰呼び出しを実行するなど、無限再帰を使用します。
+最後の具象化によって作業手順が得られます。
+重要なアイデアは、<span class="inlinecode"><span class="id" title="var">refl'</span></span>へのすべての入力を
+<i>再帰中に導入された変数の値に対する関数</i> として考えることです。
+
+<div class="paragraph"> </div>
+
+ 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Reset</span> <span class="id" title="var">refl'</span>.<br/>
+<span class="id" title="keyword">Ltac</span> <span class="id" title="var">refl'</span> <span class="id" title="var">e</span> :=<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">match</span> <span class="id" title="tactic">eval</span> <span class="id" title="tactic">simpl</span> <span class="id" title="keyword">in</span> <span class="id" title="var">e</span> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="keyword">fun</span> <span class="id" title="var">x</span> : ?<span class="id" title="var">T</span> ⇒ @?<span class="id" title="var">E1</span> <a class="idref" href="Cpdt.Reflection.html#x"><span class="id" title="variable">x</span></a> <span class="id" title="notation">+</span> @?<span class="id" title="var">E2</span> <a class="idref" href="Cpdt.Reflection.html#x"><span class="id" title="variable">x</span></a> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">let</span> <span class="id" title="var">r1</span> := <span class="id" title="var">refl'</span> <span class="id" title="var">E1</span> <span class="id" title="keyword">in</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">let</span> <span class="id" title="var">r2</span> := <span class="id" title="var">refl'</span> <span class="id" title="var">E2</span> <span class="id" title="keyword">in</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">constr</span>:(<span class="id" title="keyword">fun</span> <span class="id" title="var">x</span> ⇒ <a class="idref" href="Cpdt.Reflection.html#Plus"><span class="id" title="constructor">Plus</span></a> (<span class="id" title="var">r1</span> <a class="idref" href="Cpdt.Reflection.html#x"><span class="id" title="variable">x</span></a>) (<span class="id" title="var">r2</span> <a class="idref" href="Cpdt.Reflection.html#x"><span class="id" title="variable">x</span></a>)) <br/>
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="keyword">fun</span> (<span class="id" title="var">x</span> : ?<span class="id" title="var">T</span>) (<span class="id" title="var">y</span> : <span class="id" title="inductive">nat</span>) ⇒ @?<span class="id" title="var">E1</span> <a class="idref" href="Cpdt.Reflection.html#x"><span class="id" title="variable">x</span></a> <a class="idref" href="Cpdt.Reflection.html#y"><span class="id" title="variable">y</span></a> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">let</span> <span class="id" title="var">r1</span> := <span class="id" title="var">refl'</span> (<span class="id" title="keyword">fun</span> <span class="id" title="var">p</span> : <span class="id" title="var">T</span> <span class="id" title="notation">×</span> <span class="id" title="inductive">nat</span> ⇒ <span class="id" title="var">E1</span> (<span class="id" title="definition">fst</span> <a class="idref" href="Cpdt.Reflection.html#p"><span class="id" title="variable">p</span></a>) (<span class="id" title="definition">snd</span> <a class="idref" href="Cpdt.Reflection.html#p"><span class="id" title="variable">p</span></a>)) <span class="id" title="keyword">in</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">constr</span>:(<span class="id" title="keyword">fun</span> <span class="id" title="var">u</span> ⇒ <a class="idref" href="Cpdt.Reflection.html#Abs"><span class="id" title="constructor">Abs</span></a> (<span class="id" title="keyword">fun</span> <span class="id" title="var">v</span> ⇒ <span class="id" title="var">r1</span> <span class="id" title="notation">(</span><a class="idref" href="Cpdt.Reflection.html#u"><span class="id" title="variable">u</span></a><span class="id" title="notation">,</span> <a class="idref" href="Cpdt.Reflection.html#v"><span class="id" title="variable">v</span></a><span class="id" title="notation">)</span>)) <br/>
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="var">_</span> ⇒ <span class="id" title="keyword">constr</span>:(<span class="id" title="keyword">fun</span> <span class="id" title="var">x</span> ⇒ <a class="idref" href="Cpdt.Reflection.html#Const"><span class="id" title="constructor">Const</span></a> (<span class="id" title="var">e</span> <a class="idref" href="Cpdt.Reflection.html#x"><span class="id" title="variable">x</span></a>)) <br/>
+&nbsp;&nbsp;<span class="id" title="keyword">end</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+<span class="inlinecode">@?<span class="id" title="var">X</span></span>のパターンでは、関数の形で加算の場合でもどのように動作するのか注意してください。
+抽象化の場合、自由変数を表すために使用される型を拡張することによって新しい変数が導入されます。
+すべての自由変数を表すために<span class="inlinecode"><a class="idref" href="Cpdt.Generic.html#ok.T"><span class="id" title="variable">T</span></a></span>型を使用しました。
+抽象化の本体内の自由変数値を表す型の型を<span class="inlinecode"><a class="idref" href="Cpdt.Generic.html#ok.T"><span class="id" title="variable">T</span></a></span> <span class="inlinecode">×</span> <span class="inlinecode"><a class="idref" href="Cpdt.InductiveTypes.html#nat"><span class="id" title="inductive">nat</span></a></span>に拡張します。
+ペアとその射影(projection)による
+少しのブックキーピング(a bit of bookkeeping)は、
+再帰呼び出しで渡す抽象本体の適切なバージョンを生成します。
+このような項の再パッケージングがすべてパターンマッチングを妨げないようにするために、
+<span class="inlinecode"><span class="id" title="var">refl'</span></span>の本体の最初の行に関数引数を追加します。
+
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+今やもうひとつのタクティクが、具象化を適用する方法の例を提供します。
+具象化できる項どうしの等式であるゴールを考えてみましょう。
+このようなゴールを<span class="inlinecode"><a class="idref" href="Cpdt.ProgLang.html#HigherOrder.termDenote"><span class="id" title="definition">termDenote</span></a></span>への適切な呼び出しの間で等式に変更したいと考えています。
+ 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Ltac</span> <span class="id" title="var">refl</span> :=<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">match</span> <span class="id" title="keyword">goal</span> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| [ |- ?<span class="id" title="var">E1</span> <span class="id" title="notation">=</span> ?<span class="id" title="var">E2</span> ] ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">let</span> <span class="id" title="var">E1'</span> := <span class="id" title="var">refl'</span> (<span class="id" title="keyword">fun</span> <span class="id" title="var">_</span> : <span class="id" title="inductive">unit</span> ⇒ <span class="id" title="var">E1</span>) <span class="id" title="keyword">in</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">let</span> <span class="id" title="var">E2'</span> := <span class="id" title="var">refl'</span> (<span class="id" title="keyword">fun</span> <span class="id" title="var">_</span> : <span class="id" title="inductive">unit</span> ⇒ <span class="id" title="var">E2</span>) <span class="id" title="keyword">in</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">change</span> (<a class="idref" href="Cpdt.Reflection.html#termDenote"><span class="id" title="definition">termDenote</span></a> (<span class="id" title="var">E1'</span> <span class="id" title="constructor">tt</span>) <span class="id" title="notation">=</span> <a class="idref" href="Cpdt.Reflection.html#termDenote"><span class="id" title="definition">termDenote</span></a> (<span class="id" title="var">E2'</span> <span class="id" title="constructor">tt</span>));<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">cbv</span> <span class="id" title="keyword">beta</span> <span class="id" title="keyword">iota</span> <span class="id" title="keyword">delta</span> [<span class="id" title="definition">fst</span> <span class="id" title="definition">snd</span>]<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">end</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Goal</span> <span class="id" title="notation">(</span><span class="id" title="keyword">fun</span> (<span class="id" title="var">x</span> <span class="id" title="var">y</span> : <span class="id" title="inductive">nat</span>) ⇒ <a class="idref" href="Cpdt.Reflection.html#x"><span class="id" title="variable">x</span></a> <span class="id" title="notation">+</span> <a class="idref" href="Cpdt.Reflection.html#y"><span class="id" title="variable">y</span></a> <span class="id" title="notation">+</span> 13<span class="id" title="notation">)</span> <span class="id" title="notation">=</span> <span class="id" title="notation">(</span><span class="id" title="keyword">fun</span> (<span class="id" title="var">_</span> <span class="id" title="var">z</span> : <span class="id" title="inductive">nat</span>) ⇒ <a class="idref" href="Cpdt.Reflection.html#z"><span class="id" title="variable">z</span></a><span class="id" title="notation">)</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="var">refl</span>.<br/>
+</div>
+
+<div class="doc">
+<br/>
+<span class="inlinecode">&nbsp;&nbsp;============================<br/>
+&nbsp;&nbsp;&nbsp;<a class="idref" href="Cpdt.ProgLang.html#HigherOrder.termDenote"><span class="id" title="definition">termDenote</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<a class="idref" href="Cpdt.ProgLang.html#HigherOrder.Abs"><span class="id" title="constructor">Abs</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="keyword">fun</span> <a class="idref" href="Cpdt.Predicates.html#y"><span class="id" title="variable">y</span></a> : <a class="idref" href="Cpdt.InductiveTypes.html#nat"><span class="id" title="inductive">nat</span></a> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="Cpdt.ProgLang.html#HigherOrder.Abs"><span class="id" title="constructor">Abs</span></a> (<span class="id" title="keyword">fun</span> <span class="id" title="var">y0</span> : <a class="idref" href="Cpdt.InductiveTypes.html#nat"><span class="id" title="inductive">nat</span></a> ⇒ <a class="idref" href="Cpdt.ProgLang.html#HigherOrder.Plus"><span class="id" title="constructor">Plus</span></a> (<a class="idref" href="Cpdt.ProgLang.html#HigherOrder.Plus"><span class="id" title="constructor">Plus</span></a> (<a class="idref" href="Cpdt.ProgLang.html#HigherOrder.Const"><span class="id" title="constructor">Const</span></a> <a class="idref" href="Cpdt.Predicates.html#y"><span class="id" title="variable">y</span></a>) (<a class="idref" href="Cpdt.ProgLang.html#HigherOrder.Const"><span class="id" title="constructor">Const</span></a> <span class="id" title="var">y0</span>)) (<a class="idref" href="Cpdt.ProgLang.html#HigherOrder.Const"><span class="id" title="constructor">Const</span></a> 13)))) =<br/>
+&nbsp;&nbsp;&nbsp;<a class="idref" href="Cpdt.ProgLang.html#HigherOrder.termDenote"><span class="id" title="definition">termDenote</span></a> (<a class="idref" href="Cpdt.ProgLang.html#HigherOrder.Abs"><span class="id" title="constructor">Abs</span></a> (<span class="id" title="keyword">fun</span> <span class="id" title="var">_</span> : <a class="idref" href="Cpdt.InductiveTypes.html#nat"><span class="id" title="inductive">nat</span></a> ⇒ <a class="idref" href="Cpdt.ProgLang.html#HigherOrder.Abs"><span class="id" title="constructor">Abs</span></a> (<span class="id" title="keyword">fun</span> <span class="id" title="var">y0</span> : <a class="idref" href="Cpdt.InductiveTypes.html#nat"><span class="id" title="inductive">nat</span></a> ⇒ <a class="idref" href="Cpdt.ProgLang.html#HigherOrder.Const"><span class="id" title="constructor">Const</span></a> <span class="id" title="var">y0</span>)))
+<div class="paragraph"> </div>
+
+</span>
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Abort</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+ここでのエンコーディングは、Coqの関数を使用して、妥当な条件で束縛を表現しているため、
+特定の関数機能を実現するのが難しくなります。
+
+<div class="paragraph"> </div>
+
+また、変数を数値で表現する方法もあります。
+これは、項の引数が<span class="inlinecode"><span class="id" title="definition">fst</span></span>と<span class="inlinecode"><span class="id" title="definition">snd</span></span>の合成だけであることを検出することによって、
+変数参照を識別する若干スマートな具象化関数を書くことによって行うことができます。
+構成の順序から、変数の数値を読み取ることができます。
+読者のために詳細を練習問題（しかし、自明なものではありません！）として残しています。
+ 
+</div>
+<div class="code">
+
+<br/>
+</div>
+</div>
+
+<div id="footer">
+<hr/><a href="index.html">Index</a><hr/>This page has been generated by <a href="http://coq.inria.fr/">coqdoc</a>
+</div>
+
+</div>
+
+</body>
+</html>

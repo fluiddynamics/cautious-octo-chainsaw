@@ -1,0 +1,2258 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link href="coqdoc.css" rel="stylesheet" type="text/css" />
+<title>Cpdt.LogicProg</title>
+</head>
+
+<body>
+
+<div id="page">
+
+<div id="header">
+</div>
+
+<div id="main">
+
+<h1 class="libtitle">Library Cpdt.LogicProg</h1>
+
+<div class="code">
+
+<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+    
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+カリー・ハワード対応は、証明をすることが「まさしく」プログラミングであることを示しますが、
+このふたつの活動の実際はとても異なります。
+私たちは、一般に、プログラムの型のみならず属性について注意を払いますが、
+証明についてはそうではありません。定理のどんな証明でも同様です。
+結果として、自動化された証明探索は自動化されたプログラミングよりも概念的に簡単です。
+
+<div class="paragraph"> </div>
+
+Prolog などの言語に組み入れられた
+論理プログラミング logic programming の
+パラダイムは高階論理の証明探索にとてもよく適合します。
+この章では、過去の論理プログラミングの経験がなくてもよいように、詳細を紹介します。
+ 
+</div>
+<div class="code">
+
+<br/>
+</div>
+
+<div class="doc">
+<a name="lab74"></a><h1 class="section">論理プログラミング入門</h1>
+
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+標準ライブラリから加算の定義を思いだしましょう。
+ 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Print</span> <span class="id" title="definition">plus</span>.<br/>
+</div>
+
+<div class="doc">
+<br/>
+<span class="inlinecode"><a class="idref" href="Cpdt.InductiveTypes.html#plus"><span class="id" title="definition">plus</span></a> = <br/>
+<span class="id" title="keyword">fix</span> <a class="idref" href="Cpdt.InductiveTypes.html#plus"><span class="id" title="definition">plus</span></a> (<a class="idref" href="Cpdt.MoreDep.html#dec_star.dec_star''.n"><span class="id" title="variable">n</span></a> <a class="idref" href="Cpdt.InductiveTypes.html#m"><span class="id" title="variable">m</span></a> : <a class="idref" href="Cpdt.InductiveTypes.html#nat"><span class="id" title="inductive">nat</span></a>) : <a class="idref" href="Cpdt.InductiveTypes.html#nat"><span class="id" title="inductive">nat</span></a> := <span class="id" title="keyword">match</span> <a class="idref" href="Cpdt.MoreDep.html#dec_star.dec_star''.n"><span class="id" title="variable">n</span></a> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| 0 ⇒ <a class="idref" href="Cpdt.InductiveTypes.html#m"><span class="id" title="variable">m</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <a class="idref" href="Cpdt.Large.html#slow.S"><span class="id" title="variable">S</span></a> <a class="idref" href="Cpdt.StackMachine.html#p"><span class="id" title="variable">p</span></a> ⇒ <a class="idref" href="Cpdt.Large.html#slow.S"><span class="id" title="variable">S</span></a> (<a class="idref" href="Cpdt.InductiveTypes.html#plus"><span class="id" title="definition">plus</span></a> <a class="idref" href="Cpdt.StackMachine.html#p"><span class="id" title="variable">p</span></a> <a class="idref" href="Cpdt.InductiveTypes.html#m"><span class="id" title="variable">m</span></a>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">end</span>
+<div class="paragraph"> </div>
+
+</span>
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+これは関数プログラミングのスタイルにおける再帰的な定義です。
+また、前の章で定義した帰納的関係に対応する論理プログラミングのスタイルにも従います。
+ 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Inductive</span> <a name="plusR"><span class="id" title="inductive">plusR</span></a> : <span class="id" title="inductive">nat</span> <span class="id" title="notation">→</span> <span class="id" title="inductive">nat</span> <span class="id" title="notation">→</span> <span class="id" title="inductive">nat</span> <span class="id" title="notation">→</span> <span class="id" title="keyword">Prop</span> :=<br/>
+| <a name="PlusO"><span class="id" title="constructor">PlusO</span></a> : <span class="id" title="keyword">∀</span> <span class="id" title="var">m</span>, <a class="idref" href="Cpdt.LogicProg.html#plusR"><span class="id" title="inductive">plusR</span></a> <span class="id" title="constructor">O</span> <a class="idref" href="Cpdt.LogicProg.html#m"><span class="id" title="variable">m</span></a> <a class="idref" href="Cpdt.LogicProg.html#m"><span class="id" title="variable">m</span></a><br/>
+| <a name="PlusS"><span class="id" title="constructor">PlusS</span></a> : <span class="id" title="keyword">∀</span> <span class="id" title="var">n</span> <span class="id" title="var">m</span> <span class="id" title="var">r</span>, <a class="idref" href="Cpdt.LogicProg.html#plusR"><span class="id" title="inductive">plusR</span></a> <a class="idref" href="Cpdt.LogicProg.html#n"><span class="id" title="variable">n</span></a> <a class="idref" href="Cpdt.LogicProg.html#m"><span class="id" title="variable">m</span></a> <a class="idref" href="Cpdt.LogicProg.html#r"><span class="id" title="variable">r</span></a><br/>
+&nbsp;&nbsp;<span class="id" title="notation">→</span> <a class="idref" href="Cpdt.LogicProg.html#plusR"><span class="id" title="inductive">plusR</span></a> (<span class="id" title="constructor">S</span> <a class="idref" href="Cpdt.LogicProg.html#n"><span class="id" title="variable">n</span></a>) <a class="idref" href="Cpdt.LogicProg.html#m"><span class="id" title="variable">m</span></a> (<span class="id" title="constructor">S</span> <a class="idref" href="Cpdt.LogicProg.html#r"><span class="id" title="variable">r</span></a>).<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+直観的にいうと、事実 <span class="inlinecode"><a class="idref" href="Cpdt.LogicProg.html#plusR"><span class="id" title="inductive">plusR</span></a></span> <span class="inlinecode"><a class="idref" href="Cpdt.MoreDep.html#dec_star.dec_star''.n"><span class="id" title="variable">n</span></a></span> <span class="inlinecode"><a class="idref" href="Cpdt.InductiveTypes.html#m"><span class="id" title="variable">m</span></a></span> <span class="inlinecode"><a class="idref" href="Cpdt.InductiveTypes.html#r"><span class="id" title="variable">r</span></a></span> は、<span class="inlinecode"><a class="idref" href="Cpdt.InductiveTypes.html#plus"><span class="id" title="definition">plus</span></a></span> <span class="inlinecode"><a class="idref" href="Cpdt.MoreDep.html#dec_star.dec_star''.n"><span class="id" title="variable">n</span></a></span> <span class="inlinecode"><a class="idref" href="Cpdt.InductiveTypes.html#m"><span class="id" title="variable">m</span></a></span> <span class="inlinecode">=</span> <span class="inlinecode"><a class="idref" href="Cpdt.InductiveTypes.html#r"><span class="id" title="variable">r</span></a></span> であるときだけ成り立ちます。
+この対応を形式的に証明することは難しくありません。
+
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Hint Constructors</span> <a class="idref" href="Cpdt.LogicProg.html#plusR"><span class="id" title="inductive">plusR</span></a>.<br/>
+
+<br/>
+<span class="id" title="keyword">Theorem</span> <a name="plus_plusR"><span class="id" title="lemma">plus_plusR</span></a> : <span class="id" title="keyword">∀</span> <span class="id" title="var">n</span> <span class="id" title="var">m</span>,<br/>
+&nbsp;&nbsp;<a class="idref" href="Cpdt.LogicProg.html#plusR"><span class="id" title="inductive">plusR</span></a> <a class="idref" href="Cpdt.LogicProg.html#n"><span class="id" title="variable">n</span></a> <a class="idref" href="Cpdt.LogicProg.html#m"><span class="id" title="variable">m</span></a> (<a class="idref" href="Cpdt.LogicProg.html#n"><span class="id" title="variable">n</span></a> <span class="id" title="notation">+</span> <a class="idref" href="Cpdt.LogicProg.html#m"><span class="id" title="variable">m</span></a>).<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">induction</span> <span class="id" title="var">n</span>; <span class="id" title="var">crush</span>.<br/>
+<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Theorem</span> <a name="plusR_plus"><span class="id" title="lemma">plusR_plus</span></a> : <span class="id" title="keyword">∀</span> <span class="id" title="var">n</span> <span class="id" title="var">m</span> <span class="id" title="var">r</span>,<br/>
+&nbsp;&nbsp;<a class="idref" href="Cpdt.LogicProg.html#plusR"><span class="id" title="inductive">plusR</span></a> <a class="idref" href="Cpdt.LogicProg.html#n"><span class="id" title="variable">n</span></a> <a class="idref" href="Cpdt.LogicProg.html#m"><span class="id" title="variable">m</span></a> <a class="idref" href="Cpdt.LogicProg.html#r"><span class="id" title="variable">r</span></a><br/>
+&nbsp;&nbsp;<span class="id" title="notation">→</span> <a class="idref" href="Cpdt.LogicProg.html#r"><span class="id" title="variable">r</span></a> <span class="id" title="notation">=</span> <a class="idref" href="Cpdt.LogicProg.html#n"><span class="id" title="variable">n</span></a> <span class="id" title="notation">+</span> <a class="idref" href="Cpdt.LogicProg.html#m"><span class="id" title="variable">m</span></a>.<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">induction</span> 1; <span class="id" title="var">crush</span>.<br/>
+<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+<span class="inlinecode"><a class="idref" href="Cpdt.InductiveTypes.html#plus"><span class="id" title="definition">plus</span></a></span> の関数定義では、算術についての簡単な等式は計算に従います。
+
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Example</span> <a name="four_plus_three"><span class="id" title="definition">four_plus_three</span></a> : 4 <span class="id" title="notation">+</span> 3 <span class="id" title="notation">=</span> 7.<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">reflexivity</span>.<br/>
+<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+
+<br/>
+<span class="id" title="keyword">Print</span> <a class="idref" href="Cpdt.LogicProg.html#four_plus_three"><span class="id" title="definition">four_plus_three</span></a>.<br/>
+</div>
+
+<div class="doc">
+<br/>
+<span class="inlinecode"><a class="idref" href="Cpdt.LogicProg.html#four_plus_three"><span class="id" title="definition">four_plus_three</span></a> = <a class="idref" href="Cpdt.Predicates.html#eq_refl"><span class="id" title="constructor">eq_refl</span></a>
+<div class="paragraph"> </div>
+
+</span>
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+関係の定義では、同じ等式は証明するのにより多くのステップをとりますが、
+そのプロセスは完全に機械的です。
+例えば、simple-minded な手動の証明探索の戦略を考えよう。
+後でエラーメッセージの表示された手順は、最終的なスクリプトから省略されます。
+
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Example</span> <a name="four_plus_three'"><span class="id" title="definition">four_plus_three'</span></a> : <a class="idref" href="Cpdt.LogicProg.html#plusR"><span class="id" title="inductive">plusR</span></a> 4 3 7.<br/>
+</div>
+
+<div class="doc">
+<br/>
+<span class="inlinecode">&nbsp;&nbsp;<span class="id" title="tactic">apply</span> <a class="idref" href="Cpdt.LogicProg.html#PlusO"><span class="id" title="constructor">PlusO</span></a>.
+<div class="paragraph"> </div>
+
+</span>
+<pre>
+Error: Impossible to unify "plusR 0 ?24 ?24" with "plusR 4 3 7".
+</pre>
+ 
+</div>
+<div class="code">
+&nbsp;&nbsp;<span class="id" title="tactic">apply</span> <a class="idref" href="Cpdt.LogicProg.html#PlusS"><span class="id" title="constructor">PlusS</span></a>.<br/>
+</div>
+
+<div class="doc">
+<br/>
+<span class="inlinecode">&nbsp;&nbsp;<span class="id" title="tactic">apply</span> <a class="idref" href="Cpdt.LogicProg.html#PlusO"><span class="id" title="constructor">PlusO</span></a>.
+<div class="paragraph"> </div>
+
+</span>
+<pre>
+Error: Impossible to unify "plusR 0 ?25 ?25" with "plusR 3 3 6".
+</pre>
+ 
+</div>
+<div class="code">
+&nbsp;&nbsp;<span class="id" title="tactic">apply</span> <a class="idref" href="Cpdt.LogicProg.html#PlusS"><span class="id" title="constructor">PlusS</span></a>.<br/>
+</div>
+
+<div class="doc">
+<br/>
+<span class="inlinecode">&nbsp;&nbsp;<span class="id" title="tactic">apply</span> <a class="idref" href="Cpdt.LogicProg.html#PlusO"><span class="id" title="constructor">PlusO</span></a>.
+<div class="paragraph"> </div>
+
+</span>
+<pre>
+Error: Impossible to unify "plusR 0 ?26 ?26" with "plusR 2 3 5".
+</pre>
+ 
+</div>
+<div class="code">
+&nbsp;&nbsp;<span class="id" title="tactic">apply</span> <a class="idref" href="Cpdt.LogicProg.html#PlusS"><span class="id" title="constructor">PlusS</span></a>.<br/>
+</div>
+
+<div class="doc">
+<br/>
+<span class="inlinecode">&nbsp;&nbsp;<span class="id" title="tactic">apply</span> <a class="idref" href="Cpdt.LogicProg.html#PlusO"><span class="id" title="constructor">PlusO</span></a>.
+<div class="paragraph"> </div>
+
+</span>
+<pre>
+Error: Impossible to unify "plusR 0 ?27 ?27" with "plusR 1 3 4".
+</pre>
+ 
+</div>
+<div class="code">
+&nbsp;&nbsp;<span class="id" title="tactic">apply</span> <a class="idref" href="Cpdt.LogicProg.html#PlusS"><span class="id" title="constructor">PlusS</span></a>.<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">apply</span> <a class="idref" href="Cpdt.LogicProg.html#PlusO"><span class="id" title="constructor">PlusO</span></a>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+この時点で証明が完了します。
+単純な手続きが、この種類の全ての証明を見つけられることは、明かに間違いありません。
+ふたつの候補となるステップ <span class="inlinecode"><span class="id" title="tactic">apply</span></span> <span class="inlinecode"><a class="idref" href="Cpdt.LogicProg.html#PlusO"><span class="id" title="constructor">PlusO</span></a></span> と <span class="inlinecode"><span class="id" title="tactic">apply</span></span> <span class="inlinecode"><a class="idref" href="Cpdt.LogicProg.html#PlusS"><span class="id" title="constructor">PlusS</span></a></span> からなる可能な証明木のすべてを探検しただけです。
+先に <span class="inlinecode"><span class="id" title="keyword">Hint</span></span> <span class="inlinecode"><span class="id" title="keyword">Constructors</span></span> を
+ふたつの候補となる 証明のステップ のヒントとして登録するのに使ったので、
+組み込みタクティク <span class="inlinecode"><span class="id" title="tactic">auto</span></span> は、この戦略に従います。
+ 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Restart</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">auto</span>.<br/>
+<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Print</span> <a class="idref" href="Cpdt.LogicProg.html#four_plus_three'"><span class="id" title="definition">four_plus_three'</span></a>.<br/>
+</div>
+
+<div class="doc">
+<br/>
+<span class="inlinecode"><a class="idref" href="Cpdt.LogicProg.html#four_plus_three'"><span class="id" title="definition">four_plus_three'</span></a> = <a class="idref" href="Cpdt.LogicProg.html#PlusS"><span class="id" title="constructor">PlusS</span></a> (<a class="idref" href="Cpdt.LogicProg.html#PlusS"><span class="id" title="constructor">PlusS</span></a> (<a class="idref" href="Cpdt.LogicProg.html#PlusS"><span class="id" title="constructor">PlusS</span></a> (<a class="idref" href="Cpdt.LogicProg.html#PlusS"><span class="id" title="constructor">PlusS</span></a> (<a class="idref" href="Cpdt.LogicProg.html#PlusO"><span class="id" title="constructor">PlusO</span></a> 3))))
+<div class="paragraph"> </div>
+
+</span>
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+すこし複雑なゴールについて同じアプローチを試してみましょう。
+
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Example</span> <a name="five_plus_three"><span class="id" title="definition">five_plus_three</span></a> : <a class="idref" href="Cpdt.LogicProg.html#plusR"><span class="id" title="inductive">plusR</span></a> 5 3 8.<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">auto</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+この場合は、<span class="inlinecode"><span class="id" title="tactic">auto</span></span> は進捗をするのに十分ではありません。
+
+<div class="paragraph"> </div>
+
+単一の候補のステップは、可能な証明木の無限のスペースに導くかもしれないので、
+<span class="inlinecode"><span class="id" title="tactic">auto</span></span> は考慮するべき最大の木の深さをパラメータとして与えられるようになっています。
+ディフォルトの深さは 5 で、ゴールを証明するために深さ 6 が必要ならそのように設定します。
+ 
+</div>
+<div class="code">
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">auto</span> 6.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+しばしば、<span class="inlinecode"><span class="id" title="tactic">info</span></span> タクティカルは、
+<span class="inlinecode"><span class="id" title="tactic">auto</span></span> が見つける証明木の記述を見るのに便利です。
+ (このタクティカルは、これを書いている Coq 8.4 では使用できませんが、
+すぐに再登場することを期待しています。
+特別な場合の <span class="inlinecode"><span class="id" title="var">info_auto</span></span> タクティクは、
+<span class="inlinecode"><span class="id" title="tactic">auto</span></span> の饒舌な置き換えとして提供されます。)
+ 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Restart</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">info</span> <span class="id" title="tactic">auto</span> 6.<br/>
+</div>
+
+<div class="doc">
+<br/>
+<span class="inlinecode">&nbsp;== <span class="id" title="tactic">apply</span> <a class="idref" href="Cpdt.LogicProg.html#PlusS"><span class="id" title="constructor">PlusS</span></a>; <span class="id" title="tactic">apply</span> <a class="idref" href="Cpdt.LogicProg.html#PlusS"><span class="id" title="constructor">PlusS</span></a>; <span class="id" title="tactic">apply</span> <a class="idref" href="Cpdt.LogicProg.html#PlusS"><span class="id" title="constructor">PlusS</span></a>; <span class="id" title="tactic">apply</span> <a class="idref" href="Cpdt.LogicProg.html#PlusS"><span class="id" title="constructor">PlusS</span></a>; <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">apply</span> <a class="idref" href="Cpdt.LogicProg.html#PlusS"><span class="id" title="constructor">PlusS</span></a>; <span class="id" title="tactic">apply</span> <a class="idref" href="Cpdt.LogicProg.html#PlusO"><span class="id" title="constructor">PlusO</span></a>.
+<div class="paragraph"> </div>
+
+</span>
+</div>
+<div class="code">
+<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+論理プログラミングのふたつのキーとなるコンポーネントは、
+ <i>backtracking</i> バックトラッキングと
+ <i>unification</i> ユニフィケーションです。
+
+<div class="paragraph"> </div>
+
+これらの技法を実際に見るために、さらに単純(silly)な例を考えます。
+ここでは、候補となる証明のステップが反射的で、量化子を具体化します。
+(quantifier instantiation)
+
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Example</span> <a name="seven_minus_three"><span class="id" title="definition">seven_minus_three</span></a> : <span class="id" title="notation">∃</span> <span class="id" title="var">x</span><span class="id" title="notation">,</span> <a class="idref" href="Cpdt.LogicProg.html#x"><span class="id" title="variable">x</span></a> <span class="id" title="notation">+</span> 3 <span class="id" title="notation">=</span> 7.<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+説明のために、計算について最小限の理解をもったユーザーを考えましょう。
+量化子を具体化することを選ぶことによって始めます。
+<span class="inlinecode"><a class="idref" href="Cpdt.Predicates.html#ex_intro"><span class="id" title="constructor">ex_intro</span></a></span> は、存在量化された式のためのコンストラクタであることを思い出しましょう。
+
+</div>
+<div class="code">
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">apply</span> <span class="id" title="constructor">ex_intro</span> <span class="id" title="keyword">with</span> 0.<br/>
+</div>
+
+<div class="doc">
+<br/>
+<span class="inlinecode">&nbsp;&nbsp;<span class="id" title="tactic">reflexivity</span>.
+<div class="paragraph"> </div>
+
+</span>
+<pre>
+  Error: Impossible to unify "7" with "0 + 3".
+</pre>
+
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+これは、デッドエンドのように見えます。
+<span class="inlinecode"><span class="id" title="tactic">apply</span></span> を実行した箇所に <i>backtrack</i> バックトラックして、よりよい別の選択をします。
+
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Restart</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">apply</span> <span class="id" title="constructor">ex_intro</span> <span class="id" title="keyword">with</span> 4.<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">reflexivity</span>.<br/>
+<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+これは、かなり退屈なバックトラッキングの例です。
+一般に、<span class="inlinecode"><span class="id" title="tactic">auto</span></span> に渡された深さの上限までなら、
+証明木を導くために、異なった証明のステップの候補が見つからない場合は、
+証明の途中の(under-construction)の証明木のどんなノードでも、
+任意の回数のバックトラッキングの行き先になるでしょう。
+
+<div class="paragraph"> </div>
+
+次に、加算についての関係式(formulation)を切り替えるとき、
+それを簡単にするユニフィケーションの実演をします。
+
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Example</span> <a name="seven_minus_three'"><span class="id" title="definition">seven_minus_three'</span></a> : <span class="id" title="notation">∃</span> <span class="id" title="var">x</span><span class="id" title="notation">,</span> <a class="idref" href="Cpdt.LogicProg.html#plusR"><span class="id" title="inductive">plusR</span></a> <a class="idref" href="Cpdt.LogicProg.html#x"><span class="id" title="variable">x</span></a> 3 7.<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+以前とおなじように、手作業で量化子の具体化を推測しようとしますが、ここではそれは必要ありません。
+<span class="inlinecode"><span class="id" title="tactic">apply</span></span> の代わりに、推測を延期したいそれらのパラメータの代わりに
+プレースホルダー  <i>unification variables</i> 
+ユニフィケーション変数をつかう(proceeds with) <span class="inlinecode"><span class="id" title="tactic">eapply</span></span> を使用します。
+ 
+</div>
+<div class="code">
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">eapply</span> <span class="id" title="constructor">ex_intro</span>.<br/>
+</div>
+
+<div class="doc">
+<br/>
+<span class="inlinecode">1 <span class="id" title="keyword">subgoal</span><br/>
+&nbsp;&nbsp;<br/>
+&nbsp;&nbsp;============================<br/>
+&nbsp;&nbsp;&nbsp;<a class="idref" href="Cpdt.LogicProg.html#plusR"><span class="id" title="inductive">plusR</span></a> ?70 3 7
+<div class="paragraph"> </div>
+
+</span>
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+いまでは、正しく <span class="inlinecode"><a class="idref" href="Cpdt.LogicProg.html#plusR"><span class="id" title="inductive">plusR</span></a></span> のコンストラクタを適用することで証明を終了することができます。
+なお、新しいユニフィケーション変数は新しい unknown として生成されます。
+ 
+</div>
+<div class="code">
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">apply</span> <a class="idref" href="Cpdt.LogicProg.html#PlusS"><span class="id" title="constructor">PlusS</span></a>.<br/>
+</div>
+
+<div class="doc">
+<br/>
+<span class="inlinecode">&nbsp;&nbsp;============================<br/>
+&nbsp;&nbsp;&nbsp;<a class="idref" href="Cpdt.LogicProg.html#plusR"><span class="id" title="inductive">plusR</span></a> ?71 3 6
+<div class="paragraph"> </div>
+
+</span>
+</div>
+<div class="code">
+&nbsp;&nbsp;<span class="id" title="tactic">apply</span> <a class="idref" href="Cpdt.LogicProg.html#PlusS"><span class="id" title="constructor">PlusS</span></a>. <span class="id" title="tactic">apply</span> <a class="idref" href="Cpdt.LogicProg.html#PlusS"><span class="id" title="constructor">PlusS</span></a>. <span class="id" title="tactic">apply</span> <a class="idref" href="Cpdt.LogicProg.html#PlusS"><span class="id" title="constructor">PlusS</span></a>.<br/>
+</div>
+
+<div class="doc">
+<br/>
+<span class="inlinecode">&nbsp;&nbsp;============================<br/>
+&nbsp;&nbsp;&nbsp;<a class="idref" href="Cpdt.LogicProg.html#plusR"><span class="id" title="inductive">plusR</span></a> ?74 3 3
+<div class="paragraph"> </div>
+
+</span>
+</div>
+<div class="code">
+&nbsp;&nbsp;<span class="id" title="tactic">apply</span> <a class="idref" href="Cpdt.LogicProg.html#PlusO"><span class="id" title="constructor">PlusO</span></a>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+<span class="inlinecode"><span class="id" title="tactic">auto</span></span> タクティクはユニフィケーション変数を導入するステップの順番を実行しませんが、
+<span class="inlinecode"><span class="id" title="tactic">eauto</span></span> タクティクは実行します。
+<span class="inlinecode"><span class="id" title="tactic">eauto</span></span> スタイルの証明探索は、より多くの可能な証明木を網羅できず、
+それゆえ、実行するのにより長く時間が掛かるので、このふたつのタクティクを使い分けると便利です。
+
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Restart</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">info</span> <span class="id" title="tactic">eauto</span> 6.<br/>
+</div>
+
+<div class="doc">
+<br/>
+<span class="inlinecode">&nbsp;== <span class="id" title="tactic">eapply</span> <a class="idref" href="Cpdt.Predicates.html#ex_intro"><span class="id" title="constructor">ex_intro</span></a>; <span class="id" title="tactic">apply</span> <a class="idref" href="Cpdt.LogicProg.html#PlusS"><span class="id" title="constructor">PlusS</span></a>; <span class="id" title="tactic">apply</span> <a class="idref" href="Cpdt.LogicProg.html#PlusS"><span class="id" title="constructor">PlusS</span></a>; <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">apply</span> <a class="idref" href="Cpdt.LogicProg.html#PlusS"><span class="id" title="constructor">PlusS</span></a>; <span class="id" title="tactic">apply</span> <a class="idref" href="Cpdt.LogicProg.html#PlusS"><span class="id" title="constructor">PlusS</span></a>; <span class="id" title="tactic">apply</span> <a class="idref" href="Cpdt.LogicProg.html#PlusO"><span class="id" title="constructor">PlusO</span></a>.
+<div class="paragraph"> </div>
+
+</span>
+</div>
+<div class="code">
+<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+この証明は、論理プログラミングが、関数プログラミングと比べて、
+証明探索を単純化する最初の例を与えます。
+一般に、関数型プログラムは、単に一方方向に実行されることを意味し、
+関数は入力と出力の重なりのない集合(disjoint sets)です。
+最後の例では、特定の出力を生じさせる入力を推定するために、
+論理型プログラムを後ろ向きに効率的に実行しました。
+他の入力の未知の値を推測するために、同じことが働きます。
+ 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Example</span> <a name="seven_minus_four'"><span class="id" title="definition">seven_minus_four'</span></a> : <span class="id" title="notation">∃</span> <span class="id" title="var">x</span><span class="id" title="notation">,</span> <a class="idref" href="Cpdt.LogicProg.html#plusR"><span class="id" title="inductive">plusR</span></a> 4 <a class="idref" href="Cpdt.LogicProg.html#x"><span class="id" title="variable">x</span></a> 7.<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">eauto</span> 6.<br/>
+<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+正しい補助的な事実を証明するために、具体的な関数プログラムについて、上で論理プログラムにしたのと同じ方法で、
+理由づけすることができます。
+
+<div class="paragraph"> </div>
+
+<span class="inlinecode"><a class="idref" href="Cpdt.LogicProg.html#plusR"><span class="id" title="inductive">plusR</span></a></span> のコンストラクタが、<span class="inlinecode"><a class="idref" href="Cpdt.InductiveTypes.html#plus"><span class="id" title="definition">plus</span></a></span> についての補題を自然に翻訳することを証明しましょう。
+
+<div class="paragraph"> </div>
+
+最初に、左辺または右辺がワイルドカードとマッチする等式を証明するライブラリ関数を見つけるための
+コマンドである <span class="inlinecode"><span class="id" title="keyword">SearchRewrite</span></span> コマンドを使って、
+それらの補題が、既に標準ライブラリで証明されていることを見つけることができます。
+ 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">SearchRewrite</span> (<span class="id" title="constructor">O</span> <span class="id" title="notation">+</span> <span class="id" title="var">_</span>).<br/>
+</div>
+
+<div class="doc">
+<br/>
+<span class="inlinecode"><span class="id" title="var">plus_O_n</span>: <span class="id" title="keyword">∀</span> <a class="idref" href="Cpdt.MoreDep.html#dec_star.dec_star''.n"><span class="id" title="variable">n</span></a> : <a class="idref" href="Cpdt.InductiveTypes.html#nat"><span class="id" title="inductive">nat</span></a>, 0 + <a class="idref" href="Cpdt.MoreDep.html#dec_star.dec_star''.n"><span class="id" title="variable">n</span></a> = <a class="idref" href="Cpdt.MoreDep.html#dec_star.dec_star''.n"><span class="id" title="variable">n</span></a>
+<div class="paragraph"> </div>
+
+</span>
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+コマンド <span class="inlinecode"><span class="id" title="keyword">Hint</span></span> <span class="inlinecode"><span class="id" title="keyword">Immediate</span></span> は、
+<span class="inlinecode"><span class="id" title="tactic">auto</span></span> と <span class="inlinecode"><span class="id" title="tactic">eauto</span></span> が、この補題を証明木の任意の葉の候補として考慮するように依頼します。
+
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Hint Immediate</span> <span class="id" title="var">plus_O_n</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+<span class="inlinecode"><a class="idref" href="Cpdt.LogicProg.html#PlusS"><span class="id" title="constructor">PlusS</span></a></span> に対応するものを証明します。
+
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Lemma</span> <a name="plusS"><span class="id" title="lemma">plusS</span></a> : <span class="id" title="keyword">∀</span> <span class="id" title="var">n</span> <span class="id" title="var">m</span> <span class="id" title="var">r</span>,<br/>
+&nbsp;&nbsp;<a class="idref" href="Cpdt.LogicProg.html#n"><span class="id" title="variable">n</span></a> <span class="id" title="notation">+</span> <a class="idref" href="Cpdt.LogicProg.html#m"><span class="id" title="variable">m</span></a> <span class="id" title="notation">=</span> <a class="idref" href="Cpdt.LogicProg.html#r"><span class="id" title="variable">r</span></a><br/>
+&nbsp;&nbsp;<span class="id" title="notation">→</span> <span class="id" title="constructor">S</span> <a class="idref" href="Cpdt.LogicProg.html#n"><span class="id" title="variable">n</span></a> <span class="id" title="notation">+</span> <a class="idref" href="Cpdt.LogicProg.html#m"><span class="id" title="variable">m</span></a> <span class="id" title="notation">=</span> <span class="id" title="constructor">S</span> <a class="idref" href="Cpdt.LogicProg.html#r"><span class="id" title="variable">r</span></a>.<br/>
+&nbsp;&nbsp;<span class="id" title="var">crush</span>.<br/>
+<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+コマンド <span class="inlinecode"><span class="id" title="keyword">Hint</span></span> <span class="inlinecode"><span class="id" title="keyword">Resolve</span></span> は、
+証明木の葉のみならず、任意のレベルにおいて試みられる新しい証明のステップの候補に加えます。
+
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Hint Resolve</span> <span class="id" title="var">plusS</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+適切なヒントを登録したので、これまでの例を通常の機能追加<span class="inlinecode"><a class="idref" href="Cpdt.InductiveTypes.html#plus"><span class="id" title="definition">plus</span></a></span>で再現できます。
+
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Example</span> <a name="seven_minus_three''"><span class="id" title="definition">seven_minus_three''</span></a> : <span class="id" title="notation">∃</span> <span class="id" title="var">x</span><span class="id" title="notation">,</span> <a class="idref" href="Cpdt.LogicProg.html#x"><span class="id" title="variable">x</span></a> <span class="id" title="notation">+</span> 3 <span class="id" title="notation">=</span> 7.<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">eauto</span> 6.<br/>
+<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Example</span> <a name="seven_minus_four"><span class="id" title="definition">seven_minus_four</span></a> : <span class="id" title="notation">∃</span> <span class="id" title="var">x</span><span class="id" title="notation">,</span> 4 <span class="id" title="notation">+</span> <a class="idref" href="Cpdt.LogicProg.html#x"><span class="id" title="variable">x</span></a> <span class="id" title="notation">=</span> 7.<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">eauto</span> 6.<br/>
+<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+さらなる例では <span class="inlinecode"><span class="id" title="tactic">eauto</span></span> が終了しないことがわかるので、この新しいヒントデータベースは、
+完全な決定可能な手続き(complete decision procedure)からかけ離れています。
+ 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Example</span> <a name="seven_minus_four_zero"><span class="id" title="definition">seven_minus_four_zero</span></a> : <span class="id" title="notation">∃</span> <span class="id" title="var">x</span><span class="id" title="notation">,</span> 4 <span class="id" title="notation">+</span> <a class="idref" href="Cpdt.LogicProg.html#x"><span class="id" title="variable">x</span></a> <span class="id" title="notation">+</span> 0 <span class="id" title="notation">=</span> 7.<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">eauto</span> 6.<br/>
+<span class="id" title="keyword">Abort</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+さらなる補題が便利でしょう。
+ 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Lemma</span> <a name="plusO"><span class="id" title="lemma">plusO</span></a> : <span class="id" title="keyword">∀</span> <span class="id" title="var">n</span> <span class="id" title="var">m</span>,<br/>
+&nbsp;&nbsp;<a class="idref" href="Cpdt.LogicProg.html#n"><span class="id" title="variable">n</span></a> <span class="id" title="notation">=</span> <a class="idref" href="Cpdt.LogicProg.html#m"><span class="id" title="variable">m</span></a><br/>
+&nbsp;&nbsp;<span class="id" title="notation">→</span> <a class="idref" href="Cpdt.LogicProg.html#n"><span class="id" title="variable">n</span></a> <span class="id" title="notation">+</span> 0 <span class="id" title="notation">=</span> <a class="idref" href="Cpdt.LogicProg.html#m"><span class="id" title="variable">m</span></a>.<br/>
+&nbsp;&nbsp;<span class="id" title="var">crush</span>.<br/>
+<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Hint Resolve</span> <span class="id" title="var">plusO</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+もし、 <span class="inlinecode"><a class="idref" href="Cpdt.InductiveTypes.html#plus"><span class="id" title="definition">plus</span></a></span> への入力を論理プログラムに関連する入力として考えるなら、
+新しいルール <span class="inlinecode"><span class="id" title="var">plus0</span></span> は曖昧さを導きいれます。
+例えば、和 <span class="inlinecode">0</span> <span class="inlinecode">+</span> <span class="inlinecode">0</span> は、我々の注目するオペランドに依存して、
+<span class="inlinecode"><span class="id" title="var">plus_0_n</span></span> と <span class="inlinecode"><span class="id" title="var">plus0</span></span> のどちらにもマッチします。
+
+<div class="paragraph"> </div>
+
+この曖昧さは潜在的な探索木の数を増やし、証明探索を遅くし、
+意味的には問題を供さないが、実際に自動化した証明につながります。
+ 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Example</span> <a name="seven_minus_four_zero"><span class="id" title="definition">seven_minus_four_zero</span></a> : <span class="id" title="notation">∃</span> <span class="id" title="var">x</span><span class="id" title="notation">,</span> 4 <span class="id" title="notation">+</span> <a class="idref" href="Cpdt.LogicProg.html#x"><span class="id" title="variable">x</span></a> <span class="id" title="notation">+</span> 0 <span class="id" title="notation">=</span> 7.<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">eauto</span> 7.<br/>
+<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+可能な証明木のスペースを広げるヒントを追加することが、どれだけ損害を被ることになるでしょうか？
+古典的なものは、このライブラリの定理で具体的にしたように、
+等式についての推移性(transitivity)の無制限な使用から来ています。
+ 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Check</span> <span class="id" title="lemma">eq_trans</span>.<br/>
+</div>
+
+<div class="doc">
+<br/>
+<span class="inlinecode"><span class="id" title="lemma">eq_trans</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: <span class="id" title="keyword">∀</span> (<a class="idref" href="Cpdt.ProgLang.html#Forall.A"><span class="id" title="variable">A</span></a> : <span class="id" title="keyword">Type</span>) (<a class="idref" href="Cpdt.MoreDep.html#insert.x"><span class="id" title="variable">x</span></a> <a class="idref" href="Cpdt.Predicates.html#y"><span class="id" title="variable">y</span></a> <a class="idref" href="Cpdt.MoreDep.html#insert.present.z"><span class="id" title="variable">z</span></a> : <a class="idref" href="Cpdt.ProgLang.html#Forall.A"><span class="id" title="variable">A</span></a>), <a class="idref" href="Cpdt.MoreDep.html#insert.x"><span class="id" title="variable">x</span></a> = <a class="idref" href="Cpdt.Predicates.html#y"><span class="id" title="variable">y</span></a> → <a class="idref" href="Cpdt.Predicates.html#y"><span class="id" title="variable">y</span></a> = <a class="idref" href="Cpdt.MoreDep.html#insert.present.z"><span class="id" title="variable">z</span></a> → <a class="idref" href="Cpdt.MoreDep.html#insert.x"><span class="id" title="variable">x</span></a> = <a class="idref" href="Cpdt.MoreDep.html#insert.present.z"><span class="id" title="variable">z</span></a>
+<div class="paragraph"> </div>
+
+</span>
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+ヒントはセクションのスコープ上にあるので、
+不幸なヒントの選択の効果を含むためにセクションに入ります。
+
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Section</span> <a name="slow"><span class="id" title="section">slow</span></a>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Hint Resolve</span> <span class="id" title="var">eq_trans</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+以下の事実は間違いですが、<span class="inlinecode"><span class="id" title="tactic">eauto</span></span> のステップは、
+その証明の検索に非常に長い時間を費やすことを止めません。
+実行にいかに長くの時間を要したかを測るのために
+便利なコマンド <span class="inlinecode"><span class="id" title="keyword">Time</span></span> を使います。
+以下のステップは何も進ませません。
+   
+</div>
+<div class="code">
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Example</span> <a name="zero_minus_one"><span class="id" title="definition">zero_minus_one</span></a> : <span class="id" title="notation">∃</span> <span class="id" title="var">x</span><span class="id" title="notation">,</span> 1 <span class="id" title="notation">+</span> <a class="idref" href="Cpdt.LogicProg.html#x"><span class="id" title="variable">x</span></a> <span class="id" title="notation">=</span> 0.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Time</span> <span class="id" title="tactic">eauto</span> 1.<br/>
+</div>
+
+<div class="doc">
+
+<pre>
+Finished transaction in 0. secs (0.u,0.s)
+</pre>
+
+</div>
+<div class="code">
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Time</span> <span class="id" title="tactic">eauto</span> 2.<br/>
+</div>
+
+<div class="doc">
+
+<pre>
+Finished transaction in 0. secs (0.u,0.s)
+</pre>
+
+</div>
+<div class="code">
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Time</span> <span class="id" title="tactic">eauto</span> 3.<br/>
+</div>
+
+<div class="doc">
+
+<pre>
+Finished transaction in 0. secs (0.008u,0.s)
+</pre>
+
+</div>
+<div class="code">
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Time</span> <span class="id" title="tactic">eauto</span> 4.<br/>
+</div>
+
+<div class="doc">
+
+<pre>
+Finished transaction in 0. secs (0.068005u,0.004s)
+</pre>
+
+</div>
+<div class="code">
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Time</span> <span class="id" title="tactic">eauto</span> 5.<br/>
+</div>
+
+<div class="doc">
+
+<pre>
+Finished transaction in 2. secs (1.92012u,0.044003s)
+</pre>
+
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+実行時間が指数的に増加することを心配なら、 <span class="inlinecode"><span class="id" title="tactic">debug</span></span> タクティカルは、
+<span class="inlinecode"><span class="id" title="tactic">eauto</span></span> がどこで時間を無駄にしているのかを見て、試行されるすべての証明ステップのトレースを出力するのに役立ちます。
+ルール <span class="inlinecode"><span class="id" title="lemma">eq_trans</span></span> は証明木の各ノードでapplyし、<span class="inlinecode"><span class="id" title="tactic">eauto</span></span> はがそれらの全ての位置で試します。
+ 
+</div>
+<div class="code">
+
+<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">debug</span> <span class="id" title="tactic">eauto</span> 3.<br/>
+</div>
+
+<div class="doc">
+<br/>
+<span class="inlinecode">1 <a class="idref" href="Cpdt.MoreDep.html#depth"><span class="id" title="definition">depth</span></a>=3 <br/>
+1.1 <a class="idref" href="Cpdt.MoreDep.html#depth"><span class="id" title="definition">depth</span></a>=2 <span class="id" title="tactic">eapply</span> <a class="idref" href="Cpdt.Predicates.html#ex_intro"><span class="id" title="constructor">ex_intro</span></a><br/>
+1.1.1 <a class="idref" href="Cpdt.MoreDep.html#depth"><span class="id" title="definition">depth</span></a>=1 <span class="id" title="tactic">apply</span> <a class="idref" href="Cpdt.LogicProg.html#plusO"><span class="id" title="lemma">plusO</span></a><br/>
+1.1.1.1 <a class="idref" href="Cpdt.MoreDep.html#depth"><span class="id" title="definition">depth</span></a>=0 <span class="id" title="tactic">eapply</span> <span class="id" title="lemma">eq_trans</span><br/>
+1.1.2 <a class="idref" href="Cpdt.MoreDep.html#depth"><span class="id" title="definition">depth</span></a>=1 <span class="id" title="tactic">eapply</span> <span class="id" title="lemma">eq_trans</span><br/>
+1.1.2.1 <a class="idref" href="Cpdt.MoreDep.html#depth"><span class="id" title="definition">depth</span></a>=1 <span class="id" title="tactic">apply</span> <span class="id" title="lemma">plus_n_O</span><br/>
+1.1.2.1.1 <a class="idref" href="Cpdt.MoreDep.html#depth"><span class="id" title="definition">depth</span></a>=0 <span class="id" title="tactic">apply</span> <a class="idref" href="Cpdt.LogicProg.html#plusO"><span class="id" title="lemma">plusO</span></a><br/>
+1.1.2.1.2 <a class="idref" href="Cpdt.MoreDep.html#depth"><span class="id" title="definition">depth</span></a>=0 <span class="id" title="tactic">eapply</span> <span class="id" title="lemma">eq_trans</span><br/>
+1.1.2.2 <a class="idref" href="Cpdt.MoreDep.html#depth"><span class="id" title="definition">depth</span></a>=1 <span class="id" title="tactic">apply</span> @<a class="idref" href="Cpdt.Predicates.html#eq_refl"><span class="id" title="constructor">eq_refl</span></a><br/>
+1.1.2.2.1 <a class="idref" href="Cpdt.MoreDep.html#depth"><span class="id" title="definition">depth</span></a>=0 <span class="id" title="tactic">apply</span> <a class="idref" href="Cpdt.LogicProg.html#plusO"><span class="id" title="lemma">plusO</span></a><br/>
+1.1.2.2.2 <a class="idref" href="Cpdt.MoreDep.html#depth"><span class="id" title="definition">depth</span></a>=0 <span class="id" title="tactic">eapply</span> <span class="id" title="lemma">eq_trans</span><br/>
+1.1.2.3 <a class="idref" href="Cpdt.MoreDep.html#depth"><span class="id" title="definition">depth</span></a>=1 <span class="id" title="tactic">apply</span> <span class="id" title="definition">eq_add_S</span> ; <span class="id" title="tactic">trivial</span><br/>
+1.1.2.3.1 <a class="idref" href="Cpdt.MoreDep.html#depth"><span class="id" title="definition">depth</span></a>=0 <span class="id" title="tactic">apply</span> <a class="idref" href="Cpdt.LogicProg.html#plusO"><span class="id" title="lemma">plusO</span></a><br/>
+1.1.2.3.2 <a class="idref" href="Cpdt.MoreDep.html#depth"><span class="id" title="definition">depth</span></a>=0 <span class="id" title="tactic">eapply</span> <span class="id" title="lemma">eq_trans</span><br/>
+1.1.2.4 <a class="idref" href="Cpdt.MoreDep.html#depth"><span class="id" title="definition">depth</span></a>=1 <span class="id" title="tactic">apply</span> <span class="id" title="lemma">eq_sym</span> ; <span class="id" title="tactic">trivial</span><br/>
+1.1.2.4.1 <a class="idref" href="Cpdt.MoreDep.html#depth"><span class="id" title="definition">depth</span></a>=0 <span class="id" title="tactic">eapply</span> <span class="id" title="lemma">eq_trans</span><br/>
+1.1.2.5 <a class="idref" href="Cpdt.MoreDep.html#depth"><span class="id" title="definition">depth</span></a>=0 <span class="id" title="tactic">apply</span> <a class="idref" href="Cpdt.LogicProg.html#plusO"><span class="id" title="lemma">plusO</span></a><br/>
+1.1.2.6 <a class="idref" href="Cpdt.MoreDep.html#depth"><span class="id" title="definition">depth</span></a>=0 <span class="id" title="tactic">apply</span> <a class="idref" href="Cpdt.LogicProg.html#plusS"><span class="id" title="lemma">plusS</span></a><br/>
+1.1.2.7 <a class="idref" href="Cpdt.MoreDep.html#depth"><span class="id" title="definition">depth</span></a>=0 <span class="id" title="tactic">apply</span> <span class="id" title="tactic">f_equal</span> (<a class="idref" href="Cpdt.ProgLang.html#Forall.A"><span class="id" title="variable">A</span></a>:=<a class="idref" href="Cpdt.InductiveTypes.html#nat"><span class="id" title="inductive">nat</span></a>)<br/>
+1.1.2.8 <a class="idref" href="Cpdt.MoreDep.html#depth"><span class="id" title="definition">depth</span></a>=0 <span class="id" title="tactic">apply</span> <span class="id" title="lemma">f_equal2</span> (<a class="idref" href="Cpdt.Equality.html#A1"><span class="id" title="variable">A1</span></a>:=<a class="idref" href="Cpdt.InductiveTypes.html#nat"><span class="id" title="inductive">nat</span></a>) (<a class="idref" href="Cpdt.Equality.html#A2"><span class="id" title="variable">A2</span></a>:=<a class="idref" href="Cpdt.InductiveTypes.html#nat"><span class="id" title="inductive">nat</span></a>)<br/>
+1.1.2.9 <a class="idref" href="Cpdt.MoreDep.html#depth"><span class="id" title="definition">depth</span></a>=0 <span class="id" title="tactic">eapply</span> <span class="id" title="lemma">eq_trans</span>
+<div class="paragraph"> </div>
+
+</span>
+</div>
+<div class="code">
+&nbsp;&nbsp;<span class="id" title="keyword">Abort</span>.<br/>
+<span class="id" title="keyword">End</span> <a class="idref" href="Cpdt.LogicProg.html#slow"><span class="id" title="section">slow</span></a>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+ときには、しかし、推移性(transitivity)は、<span class="inlinecode"><span class="id" title="tactic">eauto</span></span>で自動的に通過する証明を得るのに必要なものです。
+この場合は、必要によって呼び出すことのできる、異なった別のグループ分離するために、
+名前を付けた  <i>hint databases</i> ヒントデータベースを使うことができます。
+ここで、<span class="inlinecode"><span class="id" title="lemma">eq_trans</span></span> をデータベース <span class="inlinecode"><a class="idref" href="Cpdt.Large.html#slow"><span class="id" title="lemma">slow</span></a></span> に置きます。
+ 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Hint Resolve</span> <span class="id" title="var">eq_trans</span> : <span class="id" title="var">slow</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Example</span> <a name="from_one_to_zero"><span class="id" title="definition">from_one_to_zero</span></a> : <span class="id" title="notation">∃</span> <span class="id" title="var">x</span><span class="id" title="notation">,</span> 1 <span class="id" title="notation">+</span> <a class="idref" href="Cpdt.LogicProg.html#x"><span class="id" title="variable">x</span></a> <span class="id" title="notation">=</span> 0.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Time</span> <span class="id" title="tactic">eauto</span>.<br/>
+</div>
+
+<div class="doc">
+
+<pre>
+Finished transaction in 0. secs (0.004u,0.s)
+</pre>
+
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+この <span class="inlinecode"><span class="id" title="tactic">eauto</span></span> は、ゴールを証明するのに失敗しますが、
+しかし、少なくともそれは上記の2秒よりも実質的に短い時間で済みます！
+
+</div>
+<div class="code">
+<span class="id" title="keyword">Abort</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+上のひとつの単純な例は、推移性(transitivity)によって汚染されることなしに、
+同じ合計時間で実行されます。
+ 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Example</span> <a name="seven_minus_three_again"><span class="id" title="definition">seven_minus_three_again</span></a> : <span class="id" title="notation">∃</span> <span class="id" title="var">x</span><span class="id" title="notation">,</span> <a class="idref" href="Cpdt.LogicProg.html#x"><span class="id" title="variable">x</span></a> <span class="id" title="notation">+</span> 3 <span class="id" title="notation">=</span> 7.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Time</span> <span class="id" title="tactic">eauto</span> 6.<br/>
+</div>
+
+<div class="doc">
+
+<pre>
+Finished transaction in 0. secs (0.004001u,0.s)
+</pre>
+ 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+推移性を必要とするとき、それを明示的に求めます。
+ 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Example</span> <a name="needs_trans"><span class="id" title="definition">needs_trans</span></a> : <span class="id" title="keyword">∀</span> <span class="id" title="var">x</span> <span class="id" title="var">y</span>, 1 <span class="id" title="notation">+</span> <a class="idref" href="Cpdt.LogicProg.html#x"><span class="id" title="variable">x</span></a> <span class="id" title="notation">=</span> <a class="idref" href="Cpdt.LogicProg.html#y"><span class="id" title="variable">y</span></a><br/>
+&nbsp;&nbsp;<span class="id" title="notation">→</span> <a class="idref" href="Cpdt.LogicProg.html#y"><span class="id" title="variable">y</span></a> <span class="id" title="notation">=</span> 2<br/>
+&nbsp;&nbsp;<span class="id" title="notation">→</span> <span class="id" title="notation">∃</span> <span class="id" title="var">z</span><span class="id" title="notation">,</span> <a class="idref" href="Cpdt.LogicProg.html#z"><span class="id" title="variable">z</span></a> <span class="id" title="notation">+</span> <a class="idref" href="Cpdt.LogicProg.html#x"><span class="id" title="variable">x</span></a> <span class="id" title="notation">=</span> 3.<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">info</span> <span class="id" title="tactic">eauto</span> <span class="id" title="keyword">with</span> <span class="id" title="var">slow</span>.<br/>
+</div>
+
+<div class="doc">
+<br/>
+<span class="inlinecode">&nbsp;== <span class="id" title="tactic">intro</span> <a class="idref" href="Cpdt.MoreDep.html#insert.x"><span class="id" title="variable">x</span></a>; <span class="id" title="tactic">intro</span> <a class="idref" href="Cpdt.Predicates.html#y"><span class="id" title="variable">y</span></a>; <span class="id" title="tactic">intro</span> <a class="idref" href="Cpdt.GeneralRec.html#thunk_eq_coind.H"><span class="id" title="variable">H</span></a>; <span class="id" title="tactic">intro</span> <span class="id" title="var">H0</span>; <span class="id" title="tactic">simple</span> <span class="id" title="tactic">eapply</span> <a class="idref" href="Cpdt.Predicates.html#ex_intro"><span class="id" title="constructor">ex_intro</span></a>; <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">apply</span> <a class="idref" href="Cpdt.LogicProg.html#plusS"><span class="id" title="lemma">plusS</span></a>; <span class="id" title="tactic">simple</span> <span class="id" title="tactic">eapply</span> <span class="id" title="lemma">eq_trans</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">exact</span> <a class="idref" href="Cpdt.GeneralRec.html#thunk_eq_coind.H"><span class="id" title="variable">H</span></a>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">exact</span> <span class="id" title="var">H0</span>.
+<div class="paragraph"> </div>
+
+</span>
+</div>
+<div class="code">
+<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+<span class="inlinecode"><span class="id" title="tactic">info</span></span> のトレースは、<span class="inlinecode"><span class="id" title="lemma">eq_trans</span></span> がちょうど証明を完成するのに必要な位置で使われていることを示します。
+<span class="inlinecode"><span class="id" title="tactic">auto</span></span> と <span class="inlinecode"><span class="id" title="tactic">eauto</span></span> は、<span class="inlinecode"><span class="id" title="tactic">intro</span></span> を、ステップを証明木の深さの上限をに向かって数えるとなしに、
+いつも実行します。 
+</div>
+<div class="code">
+
+<br/>
+</div>
+
+<div class="doc">
+<a name="lab75"></a><h1 class="section">拘束されていない値を探す</h1>
+
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+リストの length 関数の定義を思いだしましょう。
+ 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Print</span> <span class="id" title="definition">length</span>.<br/>
+</div>
+
+<div class="doc">
+<br/>
+<span class="inlinecode"><a class="idref" href="Cpdt.InductiveTypes.html#length"><span class="id" title="definition">length</span></a> = <br/>
+<span class="id" title="keyword">fun</span> <a class="idref" href="Cpdt.ProgLang.html#Forall.A"><span class="id" title="variable">A</span></a> : <span class="id" title="keyword">Type</span> ⇒<br/>
+<span class="id" title="keyword">fix</span> <a class="idref" href="Cpdt.InductiveTypes.html#length"><span class="id" title="definition">length</span></a> (<a class="idref" href="Cpdt.MoreDep.html#l"><span class="id" title="variable">l</span></a> : <a class="idref" href="Cpdt.InductiveTypes.html#list"><span class="id" title="inductive">list</span></a> <a class="idref" href="Cpdt.ProgLang.html#Forall.A"><span class="id" title="variable">A</span></a>) : <a class="idref" href="Cpdt.InductiveTypes.html#nat"><span class="id" title="inductive">nat</span></a> :=<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">match</span> <a class="idref" href="Cpdt.MoreDep.html#l"><span class="id" title="variable">l</span></a> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;| <span class="id" title="constructor">nil</span> ⇒ 0<br/>
+&nbsp;&nbsp;| <span class="id" title="var">_</span> :: <a class="idref" href="Cpdt.MoreDep.html#l'"><span class="id" title="variable">l'</span></a> ⇒ <a class="idref" href="Cpdt.Large.html#slow.S"><span class="id" title="variable">S</span></a> (<a class="idref" href="Cpdt.InductiveTypes.html#length"><span class="id" title="definition">length</span></a> <a class="idref" href="Cpdt.MoreDep.html#l'"><span class="id" title="variable">l'</span></a>)<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">end</span>
+<div class="paragraph"> </div>
+
+</span>
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+この関数は、前向きの方向に、入力から出力に計算するので簡単です。
+ 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Example</span> <a name="length_1_2"><span class="id" title="definition">length_1_2</span></a> : <span class="id" title="definition">length</span> (1 <span class="id" title="notation">::</span> 2 <span class="id" title="notation">::</span> <span class="id" title="constructor">nil</span>) <span class="id" title="notation">=</span> 2.<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">auto</span>.<br/>
+<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Print</span> <a class="idref" href="Cpdt.LogicProg.html#length_1_2"><span class="id" title="definition">length_1_2</span></a>.<br/>
+</div>
+
+<div class="doc">
+<br/>
+<span class="inlinecode"><a class="idref" href="Cpdt.LogicProg.html#length_1_2"><span class="id" title="definition">length_1_2</span></a> = <a class="idref" href="Cpdt.Predicates.html#eq_refl"><span class="id" title="constructor">eq_refl</span></a>
+<div class="paragraph"> </div>
+
+</span>
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+最後の節で、出力からの入力を計算するのを助けるために、
+論理プログラミングのスタイルで <span class="inlinecode"><a class="idref" href="Cpdt.InductiveTypes.html#length"><span class="id" title="definition">length</span></a></span> を再構築するためのいくつかの補題を証明します。
+ 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Theorem</span> <a name="length_O"><span class="id" title="lemma">length_O</span></a> : <span class="id" title="keyword">∀</span> <span class="id" title="var">A</span>, <span class="id" title="definition">length</span> (<span class="id" title="constructor">nil</span> (<span class="id" title="var">A</span> := <a class="idref" href="Cpdt.LogicProg.html#A"><span class="id" title="variable">A</span></a>)) <span class="id" title="notation">=</span> <span class="id" title="constructor">O</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="var">crush</span>.<br/>
+<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Theorem</span> <a name="length_S"><span class="id" title="lemma">length_S</span></a> : <span class="id" title="keyword">∀</span> <span class="id" title="var">A</span> (<span class="id" title="var">h</span> : <a class="idref" href="Cpdt.LogicProg.html#A"><span class="id" title="variable">A</span></a>) <span class="id" title="var">t</span> <span class="id" title="var">n</span>,<br/>
+&nbsp;&nbsp;<span class="id" title="definition">length</span> <a class="idref" href="Cpdt.LogicProg.html#t"><span class="id" title="variable">t</span></a> <span class="id" title="notation">=</span> <a class="idref" href="Cpdt.LogicProg.html#n"><span class="id" title="variable">n</span></a><br/>
+&nbsp;&nbsp;<span class="id" title="notation">→</span> <span class="id" title="definition">length</span> (<a class="idref" href="Cpdt.LogicProg.html#h"><span class="id" title="variable">h</span></a> <span class="id" title="notation">::</span> <a class="idref" href="Cpdt.LogicProg.html#t"><span class="id" title="variable">t</span></a>) <span class="id" title="notation">=</span> <span class="id" title="constructor">S</span> <a class="idref" href="Cpdt.LogicProg.html#n"><span class="id" title="variable">n</span></a>.<br/>
+&nbsp;&nbsp;<span class="id" title="var">crush</span>.<br/>
+<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Hint Resolve</span> <span class="id" title="var">length_O</span> <span class="id" title="var">length_S</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+長さ2の <span class="inlinecode"><a class="idref" href="Cpdt.InductiveTypes.html#list"><span class="id" title="inductive">list</span></a></span> <span class="inlinecode"><a class="idref" href="Cpdt.InductiveTypes.html#nat"><span class="id" title="inductive">nat</span></a></span> が存在することを証明するためのヒントとして、これらを適用しましょう。
+（ここで、単に <span class="inlinecode"><a class="idref" href="Cpdt.LogicProg.html#length_S"><span class="id" title="lemma">length_S</span></a></span> と同じコマンドを使うのが便利なので、
+<span class="inlinecode"><a class="idref" href="Cpdt.LogicProg.html#length_O"><span class="id" title="lemma">length_O</span></a></span> を <span class="inlinecode"><span class="id" title="keyword">Hint</span></span> <span class="inlinecode"><span class="id" title="keyword">Immediate</span></span> ではなく <span class="inlinecode"><span class="id" title="keyword">Hint</span></span> <span class="inlinecode"><span class="id" title="keyword">Resolve</span></span> で登録しています。
+<span class="inlinecode"><span class="id" title="keyword">Resolve</span></span> と <span class="inlinecode"><span class="id" title="keyword">Immediate</span></span> は、前提のない定理をヒント
+にするなら同じ意味を持ちます。
+
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Example</span> <a name="length_is_2"><span class="id" title="definition">length_is_2</span></a> : <span class="id" title="notation">∃</span> <span class="id" title="var">ls</span> : <span class="id" title="inductive">list</span> <span class="id" title="inductive">nat</span><span class="id" title="notation">,</span> <span class="id" title="definition">length</span> <a class="idref" href="Cpdt.LogicProg.html#ls"><span class="id" title="variable">ls</span></a> <span class="id" title="notation">=</span> 2.<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">eauto</span>.<br/>
+</div>
+
+<div class="doc">
+<pre>
+No more subgoals but non-instantiated existential variables:
+Existential 1 = ?20249 : [ |- nat]
+Existential 2 = ?20252 : [ |- nat]
+</pre>
+
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+Coqは、証明探索の途中で導入された幾つかのユニフィケーション変数を
+決定することなしに、証明を終えたことに文句をいいます。
+型 <span class="inlinecode"><a class="idref" href="Cpdt.InductiveTypes.html#nat"><span class="id" title="inductive">nat</span></a></span> の <i>任意</i> の値（たとば 0）をどちらの変数にも差し込むことができますから、
+このエラーメッセージは少し馬鹿げて(silly)います！
+しかし、より複雑な型では、それらの値(inhabitants)を見つけることは、
+一般的に定理証明と同じくらい複雑かもしれません。
+
+<div class="paragraph"> </div>
+
+<span class="inlinecode"><span class="id" title="keyword">Show</span></span> <span class="inlinecode"><span class="id" title="keyword">Proof</span></span> コマンドは、
+それらが使われたところで明示的に出現する未定のユニフィケーション変数と一緒に、
+<span class="inlinecode"><span class="id" title="tactic">eauto</span></span> 見つけたものを正確に示します。
+
+</div>
+<div class="code">
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Show</span> <span class="id" title="keyword">Proof</span>.<br/>
+</div>
+
+<div class="doc">
+<pre>
+Proof: ex_intro (fun ls : list nat =&gt; length ls = 2)
+         (?20249 :: ?20252 :: nil)
+         (length_S ?20249 (?20252 :: nil)
+            (length_S ?20252 nil (length_O nat)))
+</pre>
+ 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Abort</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+そのリストのふたつの要素を表わす、ふたつのユニフィケーション変数があります。
+しかしながら、リストの長さはデータの値と独立です。
+証明探索はユニフィケーションによって適切なデータの要素を自然に見つけ出すので、
+逆説的に、リストの制約によって証明探索のプロセスはより簡単になります。
+ライブラリ述語 <span class="inlinecode"><a class="idref" href="Cpdt.ProgLang.html#Forall"><span class="id" title="section">Forall</span></a></span> は便利でしょう。
+ 
+</div>
+<div class="code">
+
+<br/>
+
+<br/>
+<span class="id" title="keyword">Print</span> <span class="id" title="inductive">Forall</span>.<br/>
+</div>
+
+<div class="doc">
+<br/>
+<span class="inlinecode"><span class="id" title="keyword">Inductive</span> <a class="idref" href="Cpdt.ProgLang.html#Forall"><span class="id" title="section">Forall</span></a> (<a class="idref" href="Cpdt.ProgLang.html#Forall.A"><span class="id" title="variable">A</span></a> : <span class="id" title="keyword">Type</span>) (<a class="idref" href="Cpdt.ProgLang.html#Forall.P"><span class="id" title="variable">P</span></a> : <a class="idref" href="Cpdt.ProgLang.html#Forall.A"><span class="id" title="variable">A</span></a> → <span class="id" title="keyword">Prop</span>) : <a class="idref" href="Cpdt.InductiveTypes.html#list"><span class="id" title="inductive">list</span></a> <a class="idref" href="Cpdt.ProgLang.html#Forall.A"><span class="id" title="variable">A</span></a> → <span class="id" title="keyword">Prop</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="constructor">Forall_nil</span> : <a class="idref" href="Cpdt.ProgLang.html#Forall"><span class="id" title="section">Forall</span></a> <a class="idref" href="Cpdt.ProgLang.html#Forall.P"><span class="id" title="variable">P</span></a> <span class="id" title="constructor">nil</span><br/>
+&nbsp;&nbsp;| <span class="id" title="constructor">Forall_cons</span> : <span class="id" title="keyword">∀</span> (<a class="idref" href="Cpdt.MoreDep.html#insert.x"><span class="id" title="variable">x</span></a> : <a class="idref" href="Cpdt.ProgLang.html#Forall.A"><span class="id" title="variable">A</span></a>) (<a class="idref" href="Cpdt.MoreDep.html#l"><span class="id" title="variable">l</span></a> : <a class="idref" href="Cpdt.InductiveTypes.html#list"><span class="id" title="inductive">list</span></a> <a class="idref" href="Cpdt.ProgLang.html#Forall.A"><span class="id" title="variable">A</span></a>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="Cpdt.ProgLang.html#Forall.P"><span class="id" title="variable">P</span></a> <a class="idref" href="Cpdt.MoreDep.html#insert.x"><span class="id" title="variable">x</span></a> → <a class="idref" href="Cpdt.ProgLang.html#Forall"><span class="id" title="section">Forall</span></a> <a class="idref" href="Cpdt.ProgLang.html#Forall.P"><span class="id" title="variable">P</span></a> <a class="idref" href="Cpdt.MoreDep.html#l"><span class="id" title="variable">l</span></a> → <a class="idref" href="Cpdt.ProgLang.html#Forall"><span class="id" title="section">Forall</span></a> <a class="idref" href="Cpdt.ProgLang.html#Forall.P"><span class="id" title="variable">P</span></a> (<a class="idref" href="Cpdt.MoreDep.html#insert.x"><span class="id" title="variable">x</span></a> :: <a class="idref" href="Cpdt.MoreDep.html#l"><span class="id" title="variable">l</span></a>)
+<div class="paragraph"> </div>
+
+</span>
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Example</span> <a name="length_is_2"><span class="id" title="definition">length_is_2</span></a> : <span class="id" title="notation">∃</span> <span class="id" title="var">ls</span> : <span class="id" title="inductive">list</span> <span class="id" title="inductive">nat</span><span class="id" title="notation">,</span> <span class="id" title="definition">length</span> <a class="idref" href="Cpdt.LogicProg.html#ls"><span class="id" title="variable">ls</span></a> <span class="id" title="notation">=</span> 2<br/>
+&nbsp;&nbsp;<span class="id" title="notation">∧</span> <span class="id" title="inductive">Forall</span> (<span class="id" title="keyword">fun</span> <span class="id" title="var">n</span> ⇒ <a class="idref" href="Cpdt.LogicProg.html#n"><span class="id" title="variable">n</span></a> <span class="id" title="notation">≥</span> 1) <a class="idref" href="Cpdt.LogicProg.html#ls"><span class="id" title="variable">ls</span></a>.<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">eauto</span> 9.<br/>
+<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+証明の項を印刷することによって、<span class="inlinecode"><span class="id" title="tactic">eauto</span></span> がどのリストを見つけたかを見ることができます。
+ 
+</div>
+<div class="code">
+
+<br/>
+
+<br/>
+<span class="id" title="keyword">Print</span> <a class="idref" href="Cpdt.LogicProg.html#length_is_2"><span class="id" title="definition">length_is_2</span></a>.<br/>
+</div>
+
+<div class="doc">
+<br/>
+<span class="inlinecode"><a class="idref" href="Cpdt.LogicProg.html#length_is_2"><span class="id" title="definition">length_is_2</span></a> = <br/>
+<a class="idref" href="Cpdt.Predicates.html#ex_intro"><span class="id" title="constructor">ex_intro</span></a><br/>
+&nbsp;&nbsp;(<span class="id" title="keyword">fun</span> <a class="idref" href="Cpdt.InductiveTypes.html#ls"><span class="id" title="variable">ls</span></a> : <a class="idref" href="Cpdt.InductiveTypes.html#list"><span class="id" title="inductive">list</span></a> <a class="idref" href="Cpdt.InductiveTypes.html#nat"><span class="id" title="inductive">nat</span></a> ⇒ <a class="idref" href="Cpdt.InductiveTypes.html#length"><span class="id" title="definition">length</span></a> <a class="idref" href="Cpdt.InductiveTypes.html#ls"><span class="id" title="variable">ls</span></a> = 2 ∧ <a class="idref" href="Cpdt.ProgLang.html#Forall"><span class="id" title="section">Forall</span></a> (<span class="id" title="keyword">fun</span> <a class="idref" href="Cpdt.MoreDep.html#dec_star.dec_star''.n"><span class="id" title="variable">n</span></a> : <a class="idref" href="Cpdt.InductiveTypes.html#nat"><span class="id" title="inductive">nat</span></a> ⇒ <a class="idref" href="Cpdt.MoreDep.html#dec_star.dec_star''.n"><span class="id" title="variable">n</span></a> ≥ 1) <a class="idref" href="Cpdt.InductiveTypes.html#ls"><span class="id" title="variable">ls</span></a>)<br/>
+&nbsp;&nbsp;(1 :: 1 :: <span class="id" title="constructor">nil</span>)<br/>
+&nbsp;&nbsp;(<a class="idref" href="Cpdt.Predicates.html#conj"><span class="id" title="constructor">conj</span></a> (<a class="idref" href="Cpdt.LogicProg.html#length_S"><span class="id" title="lemma">length_S</span></a> 1 (1 :: <span class="id" title="constructor">nil</span>) (<a class="idref" href="Cpdt.LogicProg.html#length_S"><span class="id" title="lemma">length_S</span></a> 1 <span class="id" title="constructor">nil</span> (<a class="idref" href="Cpdt.LogicProg.html#length_O"><span class="id" title="lemma">length_O</span></a> <a class="idref" href="Cpdt.InductiveTypes.html#nat"><span class="id" title="inductive">nat</span></a>)))<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="constructor">Forall_cons</span> 1 (<span class="id" title="constructor">le_n</span> 1)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="constructor">Forall_cons</span> 1 (<span class="id" title="constructor">le_n</span> 1) (<span class="id" title="constructor">Forall_nil</span> (<span class="id" title="keyword">fun</span> <a class="idref" href="Cpdt.MoreDep.html#dec_star.dec_star''.n"><span class="id" title="variable">n</span></a> : <a class="idref" href="Cpdt.InductiveTypes.html#nat"><span class="id" title="inductive">nat</span></a> ⇒ <a class="idref" href="Cpdt.MoreDep.html#dec_star.dec_star''.n"><span class="id" title="variable">n</span></a> ≥ 1)))))
+<div class="paragraph"> </div>
+
+</span>
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+もうひとつ、奇妙な(fancier)例を見てみましょう。
+最初に、ひとつのリストのすべてのデータ要素を合計するための関数を定義するために
+標準の高階関数を使います。
+ 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Definition</span> <a name="sum"><span class="id" title="definition">sum</span></a> := <span class="id" title="definition">fold_right</span> <span class="id" title="abbreviation">plus</span> <span class="id" title="constructor">O</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+他の基本的な補題は、証明探索を導くのに便利です。
+ 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Lemma</span> <a name="plusO'"><span class="id" title="lemma">plusO'</span></a> : <span class="id" title="keyword">∀</span> <span class="id" title="var">n</span> <span class="id" title="var">m</span>,<br/>
+&nbsp;&nbsp;<a class="idref" href="Cpdt.LogicProg.html#n"><span class="id" title="variable">n</span></a> <span class="id" title="notation">=</span> <a class="idref" href="Cpdt.LogicProg.html#m"><span class="id" title="variable">m</span></a><br/>
+&nbsp;&nbsp;<span class="id" title="notation">→</span> 0 <span class="id" title="notation">+</span> <a class="idref" href="Cpdt.LogicProg.html#n"><span class="id" title="variable">n</span></a> <span class="id" title="notation">=</span> <a class="idref" href="Cpdt.LogicProg.html#m"><span class="id" title="variable">m</span></a>.<br/>
+&nbsp;&nbsp;<span class="id" title="var">crush</span>.<br/>
+<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Hint Resolve</span> <span class="id" title="var">plusO'</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+最後に、カスタムヒントを登録するためのコマンド
+<span class="inlinecode"><span class="id" title="keyword">Hint</span></span> <span class="inlinecode"><span class="id" title="keyword">Extern</span></span> を見ます。
+これは、証明探索の間にゴールに対してマッチするパターンを提供します。
+ひとたび、パターンがマッチしたら、タクティク（矢印 <span class="inlinecode">⇒</span> の右辺で与えられた) が試みられます。
+次に、数字 <span class="inlinecode">1</span> は、このステップの優先度を与えます。
+低い優先度は高い優先度の前に試みられ、
+それは、証明探索の時間に大きな影響をもたらすことができます。
+ 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Hint Extern</span> 1 (<a class="idref" href="Cpdt.LogicProg.html#sum"><span class="id" title="definition">sum</span></a> <span class="id" title="var">_</span> <span class="id" title="notation">=</span> <span class="id" title="var">_</span>) ⇒ <span class="id" title="tactic">simpl</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+ここで、合計が0である長さ2のリストを見つけることができます。
+
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Example</span> <a name="length_and_sum"><span class="id" title="definition">length_and_sum</span></a> : <span class="id" title="notation">∃</span> <span class="id" title="var">ls</span> : <span class="id" title="inductive">list</span> <span class="id" title="inductive">nat</span><span class="id" title="notation">,</span> <span class="id" title="definition">length</span> <a class="idref" href="Cpdt.LogicProg.html#ls"><span class="id" title="variable">ls</span></a> <span class="id" title="notation">=</span> 2<br/>
+&nbsp;&nbsp;<span class="id" title="notation">∧</span> <a class="idref" href="Cpdt.LogicProg.html#sum"><span class="id" title="definition">sum</span></a> <a class="idref" href="Cpdt.LogicProg.html#ls"><span class="id" title="variable">ls</span></a> <span class="id" title="notation">=</span> <span class="id" title="constructor">O</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">eauto</span> 7.<br/>
+<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+証明の項を印刷することは（で）、見つかったなんの不思議もない(unsurprising)リストを示します。
+ここに、どのリストが使用されるのかが明白でない例があります。
+<span class="inlinecode"><span class="id" title="tactic">eauto</span></span> が選んだリストがどれか判りますか？
+
+<div class="paragraph"> </div>
+
+ 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Example</span> <a name="length_and_sum'"><span class="id" title="definition">length_and_sum'</span></a> : <span class="id" title="notation">∃</span> <span class="id" title="var">ls</span> : <span class="id" title="inductive">list</span> <span class="id" title="inductive">nat</span><span class="id" title="notation">,</span> <span class="id" title="definition">length</span> <a class="idref" href="Cpdt.LogicProg.html#ls"><span class="id" title="variable">ls</span></a> <span class="id" title="notation">=</span> 5<br/>
+&nbsp;&nbsp;<span class="id" title="notation">∧</span> <a class="idref" href="Cpdt.LogicProg.html#sum"><span class="id" title="definition">sum</span></a> <a class="idref" href="Cpdt.LogicProg.html#ls"><span class="id" title="variable">ls</span></a> <span class="id" title="notation">=</span> 42.<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">eauto</span> 15.<br/>
+<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+上記のリストはあまりにも多くのゼロが含まれているので、
+私たちは答えの一部を放棄して、望むよりも面白くないと言うでしょう。
+さらなる制約は、問題のより小さい具体例(インスタンス)に対して、異なる答えを強制します。
+ 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Example</span> <a name="length_and_sum''"><span class="id" title="definition">length_and_sum''</span></a> : <span class="id" title="notation">∃</span> <span class="id" title="var">ls</span> : <span class="id" title="inductive">list</span> <span class="id" title="inductive">nat</span><span class="id" title="notation">,</span> <span class="id" title="definition">length</span> <a class="idref" href="Cpdt.LogicProg.html#ls"><span class="id" title="variable">ls</span></a> <span class="id" title="notation">=</span> 2<br/>
+&nbsp;&nbsp;<span class="id" title="notation">∧</span> <a class="idref" href="Cpdt.LogicProg.html#sum"><span class="id" title="definition">sum</span></a> <a class="idref" href="Cpdt.LogicProg.html#ls"><span class="id" title="variable">ls</span></a> <span class="id" title="notation">=</span> 3<br/>
+&nbsp;&nbsp;<span class="id" title="notation">∧</span> <span class="id" title="inductive">Forall</span> (<span class="id" title="keyword">fun</span> <span class="id" title="var">n</span> ⇒ <a class="idref" href="Cpdt.LogicProg.html#n"><span class="id" title="variable">n</span></a> <span class="id" title="notation">≠</span> 0) <a class="idref" href="Cpdt.LogicProg.html#ls"><span class="id" title="variable">ls</span></a>.<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">eauto</span> 11.<br/>
+<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+この種類の練習を通して続けることができましたが、
+リストを自動的に検索するよりもさらに興味深いのは <i>プログラム</i> を自動的に見つけることでしょう。
+
+</div>
+<div class="code">
+
+<br/>
+</div>
+
+<div class="doc">
+<a name="lab76"></a><h1 class="section">プログラムの合成</h1>
+
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+ここに算術式の単純な構文の型があります。これは、本書で以前に数回使用したものと似ています。
+この場合、ちょうどひとつだけの識別された変数を式のなかに言及することができます。
+ 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Inductive</span> <a name="exp"><span class="id" title="inductive">exp</span></a> : <span class="id" title="keyword">Set</span> :=<br/>
+| <a name="Const"><span class="id" title="constructor">Const</span></a> : <span class="id" title="inductive">nat</span> <span class="id" title="notation">→</span> <a class="idref" href="Cpdt.LogicProg.html#exp"><span class="id" title="inductive">exp</span></a><br/>
+| <a name="Var"><span class="id" title="constructor">Var</span></a> : <a class="idref" href="Cpdt.LogicProg.html#exp"><span class="id" title="inductive">exp</span></a><br/>
+| <a name="Plus"><span class="id" title="constructor">Plus</span></a> : <a class="idref" href="Cpdt.LogicProg.html#exp"><span class="id" title="inductive">exp</span></a> <span class="id" title="notation">→</span> <a class="idref" href="Cpdt.LogicProg.html#exp"><span class="id" title="inductive">exp</span></a> <span class="id" title="notation">→</span> <a class="idref" href="Cpdt.LogicProg.html#exp"><span class="id" title="inductive">exp</span></a>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+帰納的な関係は式の意味を指定し、変数値と式を式の値に関連付けます。
+ 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Inductive</span> <a name="eval"><span class="id" title="inductive">eval</span></a> (<span class="id" title="var">var</span> : <span class="id" title="inductive">nat</span>) : <a class="idref" href="Cpdt.LogicProg.html#exp"><span class="id" title="inductive">exp</span></a> <span class="id" title="notation">→</span> <span class="id" title="inductive">nat</span> <span class="id" title="notation">→</span> <span class="id" title="keyword">Prop</span> :=<br/>
+| <a name="EvalConst"><span class="id" title="constructor">EvalConst</span></a> : <span class="id" title="keyword">∀</span> <span class="id" title="var">n</span>, <a class="idref" href="Cpdt.LogicProg.html#eval"><span class="id" title="inductive">eval</span></a> <span class="id" title="var">var</span> (<a class="idref" href="Cpdt.LogicProg.html#Const"><span class="id" title="constructor">Const</span></a> <a class="idref" href="Cpdt.LogicProg.html#n"><span class="id" title="variable">n</span></a>) <a class="idref" href="Cpdt.LogicProg.html#n"><span class="id" title="variable">n</span></a><br/>
+| <a name="EvalVar"><span class="id" title="constructor">EvalVar</span></a> : <a class="idref" href="Cpdt.LogicProg.html#eval"><span class="id" title="inductive">eval</span></a> <span class="id" title="var">var</span> <a class="idref" href="Cpdt.LogicProg.html#Var"><span class="id" title="constructor">Var</span></a> <span class="id" title="var">var</span><br/>
+| <a name="EvalPlus"><span class="id" title="constructor">EvalPlus</span></a> : <span class="id" title="keyword">∀</span> <span class="id" title="var">e1</span> <span class="id" title="var">e2</span> <span class="id" title="var">n1</span> <span class="id" title="var">n2</span>, <a class="idref" href="Cpdt.LogicProg.html#eval"><span class="id" title="inductive">eval</span></a> <span class="id" title="var">var</span> <a class="idref" href="Cpdt.LogicProg.html#e1"><span class="id" title="variable">e1</span></a> <a class="idref" href="Cpdt.LogicProg.html#n1"><span class="id" title="variable">n1</span></a><br/>
+&nbsp;&nbsp;<span class="id" title="notation">→</span> <a class="idref" href="Cpdt.LogicProg.html#eval"><span class="id" title="inductive">eval</span></a> <span class="id" title="var">var</span> <a class="idref" href="Cpdt.LogicProg.html#e2"><span class="id" title="variable">e2</span></a> <a class="idref" href="Cpdt.LogicProg.html#n2"><span class="id" title="variable">n2</span></a><br/>
+&nbsp;&nbsp;<span class="id" title="notation">→</span> <a class="idref" href="Cpdt.LogicProg.html#eval"><span class="id" title="inductive">eval</span></a> <span class="id" title="var">var</span> (<a class="idref" href="Cpdt.LogicProg.html#Plus"><span class="id" title="constructor">Plus</span></a> <a class="idref" href="Cpdt.LogicProg.html#e1"><span class="id" title="variable">e1</span></a> <a class="idref" href="Cpdt.LogicProg.html#e2"><span class="id" title="variable">e2</span></a>) (<a class="idref" href="Cpdt.LogicProg.html#n1"><span class="id" title="variable">n1</span></a> <span class="id" title="notation">+</span> <a class="idref" href="Cpdt.LogicProg.html#n2"><span class="id" title="variable">n2</span></a>).<br/>
+
+<br/>
+<span class="id" title="keyword">Hint Constructors</span> <a class="idref" href="Cpdt.LogicProg.html#eval"><span class="id" title="inductive">eval</span></a>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+<span class="inlinecode"><span class="id" title="tactic">auto</span></span> を 特定の式の意味を実行するために使えます。
+
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Example</span> <a name="eval1"><span class="id" title="definition">eval1</span></a> : <span class="id" title="keyword">∀</span> <span class="id" title="var">var</span>, <a class="idref" href="Cpdt.LogicProg.html#eval"><span class="id" title="inductive">eval</span></a> <a class="idref" href="Cpdt.LogicProg.html#var"><span class="id" title="variable">var</span></a> (<a class="idref" href="Cpdt.LogicProg.html#Plus"><span class="id" title="constructor">Plus</span></a> <a class="idref" href="Cpdt.LogicProg.html#Var"><span class="id" title="constructor">Var</span></a> (<a class="idref" href="Cpdt.LogicProg.html#Plus"><span class="id" title="constructor">Plus</span></a> (<a class="idref" href="Cpdt.LogicProg.html#Const"><span class="id" title="constructor">Const</span></a> 8) <a class="idref" href="Cpdt.LogicProg.html#Var"><span class="id" title="constructor">Var</span></a>)) (<a class="idref" href="Cpdt.LogicProg.html#var"><span class="id" title="variable">var</span></a> <span class="id" title="notation">+</span> <span class="id" title="notation">(</span>8 <span class="id" title="notation">+</span> <a class="idref" href="Cpdt.LogicProg.html#var"><span class="id" title="variable">var</span></a><span class="id" title="notation">)</span>).<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">auto</span>.<br/>
+<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+不幸にも、<span class="inlinecode"><span class="id" title="tactic">eval</span></span> のコンストラクタは、次のように、
+算術的な同一性  に依存するような定理
+を証明するのに十分ではありません。
+ 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Example</span> <a name="eval1'"><span class="id" title="definition">eval1'</span></a> : <span class="id" title="keyword">∀</span> <span class="id" title="var">var</span>, <a class="idref" href="Cpdt.LogicProg.html#eval"><span class="id" title="inductive">eval</span></a> <a class="idref" href="Cpdt.LogicProg.html#var"><span class="id" title="variable">var</span></a> (<a class="idref" href="Cpdt.LogicProg.html#Plus"><span class="id" title="constructor">Plus</span></a> <a class="idref" href="Cpdt.LogicProg.html#Var"><span class="id" title="constructor">Var</span></a> (<a class="idref" href="Cpdt.LogicProg.html#Plus"><span class="id" title="constructor">Plus</span></a> (<a class="idref" href="Cpdt.LogicProg.html#Const"><span class="id" title="constructor">Const</span></a> 8) <a class="idref" href="Cpdt.LogicProg.html#Var"><span class="id" title="constructor">Var</span></a>)) (2 <span class="id" title="notation">×</span> <a class="idref" href="Cpdt.LogicProg.html#var"><span class="id" title="variable">var</span></a> <span class="id" title="notation">+</span> 8).<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">eauto</span>.<br/>
+<span class="id" title="keyword">Abort</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+<span class="inlinecode"><a class="idref" href="Cpdt.LogicProg.html#eval1'"><span class="id" title="definition">eval1'</span></a></span> を証明するのを助けるために、別の等式の前提を挿入する、
+別なバージョンの <span class="inlinecode"><a class="idref" href="Cpdt.LogicProg.html#EvalPlus"><span class="id" title="constructor">EvalPlus</span></a></span> を証明します。
+
+<div class="paragraph"> </div>
+
+この種類の演出は、<span class="inlinecode"><span class="id" title="tactic">eauto</span></span> のユニフィケーションの制限を回避するのに役に立ちます。
+直接的なヒントとしての<span class="inlinecode"><a class="idref" href="Cpdt.LogicProg.html#EvalPlus"><span class="id" title="constructor">EvalPlus</span></a></span>は、
+結果が既に定数ではなく加算として表現されているゴールにのみ一致します。
+
+<div class="paragraph"> </div>
+
+下の代替バージョンでは、加算の木がどのように分解されたとしても、
+最初の2つの前提を証明するために、
+<span class="inlinecode"><span class="id" title="tactic">eauto</span></span> は <span class="inlinecode"><a class="idref" href="Cpdt.InductiveTypes.html#n1"><span class="id" title="variable">n1</span></a></span> と <span class="inlinecode"><a class="idref" href="Cpdt.InductiveTypes.html#n2"><span class="id" title="variable">n2</span></a></span> の値を決める際に自由な範囲(regin)を与え、
+3番目の前提は <span class="inlinecode"><span class="id" title="tactic">reflexivity</span></span> によって証明されます。
+ 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Theorem</span> <a name="EvalPlus'"><span class="id" title="lemma">EvalPlus'</span></a> : <span class="id" title="keyword">∀</span> <span class="id" title="var">var</span> <span class="id" title="var">e1</span> <span class="id" title="var">e2</span> <span class="id" title="var">n1</span> <span class="id" title="var">n2</span> <span class="id" title="var">n</span>, <a class="idref" href="Cpdt.LogicProg.html#eval"><span class="id" title="inductive">eval</span></a> <a class="idref" href="Cpdt.LogicProg.html#var"><span class="id" title="variable">var</span></a> <a class="idref" href="Cpdt.LogicProg.html#e1"><span class="id" title="variable">e1</span></a> <a class="idref" href="Cpdt.LogicProg.html#n1"><span class="id" title="variable">n1</span></a><br/>
+&nbsp;&nbsp;<span class="id" title="notation">→</span> <a class="idref" href="Cpdt.LogicProg.html#eval"><span class="id" title="inductive">eval</span></a> <a class="idref" href="Cpdt.LogicProg.html#var"><span class="id" title="variable">var</span></a> <a class="idref" href="Cpdt.LogicProg.html#e2"><span class="id" title="variable">e2</span></a> <a class="idref" href="Cpdt.LogicProg.html#n2"><span class="id" title="variable">n2</span></a><br/>
+&nbsp;&nbsp;<span class="id" title="notation">→</span> <a class="idref" href="Cpdt.LogicProg.html#n1"><span class="id" title="variable">n1</span></a> <span class="id" title="notation">+</span> <a class="idref" href="Cpdt.LogicProg.html#n2"><span class="id" title="variable">n2</span></a> <span class="id" title="notation">=</span> <a class="idref" href="Cpdt.LogicProg.html#n"><span class="id" title="variable">n</span></a><br/>
+&nbsp;&nbsp;<span class="id" title="notation">→</span> <a class="idref" href="Cpdt.LogicProg.html#eval"><span class="id" title="inductive">eval</span></a> <a class="idref" href="Cpdt.LogicProg.html#var"><span class="id" title="variable">var</span></a> (<a class="idref" href="Cpdt.LogicProg.html#Plus"><span class="id" title="constructor">Plus</span></a> <a class="idref" href="Cpdt.LogicProg.html#e1"><span class="id" title="variable">e1</span></a> <a class="idref" href="Cpdt.LogicProg.html#e2"><span class="id" title="variable">e2</span></a>) <a class="idref" href="Cpdt.LogicProg.html#n"><span class="id" title="variable">n</span></a>.<br/>
+&nbsp;&nbsp;<span class="id" title="var">crush</span>.<br/>
+<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Hint Resolve</span> <span class="id" title="var">EvalPlus'</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+さらに、<span class="inlinecode"><span class="id" title="tactic">eauto</span></span> を
+量化子のない線形算術(quantifier-free linear arithmetic)
+のための完全な決定手順を提供する標準タクティクである
+<span class="inlinecode"><span class="id" title="tactic">omega</span></span> に適用させます。
+<span class="inlinecode"><span class="id" title="keyword">Hint</span></span> <span class="inlinecode"><span class="id" title="keyword">Extern</span></span> を通して、どんな等式のゴールに対してでも <span class="inlinecode"><span class="id" title="tactic">omega</span></span> を使うように要求します。
+
+<div class="paragraph"> </div>
+
+<span class="inlinecode"><span class="id" title="tactic">abstract</span></span> タクティカルは、成功した証明のそれぞれに対して新しい補題を生成し、
+最後の証明項において、
+その補題は、算術的に等しいこと(arithmetic equality)の全体の証明
+を置き換える箇所で参照されます。
+ 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Hint Extern</span> 1 (<span class="id" title="var">_</span> <span class="id" title="notation">=</span> <span class="id" title="var">_</span>) ⇒ <span class="id" title="tactic">abstract</span> <span class="id" title="tactic">omega</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+<span class="inlinecode"><a class="idref" href="Cpdt.LogicProg.html#eval1'"><span class="id" title="definition">eval1'</span></a></span> に戻って、それを自動的に証明します。
+ 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Example</span> <a name="eval1'"><span class="id" title="definition">eval1'</span></a> : <span class="id" title="keyword">∀</span> <span class="id" title="var">var</span>, <a class="idref" href="Cpdt.LogicProg.html#eval"><span class="id" title="inductive">eval</span></a> <a class="idref" href="Cpdt.LogicProg.html#var"><span class="id" title="variable">var</span></a> (<a class="idref" href="Cpdt.LogicProg.html#Plus"><span class="id" title="constructor">Plus</span></a> <a class="idref" href="Cpdt.LogicProg.html#Var"><span class="id" title="constructor">Var</span></a> (<a class="idref" href="Cpdt.LogicProg.html#Plus"><span class="id" title="constructor">Plus</span></a> (<a class="idref" href="Cpdt.LogicProg.html#Const"><span class="id" title="constructor">Const</span></a> 8) <a class="idref" href="Cpdt.LogicProg.html#Var"><span class="id" title="constructor">Var</span></a>)) (2 <span class="id" title="notation">×</span> <a class="idref" href="Cpdt.LogicProg.html#var"><span class="id" title="variable">var</span></a> <span class="id" title="notation">+</span> 8).<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">eauto</span>.<br/>
+<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Print</span> <a class="idref" href="Cpdt.LogicProg.html#eval1'"><span class="id" title="definition">eval1'</span></a>.<br/>
+</div>
+
+<div class="doc">
+<br/>
+<span class="inlinecode"><a class="idref" href="Cpdt.LogicProg.html#eval1'"><span class="id" title="definition">eval1'</span></a> = <br/>
+<span class="id" title="keyword">fun</span> <a class="idref" href="Cpdt.ProgLang.html#HigherOrder.var.var"><span class="id" title="variable">var</span></a> : <a class="idref" href="Cpdt.InductiveTypes.html#nat"><span class="id" title="inductive">nat</span></a> ⇒<br/>
+<a class="idref" href="Cpdt.LogicProg.html#EvalPlus'"><span class="id" title="lemma">EvalPlus'</span></a> (<a class="idref" href="Cpdt.LogicProg.html#EvalVar"><span class="id" title="constructor">EvalVar</span></a> <a class="idref" href="Cpdt.ProgLang.html#HigherOrder.var.var"><span class="id" title="variable">var</span></a>) (<a class="idref" href="Cpdt.LogicProg.html#EvalPlus"><span class="id" title="constructor">EvalPlus</span></a> (<a class="idref" href="Cpdt.LogicProg.html#EvalConst"><span class="id" title="constructor">EvalConst</span></a> <a class="idref" href="Cpdt.ProgLang.html#HigherOrder.var.var"><span class="id" title="variable">var</span></a> 8) (<a class="idref" href="Cpdt.LogicProg.html#EvalVar"><span class="id" title="constructor">EvalVar</span></a> <a class="idref" href="Cpdt.ProgLang.html#HigherOrder.var.var"><span class="id" title="variable">var</span></a>))<br/>
+&nbsp;&nbsp;(<span class="id" title="var">eval1'_subproof</span> <a class="idref" href="Cpdt.ProgLang.html#HigherOrder.var.var"><span class="id" title="variable">var</span></a>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: <span class="id" title="keyword">∀</span> <a class="idref" href="Cpdt.ProgLang.html#HigherOrder.var.var"><span class="id" title="variable">var</span></a> : <a class="idref" href="Cpdt.InductiveTypes.html#nat"><span class="id" title="inductive">nat</span></a>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">eval</span> <a class="idref" href="Cpdt.ProgLang.html#HigherOrder.var.var"><span class="id" title="variable">var</span></a> (<a class="idref" href="Cpdt.ProgLang.html#HigherOrder.Plus"><span class="id" title="constructor">Plus</span></a> <a class="idref" href="Cpdt.ProgLang.html#HigherOrder.Var"><span class="id" title="constructor">Var</span></a> (<a class="idref" href="Cpdt.ProgLang.html#HigherOrder.Plus"><span class="id" title="constructor">Plus</span></a> (<a class="idref" href="Cpdt.ProgLang.html#HigherOrder.Const"><span class="id" title="constructor">Const</span></a> 8) <a class="idref" href="Cpdt.ProgLang.html#HigherOrder.Var"><span class="id" title="constructor">Var</span></a>)) (2 × <a class="idref" href="Cpdt.ProgLang.html#HigherOrder.var.var"><span class="id" title="variable">var</span></a> + 8)
+<div class="paragraph"> </div>
+
+</span>
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+補題 <span class="inlinecode"><span class="id" title="var">eval1'_subproof</span></span> は <span class="inlinecode"><span class="id" title="tactic">abstract</span></span> <span class="inlinecode"><span class="id" title="tactic">omega</span></span> によって生成されました。
+
+<div class="paragraph"> </div>
+
+これで、常に特定のシンボリック値に評価されるプログラム（算術式）を検索することで、
+論理プログラミングの柔軟性を利用する準備が整いました。
+ 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Example</span> <a name="synthesize1"><span class="id" title="definition">synthesize1</span></a> : <span class="id" title="notation">∃</span> <span class="id" title="var">e</span><span class="id" title="notation">,</span> <span class="id" title="keyword">∀</span> <span class="id" title="var">var</span>, <a class="idref" href="Cpdt.LogicProg.html#eval"><span class="id" title="inductive">eval</span></a> <a class="idref" href="Cpdt.LogicProg.html#var"><span class="id" title="variable">var</span></a> <a class="idref" href="Cpdt.LogicProg.html#e"><span class="id" title="variable">e</span></a> (<a class="idref" href="Cpdt.LogicProg.html#var"><span class="id" title="variable">var</span></a> <span class="id" title="notation">+</span> 7).<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">eauto</span>.<br/>
+<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Print</span> <a class="idref" href="Cpdt.LogicProg.html#synthesize1"><span class="id" title="definition">synthesize1</span></a>.<br/>
+</div>
+
+<div class="doc">
+<br/>
+<span class="inlinecode"><a class="idref" href="Cpdt.LogicProg.html#synthesize1"><span class="id" title="definition">synthesize1</span></a> = <br/>
+<a class="idref" href="Cpdt.Predicates.html#ex_intro"><span class="id" title="constructor">ex_intro</span></a> (<span class="id" title="keyword">fun</span> <a class="idref" href="Cpdt.Reflection.html#monoid.e"><span class="id" title="variable">e</span></a> : <a class="idref" href="Cpdt.Large.html#exp"><span class="id" title="inductive">exp</span></a> ⇒ <span class="id" title="keyword">∀</span> <a class="idref" href="Cpdt.ProgLang.html#HigherOrder.var.var"><span class="id" title="variable">var</span></a> : <a class="idref" href="Cpdt.InductiveTypes.html#nat"><span class="id" title="inductive">nat</span></a>, <span class="id" title="tactic">eval</span> <a class="idref" href="Cpdt.ProgLang.html#HigherOrder.var.var"><span class="id" title="variable">var</span></a> <a class="idref" href="Cpdt.Reflection.html#monoid.e"><span class="id" title="variable">e</span></a> (<a class="idref" href="Cpdt.ProgLang.html#HigherOrder.var.var"><span class="id" title="variable">var</span></a> + 7))<br/>
+&nbsp;&nbsp;(<a class="idref" href="Cpdt.ProgLang.html#HigherOrder.Plus"><span class="id" title="constructor">Plus</span></a> <a class="idref" href="Cpdt.ProgLang.html#HigherOrder.Var"><span class="id" title="constructor">Var</span></a> (<a class="idref" href="Cpdt.ProgLang.html#HigherOrder.Const"><span class="id" title="constructor">Const</span></a> 7))<br/>
+&nbsp;&nbsp;(<span class="id" title="keyword">fun</span> <a class="idref" href="Cpdt.ProgLang.html#HigherOrder.var.var"><span class="id" title="variable">var</span></a> : <a class="idref" href="Cpdt.InductiveTypes.html#nat"><span class="id" title="inductive">nat</span></a> ⇒ <a class="idref" href="Cpdt.LogicProg.html#EvalPlus"><span class="id" title="constructor">EvalPlus</span></a> (<a class="idref" href="Cpdt.LogicProg.html#EvalVar"><span class="id" title="constructor">EvalVar</span></a> <a class="idref" href="Cpdt.ProgLang.html#HigherOrder.var.var"><span class="id" title="variable">var</span></a>) (<a class="idref" href="Cpdt.LogicProg.html#EvalConst"><span class="id" title="constructor">EvalConst</span></a> <a class="idref" href="Cpdt.ProgLang.html#HigherOrder.var.var"><span class="id" title="variable">var</span></a> 7))
+<div class="paragraph"> </div>
+
+</span>
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+プログラム合成の能力を見せてくれるもう2つの例があります。
+ 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Example</span> <a name="synthesize2"><span class="id" title="definition">synthesize2</span></a> : <span class="id" title="notation">∃</span> <span class="id" title="var">e</span><span class="id" title="notation">,</span> <span class="id" title="keyword">∀</span> <span class="id" title="var">var</span>, <a class="idref" href="Cpdt.LogicProg.html#eval"><span class="id" title="inductive">eval</span></a> <a class="idref" href="Cpdt.LogicProg.html#var"><span class="id" title="variable">var</span></a> <a class="idref" href="Cpdt.LogicProg.html#e"><span class="id" title="variable">e</span></a> (2 <span class="id" title="notation">×</span> <a class="idref" href="Cpdt.LogicProg.html#var"><span class="id" title="variable">var</span></a> <span class="id" title="notation">+</span> 8).<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">eauto</span>.<br/>
+<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+
+<br/>
+<span class="id" title="keyword">Example</span> <a name="synthesize3"><span class="id" title="definition">synthesize3</span></a> : <span class="id" title="notation">∃</span> <span class="id" title="var">e</span><span class="id" title="notation">,</span> <span class="id" title="keyword">∀</span> <span class="id" title="var">var</span>, <a class="idref" href="Cpdt.LogicProg.html#eval"><span class="id" title="inductive">eval</span></a> <a class="idref" href="Cpdt.LogicProg.html#var"><span class="id" title="variable">var</span></a> <a class="idref" href="Cpdt.LogicProg.html#e"><span class="id" title="variable">e</span></a> (3 <span class="id" title="notation">×</span> <a class="idref" href="Cpdt.LogicProg.html#var"><span class="id" title="variable">var</span></a> <span class="id" title="notation">+</span> 42).<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">eauto</span>.<br/>
+<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+これらの例は、変数 <span class="inlinecode"><a class="idref" href="Cpdt.ProgLang.html#HigherOrder.var.var"><span class="id" title="variable">var</span></a></span> の線形な式を示します。
+これらのどんな式でも、適当な <span class="inlinecode"><a class="idref" href="Cpdt.LogicProg.html#k"><span class="id" title="variable">k</span></a></span> と <span class="inlinecode"><a class="idref" href="Cpdt.MoreDep.html#dec_star.dec_star''.n"><span class="id" title="variable">n</span></a></span> なら、<span class="inlinecode"><a class="idref" href="Cpdt.LogicProg.html#k"><span class="id" title="variable">k</span></a></span> <span class="inlinecode">×</span> <span class="inlinecode"><a class="idref" href="Cpdt.ProgLang.html#HigherOrder.var.var"><span class="id" title="variable">var</span></a></span> <span class="inlinecode">+</span> <span class="inlinecode"><a class="idref" href="Cpdt.MoreDep.html#dec_star.dec_star''.n"><span class="id" title="variable">n</span></a></span> に等しいです。
+任意の式の意味がこのような線形の式に等しいということを証明できることは、
+多分それほど驚きではありませんが、そのような事実を手動で証明するとは退屈です。
+このセクションを終了するにあたり、<span class="inlinecode"><span class="id" title="tactic">eauto</span></span> を使って証明を完成させ、
+<span class="inlinecode"><a class="idref" href="Cpdt.LogicProg.html#k"><span class="id" title="variable">k</span></a></span>と<span class="inlinecode"><a class="idref" href="Cpdt.MoreDep.html#dec_star.dec_star''.n"><span class="id" title="variable">n</span></a></span>の値を自動的に見つけてみましょう。
+
+<div class="paragraph"> </div>
+
+一連の補題を証明してヒントとして追加します。
+別の <span class="inlinecode"><span class="id" title="tactic">eval</span></span> コンストラクタと補題と算術に関するいくつかの事実があります。
+ 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Theorem</span> <a name="EvalConst'"><span class="id" title="lemma">EvalConst'</span></a> : <span class="id" title="keyword">∀</span> <span class="id" title="var">var</span> <span class="id" title="var">n</span> <span class="id" title="var">m</span>, <a class="idref" href="Cpdt.LogicProg.html#n"><span class="id" title="variable">n</span></a> <span class="id" title="notation">=</span> <a class="idref" href="Cpdt.LogicProg.html#m"><span class="id" title="variable">m</span></a><br/>
+&nbsp;&nbsp;<span class="id" title="notation">→</span> <a class="idref" href="Cpdt.LogicProg.html#eval"><span class="id" title="inductive">eval</span></a> <a class="idref" href="Cpdt.LogicProg.html#var"><span class="id" title="variable">var</span></a> (<a class="idref" href="Cpdt.LogicProg.html#Const"><span class="id" title="constructor">Const</span></a> <a class="idref" href="Cpdt.LogicProg.html#n"><span class="id" title="variable">n</span></a>) <a class="idref" href="Cpdt.LogicProg.html#m"><span class="id" title="variable">m</span></a>.<br/>
+&nbsp;&nbsp;<span class="id" title="var">crush</span>.<br/>
+<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Hint Resolve</span> <span class="id" title="var">EvalConst'</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Theorem</span> <a name="zero_times"><span class="id" title="lemma">zero_times</span></a> : <span class="id" title="keyword">∀</span> <span class="id" title="var">n</span> <span class="id" title="var">m</span> <span class="id" title="var">r</span>,<br/>
+&nbsp;&nbsp;<a class="idref" href="Cpdt.LogicProg.html#r"><span class="id" title="variable">r</span></a> <span class="id" title="notation">=</span> <a class="idref" href="Cpdt.LogicProg.html#m"><span class="id" title="variable">m</span></a><br/>
+&nbsp;&nbsp;<span class="id" title="notation">→</span> <a class="idref" href="Cpdt.LogicProg.html#r"><span class="id" title="variable">r</span></a> <span class="id" title="notation">=</span> 0 <span class="id" title="notation">×</span> <a class="idref" href="Cpdt.LogicProg.html#n"><span class="id" title="variable">n</span></a> <span class="id" title="notation">+</span> <a class="idref" href="Cpdt.LogicProg.html#m"><span class="id" title="variable">m</span></a>.<br/>
+&nbsp;&nbsp;<span class="id" title="var">crush</span>.<br/>
+<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Hint Resolve</span> <span class="id" title="var">zero_times</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Theorem</span> <a name="EvalVar'"><span class="id" title="lemma">EvalVar'</span></a> : <span class="id" title="keyword">∀</span> <span class="id" title="var">var</span> <span class="id" title="var">n</span>,<br/>
+&nbsp;&nbsp;<a class="idref" href="Cpdt.LogicProg.html#var"><span class="id" title="variable">var</span></a> <span class="id" title="notation">=</span> <a class="idref" href="Cpdt.LogicProg.html#n"><span class="id" title="variable">n</span></a><br/>
+&nbsp;&nbsp;<span class="id" title="notation">→</span> <a class="idref" href="Cpdt.LogicProg.html#eval"><span class="id" title="inductive">eval</span></a> <a class="idref" href="Cpdt.LogicProg.html#var"><span class="id" title="variable">var</span></a> <a class="idref" href="Cpdt.LogicProg.html#Var"><span class="id" title="constructor">Var</span></a> <a class="idref" href="Cpdt.LogicProg.html#n"><span class="id" title="variable">n</span></a>.<br/>
+&nbsp;&nbsp;<span class="id" title="var">crush</span>.<br/>
+<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Hint Resolve</span> <span class="id" title="var">EvalVar'</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Theorem</span> <a name="plus_0"><span class="id" title="lemma">plus_0</span></a> : <span class="id" title="keyword">∀</span> <span class="id" title="var">n</span> <span class="id" title="var">r</span>,<br/>
+&nbsp;&nbsp;<a class="idref" href="Cpdt.LogicProg.html#r"><span class="id" title="variable">r</span></a> <span class="id" title="notation">=</span> <a class="idref" href="Cpdt.LogicProg.html#n"><span class="id" title="variable">n</span></a><br/>
+&nbsp;&nbsp;<span class="id" title="notation">→</span> <a class="idref" href="Cpdt.LogicProg.html#r"><span class="id" title="variable">r</span></a> <span class="id" title="notation">=</span> <a class="idref" href="Cpdt.LogicProg.html#n"><span class="id" title="variable">n</span></a> <span class="id" title="notation">+</span> 0.<br/>
+&nbsp;&nbsp;<span class="id" title="var">crush</span>.<br/>
+<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Theorem</span> <a name="times_1"><span class="id" title="lemma">times_1</span></a> : <span class="id" title="keyword">∀</span> <span class="id" title="var">n</span>, <a class="idref" href="Cpdt.LogicProg.html#n"><span class="id" title="variable">n</span></a> <span class="id" title="notation">=</span> 1 <span class="id" title="notation">×</span> <a class="idref" href="Cpdt.LogicProg.html#n"><span class="id" title="variable">n</span></a>.<br/>
+&nbsp;&nbsp;<span class="id" title="var">crush</span>.<br/>
+<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Hint Resolve</span> <span class="id" title="var">plus_0</span> <span class="id" title="var">times_1</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+もうひとつ、定理に特に特化した算術的な補題で終わりましょう。
+この事実は、半環代数構造の公理に従うので、半環なら自然に(since the naturals form a semiring)、
+組み込みタクティク <span class="inlinecode"><span class="id" title="tactic">ring</span></span> を使うことができます。
+ 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <span class="id" title="library">Arith</span> <span class="id" title="library">Ring</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Theorem</span> <a name="combine"><span class="id" title="lemma">combine</span></a> : <span class="id" title="keyword">∀</span> <span class="id" title="var">x</span> <span class="id" title="var">k1</span> <span class="id" title="var">k2</span> <span class="id" title="var">n1</span> <span class="id" title="var">n2</span>,<br/>
+&nbsp;&nbsp;<span class="id" title="notation">(</span><a class="idref" href="Cpdt.LogicProg.html#k1"><span class="id" title="variable">k1</span></a> <span class="id" title="notation">×</span> <a class="idref" href="Cpdt.LogicProg.html#x"><span class="id" title="variable">x</span></a> <span class="id" title="notation">+</span> <a class="idref" href="Cpdt.LogicProg.html#n1"><span class="id" title="variable">n1</span></a><span class="id" title="notation">)</span> <span class="id" title="notation">+</span> <span class="id" title="notation">(</span><a class="idref" href="Cpdt.LogicProg.html#k2"><span class="id" title="variable">k2</span></a> <span class="id" title="notation">×</span> <a class="idref" href="Cpdt.LogicProg.html#x"><span class="id" title="variable">x</span></a> <span class="id" title="notation">+</span> <a class="idref" href="Cpdt.LogicProg.html#n2"><span class="id" title="variable">n2</span></a><span class="id" title="notation">)</span> <span class="id" title="notation">=</span> <span class="id" title="notation">(</span><a class="idref" href="Cpdt.LogicProg.html#k1"><span class="id" title="variable">k1</span></a> <span class="id" title="notation">+</span> <a class="idref" href="Cpdt.LogicProg.html#k2"><span class="id" title="variable">k2</span></a><span class="id" title="notation">)</span> <span class="id" title="notation">×</span> <a class="idref" href="Cpdt.LogicProg.html#x"><span class="id" title="variable">x</span></a> <span class="id" title="notation">+</span> <span class="id" title="notation">(</span><a class="idref" href="Cpdt.LogicProg.html#n1"><span class="id" title="variable">n1</span></a> <span class="id" title="notation">+</span> <a class="idref" href="Cpdt.LogicProg.html#n2"><span class="id" title="variable">n2</span></a><span class="id" title="notation">)</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">intros</span>; <span class="id" title="tactic">ring</span>.<br/>
+<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Hint Resolve</span> <span class="id" title="var">combine</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+私たちのヒントの選択は、<span class="inlinecode"><a class="idref" href="Cpdt.LogicProg.html#k"><span class="id" title="variable">k</span></a></span> と <span class="inlinecode"><a class="idref" href="Cpdt.MoreDep.html#dec_star.dec_star''.n"><span class="id" title="variable">n</span></a></span> の値を選ぶ手続きを電報で伝える(telegraphing)ようで、
+ちょっといんちきです(cheating, to an extent)。
+それにもかかわらず、
+これらの補題が定位置にある場合、
+補題の構成を明示的に編成せずに自動証明を成しとけることができます。
+ 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Theorem</span> <a name="linear"><span class="id" title="lemma">linear</span></a> : <span class="id" title="keyword">∀</span> <span class="id" title="var">e</span>, <span class="id" title="notation">∃</span> <span class="id" title="var">k</span><span class="id" title="notation">,</span> <span class="id" title="notation">∃</span> <span class="id" title="var">n</span><span class="id" title="notation">,</span><br/>
+&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">var</span>, <a class="idref" href="Cpdt.LogicProg.html#eval"><span class="id" title="inductive">eval</span></a> <a class="idref" href="Cpdt.LogicProg.html#var"><span class="id" title="variable">var</span></a> <a class="idref" href="Cpdt.LogicProg.html#e"><span class="id" title="variable">e</span></a> (<a class="idref" href="Cpdt.LogicProg.html#k"><span class="id" title="variable">k</span></a> <span class="id" title="notation">×</span> <a class="idref" href="Cpdt.LogicProg.html#var"><span class="id" title="variable">var</span></a> <span class="id" title="notation">+</span> <a class="idref" href="Cpdt.LogicProg.html#n"><span class="id" title="variable">n</span></a>).<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">induction</span> <span class="id" title="var">e</span>; <span class="id" title="var">crush</span>; <span class="id" title="tactic">eauto</span>.<br/>
+<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+証明項を印刷することで、入力項ごとに定数を選ぶための手続きを見ることができます。
+ 
+</div>
+<div class="code">
+</div>
+
+<div class="doc">
+<a name="lab77"></a><h1 class="section">さらに <span class="inlinecode"><span class="id" title="tactic">auto</span></span> のヒントについて</h1>
+
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+ここで止めて、<span class="inlinecode"><span class="id" title="tactic">auto</span></span> と <span class="inlinecode"><span class="id" title="tactic">eauto</span></span> のヒントの可能性を検討しましょう。
+ヒントは、これまでの多くの例で拡張されるのを見た、 <i>ヒントデータベース</i> に格納されます。
+ヒントデータベースが指定されていない場合は、デフォルトのデータベースが使用されます。
+<span class="inlinecode"><span class="id" title="tactic">auto</span></span> または <span class="inlinecode"><span class="id" title="tactic">eauto</span></span> によって、デフォルトデータベースのヒントが常に使用されます。
+命令的に(imperatively)ヒントデータベースを拡張する機会(chance)は重要で、なぜなら、
+Ltac プログラミング言語において、
+異なるソースファイル内の異なるモジュールによってシームレスにその値を拡張することのできる
+「グローバル変数」を作ることができないためです。
+<span class="inlinecode"><span class="id" title="var">crush</span></span> はすべてについて一度定義できたところで、
+開発の間にヒントを自動的に適用しながら、これまでのところヒントの利点を見てきました。
+実際、<span class="inlinecode"><span class="id" title="var">crush</span></span> は <span class="inlinecode"><span class="id" title="tactic">auto</span></span> の観点から定義されており、
+この拡張性をどのように達成するかが説明されています。
+他のユーザー定義のタクティクでも、<span class="inlinecode"><span class="id" title="tactic">auto</span></span> や <span class="inlinecode"><span class="id" title="tactic">eauto</span></span> と同様の利点が得られます。
+
+<div class="paragraph"> </div>
+
+<span class="inlinecode"><span class="id" title="tactic">auto</span></span> と <span class="inlinecode"><span class="id" title="tactic">eauto</span></span> についての基本的なヒント
+<span class="inlinecode"><span class="id" title="keyword">Hint</span></span> <span class="inlinecode"><span class="id" title="keyword">Immediate</span></span> <span class="inlinecode"><span class="id" title="var">lemma</span></span> は、
+補題を適用し、仮説を打ち消して(discharging)、
+ただちに目標をひとつの証明のステップで解くように依頼します。
+
+<div class="paragraph"> </div>
+
+<span class="inlinecode"><span class="id" title="keyword">Resolve</span></span> <span class="inlinecode"><span class="id" title="var">lemma</span></span> は、
+同じことをしますが、ネストされた証明検索の対象となる新しい前提を追加するかもしれません。
+
+<div class="paragraph"> </div>
+
+<span class="inlinecode"><span class="id" title="keyword">Constructors</span></span> <span class="inlinecode"><a class="idref" href="Cpdt.ProgLang.html#type"><span class="id" title="inductive">type</span></a></span> は、
+<span class="inlinecode"><span class="id" title="keyword">Resolve</span></span> のように動作し、帰納的なすべてのコンストラクタに適用されます。
+
+<div class="paragraph"> </div>
+
+<span class="inlinecode"><span class="id" title="keyword">Unfold</span></span> <span class="inlinecode"><a class="idref" href="Cpdt.ProgLang.html#HigherOrder.ident"><span class="id" title="definition">ident</span></a></span> は、
+証明のゴールの先頭に現れるときに <span class="inlinecode"><a class="idref" href="Cpdt.ProgLang.html#HigherOrder.ident"><span class="id" title="definition">ident</span></a></span> を展開(unfolding)することを試みます。
+
+<div class="paragraph"> </div>
+
+これらの <span class="inlinecode"><span class="id" title="keyword">Hint</span></span> コマンドのそれぞれに接尾辞を付けて、
+指定されたデータベースのみにヒントを追加することができます。たとえば、
+<span class="inlinecode"><span class="id" title="keyword">Hint</span></span> <span class="inlinecode"><span class="id" title="keyword">Resolve</span></span> <span class="inlinecode"><span class="id" title="var">lemma</span></span> <span class="inlinecode">:</span> <span class="inlinecode"><span class="id" title="var">my_db</span></span> で、ヒントを特定のデータベースに追加したなら、
+例えば <span class="inlinecode"><span class="id" title="tactic">auto</span></span> <span class="inlinecode"><span class="id" title="keyword">with</span></span> <span class="inlinecode"><span class="id" title="var">my_db</span></span> のときだけに使われるでしょう。
+
+<div class="paragraph"> </div>
+
+<span class="inlinecode"><span class="id" title="tactic">auto</span></span> の追加引数は、<span class="inlinecode"><span class="id" title="tactic">auto</span></span> <span class="inlinecode">8</span> や <span class="inlinecode"><span class="id" title="tactic">auto</span></span> <span class="inlinecode">8</span> <span class="inlinecode"><span class="id" title="keyword">with</span></span> <span class="inlinecode"><span class="id" title="var">my_db</span></span> のように、
+深さ優先で検索する証明木の最大の深さを指定します。デフォルトの深さは5です。
+
+<div class="paragraph"> </div>
+
+これらの <span class="inlinecode"><span class="id" title="keyword">Hint</span></span> コマンドはすべて、より原始的なヒントの種類 <span class="inlinecode"><span class="id" title="keyword">Extern</span></span> で表現できます。
+<span class="inlinecode"><span class="id" title="keyword">Hint</span></span> <span class="inlinecode"><span class="id" title="keyword">Extern</span></span> の例をいくつか挙げると、より多くの可能性が示されます。
+ 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Theorem</span> <a name="bool_neq"><span class="id" title="lemma">bool_neq</span></a> : <span class="id" title="constructor">true</span> <span class="id" title="notation">≠</span> <span class="id" title="constructor">false</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">auto</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+A call to <span class="inlinecode"><span class="id" title="var">crush</span></span> would have discharged this goal, but the default hint database for <span class="inlinecode"><span class="id" title="tactic">auto</span></span> contains no hint that applies. 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Abort</span>.<br/>
+
+<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+私たちが証明しようとしている定理の再記述だけではない<span class="inlinecode"><a class="idref" href="Cpdt.Predicates.html#bool"><span class="id" title="inductive">bool</span></a></span> 特有のヒントを思いつくのは難しいです。
+幸運なことに、
+組み込みタクティク <span class="inlinecode"><span class="id" title="tactic">congruence</span></span> と、
+等式の定理について完全な手続き、
+解釈されない関数、
+データ型のコンストラクタを適用することにより、十分簡単になります。
+ 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Hint Extern</span> 1 (<span class="id" title="var">_</span> <span class="id" title="notation">≠</span> <span class="id" title="var">_</span>) ⇒ <span class="id" title="tactic">congruence</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Theorem</span> <a name="bool_neq"><span class="id" title="lemma">bool_neq</span></a> : <span class="id" title="constructor">true</span> <span class="id" title="notation">≠</span> <span class="id" title="constructor">false</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">auto</span>.<br/>
+<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+<span class="inlinecode"><span class="id" title="keyword">Hint</span></span> <span class="inlinecode"><span class="id" title="var">Exter</span></span> は、全部 Ltac 言語で実装されているかもしれません。
+この例は、ヒントがどこで <span class="inlinecode"><span class="id" title="keyword">match</span></span> を使うか示しています。
+
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Section</span> <a name="forall_and"><span class="id" title="section">forall_and</span></a>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Variable</span> <a name="forall_and.A"><span class="id" title="variable">A</span></a> : <span class="id" title="keyword">Set</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Variables</span> <a name="forall_and.P"><span class="id" title="variable">P</span></a> <a name="forall_and.Q"><span class="id" title="variable">Q</span></a> : <a class="idref" href="Cpdt.LogicProg.html#forall_and.A"><span class="id" title="variable">A</span></a> <span class="id" title="notation">→</span> <span class="id" title="keyword">Prop</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Hypothesis</span> <a name="forall_and.both"><span class="id" title="variable">both</span></a> : <span class="id" title="keyword">∀</span> <span class="id" title="var">x</span>, <a class="idref" href="Cpdt.LogicProg.html#forall_and.P"><span class="id" title="variable">P</span></a> <a class="idref" href="Cpdt.LogicProg.html#x"><span class="id" title="variable">x</span></a> <span class="id" title="notation">∧</span> <a class="idref" href="Cpdt.LogicProg.html#forall_and.Q"><span class="id" title="variable">Q</span></a> <a class="idref" href="Cpdt.LogicProg.html#x"><span class="id" title="variable">x</span></a>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Theorem</span> <a name="forall_and"><span class="id" title="lemma">forall_and</span></a> : <span class="id" title="keyword">∀</span> <span class="id" title="var">z</span>, <a class="idref" href="Cpdt.LogicProg.html#forall_and.P"><span class="id" title="variable">P</span></a> <a class="idref" href="Cpdt.LogicProg.html#z"><span class="id" title="variable">z</span></a>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">crush</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+<span class="inlinecode"><span class="id" title="var">crush</span></span> の呼び出しは、<span class="inlinecode"><span class="id" title="var">intor</span></span> が行うことよりも進捗しない。
+なぜなら、<span class="inlinecode"><a class="idref" href="Cpdt.LogicProg.html#forall_and.both"><span class="id" title="variable">both</span></a></span> の結論はゴールの結論とユニファイしないため、
+<span class="inlinecode"><span class="id" title="tactic">auto</span></span> の呼び出しは、証明するために前提 <span class="inlinecode"><a class="idref" href="Cpdt.LogicProg.html#forall_and.both"><span class="id" title="variable">both</span></a></span> を適用しない。
+しかしながら、<span class="inlinecode"><span class="id" title="tactic">auto</span></span> にこの種類のゴールの扱いを教えることができる。
+     
+</div>
+<div class="code">
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Hint Extern</span> 1 (<a class="idref" href="Cpdt.LogicProg.html#forall_and.P"><span class="id" title="variable">P</span></a> ?<span class="id" title="var">X</span>) ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">match</span> <span class="id" title="keyword">goal</span> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| [ <span class="id" title="var">H</span> : <span class="id" title="keyword">∀</span> <span class="id" title="var">x</span>, <a class="idref" href="Cpdt.LogicProg.html#forall_and.P"><span class="id" title="variable">P</span></a> <a class="idref" href="Cpdt.LogicProg.html#x"><span class="id" title="variable">x</span></a> <span class="id" title="notation">∧</span> <span class="id" title="var">_</span> |- <span class="id" title="var">_</span> ] ⇒ <span class="id" title="tactic">apply</span> (<span class="id" title="lemma">proj1</span> (<span class="id" title="var">H</span> <span class="id" title="var">X</span>))<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">end</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">auto</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+<span class="inlinecode"><span class="id" title="keyword">Extern</span></span> パターンは、関連するタクティクで使った、
+ユニフィケーション変数を束縛するかもしれないことがわかります。
+<span class="inlinecode"><span class="id" title="lemma">proj1</span></span> 関数 は、
+<span class="inlinecode"><a class="idref" href="Cpdt.Equality.html#U"><span class="id" title="variable">U</span></a></span> の証明を <span class="inlinecode"><a class="idref" href="Cpdt.Equality.html#U"><span class="id" title="variable">U</span></a></span> <span class="inlinecode">∧</span> <span class="inlinecode"><span class="id" title="var">V</span></span> の証明から取り出す(extracting)標準ライブラリから取り入れました。
+   
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">End</span> <a class="idref" href="Cpdt.LogicProg.html#forall_and"><span class="id" title="section">forall_and</span></a>.<br/>
+
+<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+この例が成功したあと、より野心的になって、
+すべての可能な述語 <span class="inlinecode"><a class="idref" href="Cpdt.ProgLang.html#Forall.P"><span class="id" title="variable">P</span></a></span> へのヒントを一般化することを探し求めるかもしれません。
+
+<div class="paragraph"> </div>
+
+   <br/>
+<span class="inlinecode"><span class="id" title="keyword">Hint</span> <span class="id" title="keyword">Extern</span> 1 (?<a class="idref" href="Cpdt.ProgLang.html#Forall.P"><span class="id" title="variable">P</span></a> ?<span class="id" title="var">X</span>) ⇒<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">match</span> <span class="id" title="keyword">goal</span> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| [ <a class="idref" href="Cpdt.GeneralRec.html#thunk_eq_coind.H"><span class="id" title="variable">H</span></a> : <span class="id" title="keyword">∀</span> <a class="idref" href="Cpdt.MoreDep.html#insert.x"><span class="id" title="variable">x</span></a>, <a class="idref" href="Cpdt.ProgLang.html#Forall.P"><span class="id" title="variable">P</span></a> <a class="idref" href="Cpdt.MoreDep.html#insert.x"><span class="id" title="variable">x</span></a> ∧ <span class="id" title="var">_</span> |- <span class="id" title="var">_</span> ] ⇒ <span class="id" title="tactic">apply</span> (<span class="id" title="lemma">proj1</span> (<a class="idref" href="Cpdt.GeneralRec.html#thunk_eq_coind.H"><span class="id" title="variable">H</span></a> <span class="id" title="var">X</span>))<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">end</span>.
+<div class="paragraph"> </div>
+
+</span><pre>
+User error: Bound head variable
+</pre>
+
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+Coqの <span class="inlinecode"><span class="id" title="tactic">auto</span></span> のヒントデータベースは、タクティクが試みるためのリストとして、
+ <i>head symbols</i> <i>頭部シンボル</i> をマッピングするように働きます。
+これはなぜなら、<span class="inlinecode"><span class="id" title="keyword">Extern</span></span> パターンの定数の頭部は静的に決定されるべきだからです。
+最初の <span class="inlinecode"><span class="id" title="keyword">Extern</span></span> ヒントにおいて、<span class="inlinecode"><a class="idref" href="Cpdt.MoreDep.html#insert.x"><span class="id" title="variable">x</span></a></span> <span class="inlinecode">≠</span> <span class="inlinecode"><a class="idref" href="Cpdt.Predicates.html#y"><span class="id" title="variable">y</span></a></span> の構文糖衣を取り除く(desugars)と <span class="inlinecode"><span class="id" title="definition">not</span></span> <span class="inlinecode">(<a class="idref" href="Cpdt.Predicates.html#eq"><span class="id" title="inductive">eq</span></a></span> <span class="inlinecode"><a class="idref" href="Cpdt.MoreDep.html#insert.x"><span class="id" title="variable">x</span></a></span> <span class="inlinecode"><a class="idref" href="Cpdt.Predicates.html#y"><span class="id" title="variable">y</span></a>)</span> なので、
+頭部シンボルは <span class="inlinecode"><span class="id" title="definition">not</span></span> でした。次の例では、頭部シンボルは <span class="inlinecode"><a class="idref" href="Cpdt.ProgLang.html#Forall.P"><span class="id" title="variable">P</span></a></span> でした。
+
+<div class="paragraph"> </div>
+
+幸いにも、より基本的な形式である <span class="inlinecode"><span class="id" title="keyword">Hint</span></span> <span class="inlinecode"><span class="id" title="keyword">Extern</span></span> にも適用されます。
+<span class="inlinecode">⇒</span> の左側にパターンを残して、対応するロジックを Ltac スクリプトに組み込むことができます。
+ 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Hint Extern</span> 1 ⇒<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">match</span> <span class="id" title="keyword">goal</span> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| [ <span class="id" title="var">H</span> : <span class="id" title="keyword">∀</span> <span class="id" title="var">x</span>, ?<span class="id" title="var">P</span> <a class="idref" href="Cpdt.LogicProg.html#x"><span class="id" title="variable">x</span></a> <span class="id" title="notation">∧</span> <span class="id" title="var">_</span> |- ?<span class="id" title="var">P</span> ?<span class="id" title="var">X</span> ] ⇒ <span class="id" title="tactic">apply</span> (<span class="id" title="lemma">proj1</span> (<span class="id" title="var">H</span> <span class="id" title="var">X</span>))<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">end</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+この種の <span class="inlinecode"><span class="id" title="keyword">Hint</span></span> <span class="inlinecode"><span class="id" title="keyword">Extern</span></span> は、証明木の <i>すべての</i> ノードに適用されることに注意してください。
+高価な Ltac スクリプトは、証明検索を大幅に遅くする可能性があります。
+
+</div>
+<div class="code">
+
+<br/>
+</div>
+
+<div class="doc">
+<a name="lab78"></a><h1 class="section">Rewrite のヒント</h1>
+
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+ヒントの他の側面は量化された等式を書き換えることです。
+関連するコマンド <span class="inlinecode"><span class="id" title="keyword">Hint</span></span> <span class="inlinecode"><span class="id" title="keyword">Rewrite</span></span>
+をこれまでの多くの例で使ったことがありました。
+<span class="inlinecode"><span class="id" title="var">crush</span></span> タクティクは、これらのヒントを組み込みタクティク
+<span class="inlinecode"><span class="id" title="tactic">autorewrite</span></span>
+を呼び出すことで使います。
+rewrite ヒントは、デフォルトではデォフォルトデータベース <span class="inlinecode"><span class="id" title="var">core</span></span> に追加される
+<span class="inlinecode"><span class="id" title="keyword">Hint</span></span> <span class="inlinecode"><span class="id" title="keyword">Rewrite</span></span> <span class="inlinecode"><span class="id" title="var">lemma</span></span> のかたちをとっています。
+しかし、別のヒントデータベースも <span class="inlinecode"><span class="id" title="keyword">Hint</span></span> <span class="inlinecode"><span class="id" title="keyword">Resolve</span></span> のように指定することもできます。
+
+<div class="paragraph"> </div>
+
+次の例は <span class="inlinecode"><span class="id" title="tactic">autorewrite</span></span> を直接使うことを示します。
+<span class="inlinecode"><span class="id" title="keyword">Hint</span></span> <span class="inlinecode"><span class="id" title="keyword">Rewrite</span></span> はディフォルトのデータベースを使うので、
+<span class="inlinecode"><span class="id" title="tactic">autorewrite</span></span> はその名前のデータベースが必要です。
+ 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Section</span> <a name="autorewrite"><span class="id" title="section">autorewrite</span></a>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Variable</span> <a name="autorewrite.A"><span class="id" title="variable">A</span></a> : <span class="id" title="keyword">Set</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Variable</span> <a name="autorewrite.f"><span class="id" title="variable">f</span></a> : <a class="idref" href="Cpdt.LogicProg.html#autorewrite.A"><span class="id" title="variable">A</span></a> <span class="id" title="notation">→</span> <a class="idref" href="Cpdt.LogicProg.html#autorewrite.A"><span class="id" title="variable">A</span></a>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Hypothesis</span> <a name="autorewrite.f_f"><span class="id" title="variable">f_f</span></a> : <span class="id" title="keyword">∀</span> <span class="id" title="var">x</span>, <a class="idref" href="Cpdt.LogicProg.html#autorewrite.f"><span class="id" title="variable">f</span></a> (<a class="idref" href="Cpdt.LogicProg.html#autorewrite.f"><span class="id" title="variable">f</span></a> <a class="idref" href="Cpdt.LogicProg.html#x"><span class="id" title="variable">x</span></a>) <span class="id" title="notation">=</span> <a class="idref" href="Cpdt.LogicProg.html#autorewrite.f"><span class="id" title="variable">f</span></a> <a class="idref" href="Cpdt.LogicProg.html#x"><span class="id" title="variable">x</span></a>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Hint Rewrite</span> <a class="idref" href="Cpdt.LogicProg.html#autorewrite.f_f"><span class="id" title="variable">f_f</span></a>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <a name="f_f_f"><span class="id" title="lemma">f_f_f</span></a> : <span class="id" title="keyword">∀</span> <span class="id" title="var">x</span>, <a class="idref" href="Cpdt.LogicProg.html#autorewrite.f"><span class="id" title="variable">f</span></a> (<a class="idref" href="Cpdt.LogicProg.html#autorewrite.f"><span class="id" title="variable">f</span></a> (<a class="idref" href="Cpdt.LogicProg.html#autorewrite.f"><span class="id" title="variable">f</span></a> <a class="idref" href="Cpdt.LogicProg.html#x"><span class="id" title="variable">x</span></a>)) <span class="id" title="notation">=</span> <a class="idref" href="Cpdt.LogicProg.html#autorewrite.f"><span class="id" title="variable">f</span></a> <a class="idref" href="Cpdt.LogicProg.html#x"><span class="id" title="variable">x</span></a>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">intros</span>; <span class="id" title="tactic">autorewrite</span> <span class="id" title="keyword">with</span> <span class="id" title="var">core</span>; <span class="id" title="tactic">reflexivity</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+ヒントの選択に十分な注意を払わないときに、<span class="inlinecode"><span class="id" title="tactic">autorewrite</span></span> が問題を引き起こす幾つかの方法があります。
+最初に、ヒントの集合が終わらない書き換えのシステムを定義しているとき、
+その場合、<span class="inlinecode"><span class="id" title="tactic">autorewrite</span></span> の呼び出しが終わらないことがあります。
+次に、誤った道筋(path)に <span class="inlinecode"><span class="id" title="tactic">autorewrite</span></span> を導くヒントを加えることがあります。例えば：
+   
+</div>
+<div class="code">
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Section</span> <a name="autorewrite.garden_path"><span class="id" title="section">garden_path</span></a>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Variable</span> <a name="autorewrite.garden_path.g"><span class="id" title="variable">g</span></a> : <a class="idref" href="Cpdt.LogicProg.html#autorewrite.A"><span class="id" title="variable">A</span></a> <span class="id" title="notation">→</span> <a class="idref" href="Cpdt.LogicProg.html#autorewrite.A"><span class="id" title="variable">A</span></a>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Hypothesis</span> <a name="autorewrite.garden_path.f_g"><span class="id" title="variable">f_g</span></a> : <span class="id" title="keyword">∀</span> <span class="id" title="var">x</span>, <a class="idref" href="Cpdt.LogicProg.html#autorewrite.f"><span class="id" title="variable">f</span></a> <a class="idref" href="Cpdt.LogicProg.html#x"><span class="id" title="variable">x</span></a> <span class="id" title="notation">=</span> <a class="idref" href="Cpdt.LogicProg.html#autorewrite.garden_path.g"><span class="id" title="variable">g</span></a> <a class="idref" href="Cpdt.LogicProg.html#x"><span class="id" title="variable">x</span></a>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Hint Rewrite</span> <a class="idref" href="Cpdt.LogicProg.html#autorewrite.garden_path.f_g"><span class="id" title="variable">f_g</span></a>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <a name="f_f_f'"><span class="id" title="lemma">f_f_f'</span></a> : <span class="id" title="keyword">∀</span> <span class="id" title="var">x</span>, <a class="idref" href="Cpdt.LogicProg.html#autorewrite.f"><span class="id" title="variable">f</span></a> (<a class="idref" href="Cpdt.LogicProg.html#autorewrite.f"><span class="id" title="variable">f</span></a> (<a class="idref" href="Cpdt.LogicProg.html#autorewrite.f"><span class="id" title="variable">f</span></a> <a class="idref" href="Cpdt.LogicProg.html#x"><span class="id" title="variable">x</span></a>)) <span class="id" title="notation">=</span> <a class="idref" href="Cpdt.LogicProg.html#autorewrite.f"><span class="id" title="variable">f</span></a> <a class="idref" href="Cpdt.LogicProg.html#x"><span class="id" title="variable">x</span></a>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">intros</span>; <span class="id" title="tactic">autorewrite</span> <span class="id" title="keyword">with</span> <span class="id" title="var">core</span>.<br/>
+</div>
+
+<div class="doc">
+<br/>
+<span class="inlinecode">============================<br/>
+&nbsp;<a class="idref" href="Cpdt.Match.html#t7.g"><span class="id" title="variable">g</span></a> (<a class="idref" href="Cpdt.Match.html#t7.g"><span class="id" title="variable">g</span></a> (<a class="idref" href="Cpdt.Match.html#t7.g"><span class="id" title="variable">g</span></a> <a class="idref" href="Cpdt.MoreDep.html#insert.x"><span class="id" title="variable">x</span></a>)) = <a class="idref" href="Cpdt.Match.html#t7.g"><span class="id" title="variable">g</span></a> <a class="idref" href="Cpdt.MoreDep.html#insert.x"><span class="id" title="variable">x</span></a>
+<div class="paragraph"> </div>
+
+</span>          
+</div>
+<div class="code">
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Abort</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+新しいヒントは、古いヒントがもう適用できないかたち(form)となった、ゴールに適用されます。
+この、新しいヒントが証明探索を遅くするかもしれない、
+<span class="inlinecode"><span class="id" title="tactic">auto</span></span> の状況と対比される rewrite ヒントの "非単調性(non-monotonicity)" は、
+古い証明を "壊す(break)" ことは決してありません。
+
+<div class="paragraph"> </div>
+
+キーとなる違いは、
+<span class="inlinecode"><span class="id" title="tactic">autorewrite</span></span> は、ゴールを解くことなしに変形するかもしれないのに対して、
+<span class="inlinecode"><span class="id" title="tactic">auto</span></span> は、ゴールと解くか、または、それを変えないかのどちらかです。
+ヒントデータベースを変更すると特定のゴールについて見つかった証明が変更される可能性があり、
+その証明は、証明状態の他の場所に表示される
+ユニフィケーション変数の設定に影響を与える可能性があるので、
+<span class="inlinecode"><span class="id" title="tactic">eauto</span></span> の状況はやや複雑です。
+     
+</div>
+<div class="code">
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Reset</span> <span class="id" title="var">garden_path</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+<span class="inlinecode"><span class="id" title="tactic">autorewrite</span></span> タクティクは、追加の前提を含む量化された等式でも機能しますが、同様の誤った書き換えを避けるように注意する必要があります。
+   
+</div>
+<div class="code">
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Section</span> <a name="autorewrite.garden_path"><span class="id" title="section">garden_path</span></a>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Variable</span> <a name="autorewrite.garden_path.P"><span class="id" title="variable">P</span></a> : <a class="idref" href="Cpdt.LogicProg.html#autorewrite.A"><span class="id" title="variable">A</span></a> <span class="id" title="notation">→</span> <span class="id" title="keyword">Prop</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Variable</span> <a name="autorewrite.garden_path.g"><span class="id" title="variable">g</span></a> : <a class="idref" href="Cpdt.LogicProg.html#autorewrite.A"><span class="id" title="variable">A</span></a> <span class="id" title="notation">→</span> <a class="idref" href="Cpdt.LogicProg.html#autorewrite.A"><span class="id" title="variable">A</span></a>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Hypothesis</span> <a name="autorewrite.garden_path.f_g"><span class="id" title="variable">f_g</span></a> : <span class="id" title="keyword">∀</span> <span class="id" title="var">x</span>, <a class="idref" href="Cpdt.LogicProg.html#autorewrite.garden_path.P"><span class="id" title="variable">P</span></a> <a class="idref" href="Cpdt.LogicProg.html#x"><span class="id" title="variable">x</span></a> <span class="id" title="notation">→</span> <a class="idref" href="Cpdt.LogicProg.html#autorewrite.f"><span class="id" title="variable">f</span></a> <a class="idref" href="Cpdt.LogicProg.html#x"><span class="id" title="variable">x</span></a> <span class="id" title="notation">=</span> <a class="idref" href="Cpdt.LogicProg.html#autorewrite.garden_path.g"><span class="id" title="variable">g</span></a> <a class="idref" href="Cpdt.LogicProg.html#x"><span class="id" title="variable">x</span></a>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Hint Rewrite</span> <a class="idref" href="Cpdt.LogicProg.html#autorewrite.garden_path.f_g"><span class="id" title="variable">f_g</span></a>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <a name="f_f_f'"><span class="id" title="lemma">f_f_f'</span></a> : <span class="id" title="keyword">∀</span> <span class="id" title="var">x</span>, <a class="idref" href="Cpdt.LogicProg.html#autorewrite.f"><span class="id" title="variable">f</span></a> (<a class="idref" href="Cpdt.LogicProg.html#autorewrite.f"><span class="id" title="variable">f</span></a> (<a class="idref" href="Cpdt.LogicProg.html#autorewrite.f"><span class="id" title="variable">f</span></a> <a class="idref" href="Cpdt.LogicProg.html#x"><span class="id" title="variable">x</span></a>)) <span class="id" title="notation">=</span> <a class="idref" href="Cpdt.LogicProg.html#autorewrite.f"><span class="id" title="variable">f</span></a> <a class="idref" href="Cpdt.LogicProg.html#x"><span class="id" title="variable">x</span></a>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">intros</span>; <span class="id" title="tactic">autorewrite</span> <span class="id" title="keyword">with</span> <span class="id" title="var">core</span>.<br/>
+</div>
+
+<div class="doc">
+<br/>
+<span class="inlinecode">&nbsp;&nbsp;============================<br/>
+&nbsp;&nbsp;&nbsp;<a class="idref" href="Cpdt.Match.html#t7.g"><span class="id" title="variable">g</span></a> (<a class="idref" href="Cpdt.Match.html#t7.g"><span class="id" title="variable">g</span></a> (<a class="idref" href="Cpdt.Match.html#t7.g"><span class="id" title="variable">g</span></a> <a class="idref" href="Cpdt.MoreDep.html#insert.x"><span class="id" title="variable">x</span></a>)) = <a class="idref" href="Cpdt.Match.html#t7.g"><span class="id" title="variable">g</span></a> <a class="idref" href="Cpdt.MoreDep.html#insert.x"><span class="id" title="variable">x</span></a><br/>
+<br/>
+<span class="id" title="keyword">subgoal</span> 2 <span class="id" title="var">is</span>:<br/>
+&nbsp;<a class="idref" href="Cpdt.ProgLang.html#Forall.P"><span class="id" title="variable">P</span></a> <a class="idref" href="Cpdt.MoreDep.html#insert.x"><span class="id" title="variable">x</span></a><br/>
+<span class="id" title="keyword">subgoal</span> 3 <span class="id" title="var">is</span>:<br/>
+&nbsp;<a class="idref" href="Cpdt.ProgLang.html#Forall.P"><span class="id" title="variable">P</span></a> (<a class="idref" href="Cpdt.Large.html#Int.f"><span class="id" title="definition">f</span></a> <a class="idref" href="Cpdt.MoreDep.html#insert.x"><span class="id" title="variable">x</span></a>)<br/>
+<span class="id" title="keyword">subgoal</span> 4 <span class="id" title="var">is</span>:<br/>
+&nbsp;<a class="idref" href="Cpdt.ProgLang.html#Forall.P"><span class="id" title="variable">P</span></a> (<a class="idref" href="Cpdt.Large.html#Int.f"><span class="id" title="definition">f</span></a> <a class="idref" href="Cpdt.MoreDep.html#insert.x"><span class="id" title="variable">x</span></a>)
+<div class="paragraph"> </div>
+
+</span>          
+</div>
+<div class="code">
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Abort</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+前提を証明することができないことを知っているにもかかわらず、
+不適切なルールは、前と同様に3回実行(fire)しました。
+     
+</div>
+<div class="code">
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Reset</span> <span class="id" title="var">garden_path</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+最終的な成功は、生成された前提に適用するタクティクを指定する <span class="inlinecode"><span class="id" title="keyword">Hint</span></span> <span class="inlinecode"><span class="id" title="keyword">Rewrite</span></span>
+に対する追加の引数を使用します。
+そのようなヒントは、タクティクがすべての前提で成功した場合にのみ使用され、
+前提によってはいくつかの前提のためにさらにサブゴールを残します。
+   
+</div>
+<div class="code">
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Section</span> <a name="autorewrite.garden_path"><span class="id" title="section">garden_path</span></a>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Variable</span> <a name="autorewrite.garden_path.P"><span class="id" title="variable">P</span></a> : <a class="idref" href="Cpdt.LogicProg.html#autorewrite.A"><span class="id" title="variable">A</span></a> <span class="id" title="notation">→</span> <span class="id" title="keyword">Prop</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Variable</span> <a name="autorewrite.garden_path.g"><span class="id" title="variable">g</span></a> : <a class="idref" href="Cpdt.LogicProg.html#autorewrite.A"><span class="id" title="variable">A</span></a> <span class="id" title="notation">→</span> <a class="idref" href="Cpdt.LogicProg.html#autorewrite.A"><span class="id" title="variable">A</span></a>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Hypothesis</span> <a name="autorewrite.garden_path.f_g"><span class="id" title="variable">f_g</span></a> : <span class="id" title="keyword">∀</span> <span class="id" title="var">x</span>, <a class="idref" href="Cpdt.LogicProg.html#autorewrite.garden_path.P"><span class="id" title="variable">P</span></a> <a class="idref" href="Cpdt.LogicProg.html#x"><span class="id" title="variable">x</span></a> <span class="id" title="notation">→</span> <a class="idref" href="Cpdt.LogicProg.html#autorewrite.f"><span class="id" title="variable">f</span></a> <a class="idref" href="Cpdt.LogicProg.html#x"><span class="id" title="variable">x</span></a> <span class="id" title="notation">=</span> <a class="idref" href="Cpdt.LogicProg.html#autorewrite.garden_path.g"><span class="id" title="variable">g</span></a> <a class="idref" href="Cpdt.LogicProg.html#x"><span class="id" title="variable">x</span></a>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Hint Rewrite</span> <a class="idref" href="Cpdt.LogicProg.html#autorewrite.garden_path.f_g"><span class="id" title="variable">f_g</span></a> <span class="id" title="keyword">using</span> <span class="id" title="tactic">assumption</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <a name="f_f_f'"><span class="id" title="lemma">f_f_f'</span></a> : <span class="id" title="keyword">∀</span> <span class="id" title="var">x</span>, <a class="idref" href="Cpdt.LogicProg.html#autorewrite.f"><span class="id" title="variable">f</span></a> (<a class="idref" href="Cpdt.LogicProg.html#autorewrite.f"><span class="id" title="variable">f</span></a> (<a class="idref" href="Cpdt.LogicProg.html#autorewrite.f"><span class="id" title="variable">f</span></a> <a class="idref" href="Cpdt.LogicProg.html#x"><span class="id" title="variable">x</span></a>)) <span class="id" title="notation">=</span> <a class="idref" href="Cpdt.LogicProg.html#autorewrite.f"><span class="id" title="variable">f</span></a> <a class="idref" href="Cpdt.LogicProg.html#x"><span class="id" title="variable">x</span></a>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">intros</span>; <span class="id" title="tactic">autorewrite</span> <span class="id" title="keyword">with</span> <span class="id" title="var">core</span>; <span class="id" title="tactic">reflexivity</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+生成された前提が仮定の中にあるとき、さらに、
+<span class="inlinecode"><span class="id" title="tactic">autorewrite</span></span> を <span class="inlinecode"><a class="idref" href="Cpdt.LogicProg.html#autorewrite.garden_path.f_g"><span class="id" title="variable">f_g</span></a></span> に適用します。
+
+</div>
+<div class="code">
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <a name="f_f_f_g"><span class="id" title="lemma">f_f_f_g</span></a> : <span class="id" title="keyword">∀</span> <span class="id" title="var">x</span>, <a class="idref" href="Cpdt.LogicProg.html#autorewrite.garden_path.P"><span class="id" title="variable">P</span></a> <a class="idref" href="Cpdt.LogicProg.html#x"><span class="id" title="variable">x</span></a> <span class="id" title="notation">→</span> <a class="idref" href="Cpdt.LogicProg.html#autorewrite.f"><span class="id" title="variable">f</span></a> (<a class="idref" href="Cpdt.LogicProg.html#autorewrite.f"><span class="id" title="variable">f</span></a> <a class="idref" href="Cpdt.LogicProg.html#x"><span class="id" title="variable">x</span></a>) <span class="id" title="notation">=</span> <a class="idref" href="Cpdt.LogicProg.html#autorewrite.garden_path.g"><span class="id" title="variable">g</span></a> <a class="idref" href="Cpdt.LogicProg.html#x"><span class="id" title="variable">x</span></a>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">intros</span>; <span class="id" title="tactic">autorewrite</span> <span class="id" title="keyword">with</span> <span class="id" title="var">core</span>; <span class="id" title="tactic">reflexivity</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Qed</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">End</span> <a class="idref" href="Cpdt.LogicProg.html#autorewrite.garden_path"><span class="id" title="section">garden_path</span></a>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+結論に対するのと同様に、仮定に対して書き換えをするとき、
+<span class="inlinecode"><span class="id" title="tactic">autorewrite</span></span> <span class="inlinecode"><span class="id" title="keyword">with</span></span> <span class="inlinecode"><span class="id" title="var">db</span></span> <span class="inlinecode"><span class="id" title="keyword">in</span></span> <span class="inlinecode">×</span> のかたちを適用するのは便利です。
+   
+</div>
+<div class="code">
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <a name="in_star"><span class="id" title="lemma">in_star</span></a> : <span class="id" title="keyword">∀</span> <span class="id" title="var">x</span> <span class="id" title="var">y</span>, <a class="idref" href="Cpdt.LogicProg.html#autorewrite.f"><span class="id" title="variable">f</span></a> (<a class="idref" href="Cpdt.LogicProg.html#autorewrite.f"><span class="id" title="variable">f</span></a> (<a class="idref" href="Cpdt.LogicProg.html#autorewrite.f"><span class="id" title="variable">f</span></a> (<a class="idref" href="Cpdt.LogicProg.html#autorewrite.f"><span class="id" title="variable">f</span></a> <a class="idref" href="Cpdt.LogicProg.html#x"><span class="id" title="variable">x</span></a>))) <span class="id" title="notation">=</span> <a class="idref" href="Cpdt.LogicProg.html#autorewrite.f"><span class="id" title="variable">f</span></a> (<a class="idref" href="Cpdt.LogicProg.html#autorewrite.f"><span class="id" title="variable">f</span></a> <a class="idref" href="Cpdt.LogicProg.html#y"><span class="id" title="variable">y</span></a>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="notation">→</span> <a class="idref" href="Cpdt.LogicProg.html#autorewrite.f"><span class="id" title="variable">f</span></a> <a class="idref" href="Cpdt.LogicProg.html#x"><span class="id" title="variable">x</span></a> <span class="id" title="notation">=</span> <a class="idref" href="Cpdt.LogicProg.html#autorewrite.f"><span class="id" title="variable">f</span></a> (<a class="idref" href="Cpdt.LogicProg.html#autorewrite.f"><span class="id" title="variable">f</span></a> (<a class="idref" href="Cpdt.LogicProg.html#autorewrite.f"><span class="id" title="variable">f</span></a> <a class="idref" href="Cpdt.LogicProg.html#y"><span class="id" title="variable">y</span></a>)).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">intros</span>; <span class="id" title="tactic">autorewrite</span> <span class="id" title="keyword">with</span> <span class="id" title="var">core</span> <span class="id" title="keyword">in</span> *; <span class="id" title="tactic">assumption</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">End</span> <a class="idref" href="Cpdt.LogicProg.html#autorewrite"><span class="id" title="section">autorewrite</span></a>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+多くの証明は、<span class="inlinecode"><span class="id" title="tactic">auto</span></span> と <span class="inlinecode"><span class="id" title="tactic">autorewrite</span></span> の巧妙な組み合わせで、
+快適にモジュール化された方法で自動化することができます。
+ 
+</div>
+<div class="code">
+
+<br/>
+</div>
+</div>
+
+<div id="footer">
+<hr/><a href="index.html">Index</a><hr/>This page has been generated by <a href="http://coq.inria.fr/">coqdoc</a>
+</div>
+
+</div>
+
+</body>
+</html>
