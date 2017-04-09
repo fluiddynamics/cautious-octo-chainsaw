@@ -47,6 +47,9 @@
 その仕事の列線(line)はまだ新しいものですが、
 私は大規模な形式的な証明で効果的に仕事をする方法について
 いくつかの教訓を掘り起こすのは時期尚早ではないと思います。
+
+<div class="paragraph"> </div>
+
 したがって、この章では、大規模なCoqの開発を構造化し、保守するためのヒントを示します。
  
 </div>
@@ -247,14 +250,8 @@ Error: The reference IHe1 was not found in the current environment.
 <span class="inlinecode">|</span>文字を使用して、帰納法の場合分けを区別します。
 ある場合では、<span class="inlinecode">?</span>を書いてCoqに自動的に名前を生成するように要求し、
 その名前を対応する新しい変数に割り当てるための明示的な名前を書きます。
-
-<div class="paragraph"> </div>
-
 証明のの脆弱さを避けるためにintroパターンを使用するには、
 変数が導入された順番についての、一見重要でない事実を把握する必要があることは明らかです。
-
-<div class="paragraph"> </div>
-
 したがって、<span class="inlinecode"><a class="idref" href="Cpdt.Reflection.html#monoid.e"><span class="id" title="variable">e</span></a></span>を<span class="inlinecode"><a class="idref" href="Cpdt.MoreDep.html#insert.x"><span class="id" title="variable">x</span></a></span>で置き換えるとスクリプトは動作し続けますが、
 複雑になっています。 おそらく、どちらの証明も特に追いかけるのは容易ではありません。
 
@@ -408,15 +405,9 @@ Error: The reference IHe1 was not found in the current environment.
 たぶん大部分の読者は、なぜ定理が正しいのかを説明するのに役立つとは思わないでしょう。
  <i>bullets</i> <i>ブレット</i> や、
 Coq 8.4で提供されている中括弧を使用したスクリプトでも言えます。
-
-<div class="paragraph"> </div>
-
 これは、Coqによって強制される方法で証明構造を表現して、
 上記のようなコードをセミコロンの代わりにピリオドをつけて、
 対話的に進めることができます。
-
-<div class="paragraph"> </div>
-
 対話的なスクリプトの再生(replay)が容易になりますが、
 読みやすさの助けには本当になりません。
 
@@ -554,9 +545,6 @@ Error: Expects a disjunctive pattern with 3 branches.
 ほとんどの非形式的な証明は、証明の大きなアイデアを伝えるために読み込まれます。
 どうすれば、<span class="inlinecode"><span class="id" title="tactic">induction</span></span> <span class="inlinecode"><a class="idref" href="Cpdt.Reflection.html#monoid.e"><span class="id" title="variable">e</span></a>;</span> <span class="inlinecode"><span class="id" title="var">crush</span></span> を読むことが、
 なんらかの大きなアイデアを伝えることができるでしょうか？
-
-<div class="paragraph"> </div>
-
 私の立場は、標準的な自動化が見つけることができるアイデアは結局はあまり大きくなく、
 <i>本当に</i> 大きなアイデアはヒントとして追加された補題を使って表現されるべきであるということです。
 
@@ -683,20 +671,11 @@ One subgoal remains:
 自動化が短い作業を行う、いくつかの簡単な場合を有することです。
 それ以外の場合、自動化は標準的な単純化を実行します。
 これらのケースの中には、かなり複雑な証明が必要なものもあります。
-
-<div class="paragraph"> </div>
-
 そのような場合は、
 その補題のステートメントが場合分けの単純化されたバージョンをコピーしたのならば、
 それ自身のヒントの補題に相当するかもしれません。
-
-<div class="paragraph"> </div>
-
 あるいは、主な定理のための証明スクリプトは、
 特定の場合を対象とするいくつかの自動化コードで拡張することができるかもしれません。
-
-<div class="paragraph"> </div>
-
 そのような対象のスクリプトは、
 証明の階層構造や、ケースの順序付けや、名前の束縛の構造(name binding structure)の知識がなくても、
 読まれ理解される可能性があるため、
@@ -713,20 +692,11 @@ Coq戦術の一般的なスタイルの代わりに、
 Isar 言語に関連付けられています。
 宣言的な証明スクリプトは、
 人間の可読性を目指して、サブゴール構造とローカル名の導入について非常に明示的です。
-
-<div class="paragraph"> </div>
-
 自動証明のコーディングは、
 各々の深刻な定理のための新しい自動化を構築する価値がないという考えに関連した
 証明言語の範囲外であるとみなされます。
-
-<div class="paragraph"> </div>
-
 この本では、定理に特化した自動化の多くの例を示しました。
 私は、重要な結果を得るために重要であると信じています。
-
-<div class="paragraph"> </div>
-
 宣言的な証明スクリプトを使用すると、定理の変更のためにスクリプトを変更しやすくなりますが、
 本書の代替  <i>adaptive</i> <i>適応形</i> スタイルでは、
 多くのバージョンの定理で <i>same</i> <i>同じ</i> スクリプトを使用できます。
@@ -739,16 +709,10 @@ Isar 言語に関連付けられています。
 おそらく私は、形式的な証明の全体が
 必然的に、人々には面白くない詳細で構成されていると考える悲観論者ですが、
 補題の選択を通じて証明固有の詳細を伝えることに焦点を当てることが、私の好みです。
-
-<div class="paragraph"> </div>
-
 さらに、適応形(adaptive)のLtacスクリプトには、
 独立して理解できる一連の自動化が含まれています。
 たとえば、大きな<span class="inlinecode"><span class="id" title="tactic">repeat</span></span> <span class="inlinecode"><span class="id" title="keyword">match</span></span>ループでは、それぞれのケースを別々に消化することができます。
 これは、スクリプトの階層構造をより一般的なスタイルで理解しようとするのとは大きく異なっています。
-
-<div class="paragraph"> </div>
-
 適応形のスクリプトは可変な束縛に依存(rely)しますが、
 一般的に非常に小さなスコープでしか使用だけです。
 一方、従来のスクリプトを理解するには、
@@ -764,14 +728,8 @@ Isar 言語に関連付けられています。
 私の見解では、<i>program synthesis</i> <i>プログラム合成</i>
 は広範なアプリケーションに適した非常に便利なアイデアです！
 実際には、仕様から自動的にプログラムを見つけるのに困難な障害があります。
-
-<div class="paragraph"> </div>
-
 典型的な仕様は、プログラム特性の記述において網羅的ではありません。
 例えば、特定の機械アーキテクチャ上の性能の詳細は、しばしば省略されます。
-
-<div class="paragraph"> </div>
-
 結果として、合成されたプログラムは、ある意味では正しいかもしれませんが、
 別の観点から欠陥に苦しみます。
 プログラム合成の研究はこの問題に対処する方法を生み出し続けますが、
@@ -782,14 +740,8 @@ Isar 言語に関連付けられています。
 数学的な実践に続いて、
 私たちが気にする形式証明の唯一の性質は、それが証明する定理であり、
 この特性を自動的にチェックすることは自明です。
-
-<div class="paragraph"> </div>
-
 言い換えれば、
 証明を受け入れられるものとする、簡単な基準(criterion)では、自動探索は簡単です。
-
-<div class="paragraph"> </div>
-
 もちろん、実際には、
 長期の保守を容易にするための証明の理解可能性(understandability)にも気を配ります。
 これは上に概説した技術を動機付けるものであり、
@@ -844,7 +796,241 @@ Isar 言語に関連付けられています。
  
 </div>
 <div class="code">
+
+<br/>
+<span class="id" title="keyword">Theorem</span> <a name="cfold_correct"><span class="id" title="lemma">cfold_correct</span></a> : <span class="id" title="keyword">∀</span> <span class="id" title="var">t</span> (<span class="id" title="var">e</span> : <a class="idref" href="Cpdt.MoreDep.html#exp"><span class="id" title="inductive">exp</span></a> <a class="idref" href="Cpdt.Large.html#t"><span class="id" title="variable">t</span></a>), <a class="idref" href="Cpdt.MoreDep.html#expDenote"><span class="id" title="definition">expDenote</span></a> <a class="idref" href="Cpdt.Large.html#e"><span class="id" title="variable">e</span></a> <span class="id" title="notation">=</span> <a class="idref" href="Cpdt.MoreDep.html#expDenote"><span class="id" title="definition">expDenote</span></a> (<a class="idref" href="Cpdt.MoreDep.html#cfold"><span class="id" title="definition">cfold</span></a> <a class="idref" href="Cpdt.Large.html#e"><span class="id" title="variable">e</span></a>).<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">induction</span> <span class="id" title="var">e</span>; <span class="id" title="var">crush</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="var">dep_destruct</span> (<a class="idref" href="Cpdt.MoreDep.html#cfold"><span class="id" title="definition">cfold</span></a> <span class="id" title="var">e1</span>); <span class="id" title="var">crush</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="var">dep_destruct</span> (<a class="idref" href="Cpdt.MoreDep.html#cfold"><span class="id" title="definition">cfold</span></a> <span class="id" title="var">e2</span>); <span class="id" title="var">crush</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="var">dep_destruct</span> (<a class="idref" href="Cpdt.MoreDep.html#cfold"><span class="id" title="definition">cfold</span></a> <span class="id" title="var">e1</span>); <span class="id" title="var">crush</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="var">dep_destruct</span> (<a class="idref" href="Cpdt.MoreDep.html#cfold"><span class="id" title="definition">cfold</span></a> <span class="id" title="var">e2</span>); <span class="id" title="var">crush</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="var">dep_destruct</span> (<a class="idref" href="Cpdt.MoreDep.html#cfold"><span class="id" title="definition">cfold</span></a> <span class="id" title="var">e1</span>); <span class="id" title="var">crush</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="var">dep_destruct</span> (<a class="idref" href="Cpdt.MoreDep.html#cfold"><span class="id" title="definition">cfold</span></a> <span class="id" title="var">e2</span>); <span class="id" title="var">crush</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="var">dep_destruct</span> (<a class="idref" href="Cpdt.MoreDep.html#cfold"><span class="id" title="definition">cfold</span></a> <span class="id" title="var">e1</span>); <span class="id" title="var">crush</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="var">dep_destruct</span> (<a class="idref" href="Cpdt.MoreDep.html#expDenote"><span class="id" title="definition">expDenote</span></a> <span class="id" title="var">e1</span>); <span class="id" title="var">crush</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="var">dep_destruct</span> (<a class="idref" href="Cpdt.MoreDep.html#cfold"><span class="id" title="definition">cfold</span></a> <span class="id" title="var">e</span>); <span class="id" title="var">crush</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="var">dep_destruct</span> (<a class="idref" href="Cpdt.MoreDep.html#cfold"><span class="id" title="definition">cfold</span></a> <span class="id" title="var">e</span>); <span class="id" title="var">crush</span>.<br/>
+<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+この完全な証明では、パターンに気づくのを避けるのは難しいです。
+見つけたパターンを抽象化して証明を書き直します。
+ 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Reset</span> <span class="id" title="var">cfold_correct</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Theorem</span> <a name="cfold_correct"><span class="id" title="lemma">cfold_correct</span></a> : <span class="id" title="keyword">∀</span> <span class="id" title="var">t</span> (<span class="id" title="var">e</span> : <a class="idref" href="Cpdt.MoreDep.html#exp"><span class="id" title="inductive">exp</span></a> <a class="idref" href="Cpdt.Large.html#t"><span class="id" title="variable">t</span></a>), <a class="idref" href="Cpdt.MoreDep.html#expDenote"><span class="id" title="definition">expDenote</span></a> <a class="idref" href="Cpdt.Large.html#e"><span class="id" title="variable">e</span></a> <span class="id" title="notation">=</span> <a class="idref" href="Cpdt.MoreDep.html#expDenote"><span class="id" title="definition">expDenote</span></a> (<a class="idref" href="Cpdt.MoreDep.html#cfold"><span class="id" title="definition">cfold</span></a> <a class="idref" href="Cpdt.Large.html#e"><span class="id" title="variable">e</span></a>).<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">induction</span> <span class="id" title="var">e</span>; <span class="id" title="var">crush</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+ここで destruct しようとしている式は、
+<span class="inlinecode"><span class="id" title="keyword">match</span></span>で場合分け(discriminee)しようとしているものであり、
+そのような表現をすべて destruct するタクティクを簡単に書くことができます。
+   
+</div>
+<div class="code">
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Ltac</span> <span class="id" title="var">t</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">repeat</span> (<span class="id" title="keyword">match</span> <span class="id" title="keyword">goal</span> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| [ |- <span class="id" title="keyword">context</span>[<span class="id" title="keyword">match</span> ?<span class="id" title="var">E</span> <span class="id" title="keyword">with</span> <a class="idref" href="Cpdt.MoreDep.html#NConst"><span class="id" title="constructor">NConst</span></a> <span class="id" title="var">_</span> ⇒ <span class="id" title="var">_</span> | <span class="id" title="var">_</span> ⇒ <span class="id" title="var">_</span> <span class="id" title="keyword">end</span>] ] ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">dep_destruct</span> <span class="id" title="var">E</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">end</span>; <span class="id" title="var">crush</span>).<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="var">t</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+このタクティクの使用はすべての場合を済まします。
+次の2つの場合では同じですが、第4番めの場合では立ち往生します。
+   
+</div>
+<div class="code">
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="var">t</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="var">t</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="var">t</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+第4番めのサブゴールの結論は：
+     <br/>
+<span class="inlinecode">&nbsp;&nbsp;&nbsp;&nbsp;============================<br/>
+&nbsp;&nbsp;&nbsp;(<span class="id" title="keyword">if</span> <a class="idref" href="Cpdt.DataStruct.html#expDenote"><span class="id" title="definition">expDenote</span></a> <a class="idref" href="Cpdt.Subset.html#e1"><span class="id" title="variable">e1</span></a> <span class="id" title="keyword">then</span> <a class="idref" href="Cpdt.DataStruct.html#expDenote"><span class="id" title="definition">expDenote</span></a> (<a class="idref" href="Cpdt.ProgLang.html#HigherOrder.cfold"><span class="id" title="definition">cfold</span></a> <a class="idref" href="Cpdt.Subset.html#e2"><span class="id" title="variable">e2</span></a>) <span class="id" title="keyword">else</span> <a class="idref" href="Cpdt.DataStruct.html#expDenote"><span class="id" title="definition">expDenote</span></a> (<a class="idref" href="Cpdt.ProgLang.html#HigherOrder.cfold"><span class="id" title="definition">cfold</span></a> <a class="idref" href="Cpdt.Large.html#e3"><span class="id" title="variable">e3</span></a>)) =<br/>
+&nbsp;&nbsp;&nbsp;<a class="idref" href="Cpdt.DataStruct.html#expDenote"><span class="id" title="definition">expDenote</span></a> (<span class="id" title="keyword">if</span> <a class="idref" href="Cpdt.DataStruct.html#expDenote"><span class="id" title="definition">expDenote</span></a> <a class="idref" href="Cpdt.Subset.html#e1"><span class="id" title="variable">e1</span></a> <span class="id" title="keyword">then</span> <a class="idref" href="Cpdt.ProgLang.html#HigherOrder.cfold"><span class="id" title="definition">cfold</span></a> <a class="idref" href="Cpdt.Subset.html#e2"><span class="id" title="variable">e2</span></a> <span class="id" title="keyword">else</span> <a class="idref" href="Cpdt.ProgLang.html#HigherOrder.cfold"><span class="id" title="definition">cfold</span></a> <a class="idref" href="Cpdt.Large.html#e3"><span class="id" title="variable">e3</span></a>)
+<div class="paragraph"> </div>
+
+</span>
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+この場合を扱うためには、<span class="inlinecode"><a class="idref" href="Cpdt.DataStruct.html#cfoldCond.t"><span class="id" title="variable">t</span></a></span> タクティクを拡張する必要があります。
+   
+</div>
+<div class="code">
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Ltac</span> <span class="id" title="var">t'</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">repeat</span> (<span class="id" title="keyword">match</span> <span class="id" title="keyword">goal</span> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| [ |- <span class="id" title="keyword">context</span>[<span class="id" title="keyword">match</span> ?<span class="id" title="var">E</span> <span class="id" title="keyword">with</span> <a class="idref" href="Cpdt.MoreDep.html#NConst"><span class="id" title="constructor">NConst</span></a> <span class="id" title="var">_</span> ⇒ <span class="id" title="var">_</span> | <span class="id" title="var">_</span> ⇒ <span class="id" title="var">_</span> <span class="id" title="keyword">end</span>] ] ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">dep_destruct</span> <span class="id" title="var">E</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| [ |- <span class="id" title="notation">(</span><span class="id" title="keyword">if</span> ?<span class="id" title="var">E</span> <span class="id" title="keyword">then</span> <span class="id" title="var">_</span> <span class="id" title="keyword">else</span> <span class="id" title="var">_</span><span class="id" title="notation">)</span> <span class="id" title="notation">=</span> <span class="id" title="var">_</span> ] ⇒ <span class="id" title="tactic">destruct</span> <span class="id" title="var">E</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">end</span>; <span class="id" title="var">crush</span>).<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="var">t'</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+  
+<div class="paragraph"> </div>
+
+今度は、ゴールは済まされていますが、<span class="inlinecode"><a class="idref" href="Cpdt.DataStruct.html#cfoldCond.t"><span class="id" title="variable">t</span></a></span> <span class="inlinecode">'</span>は次のサブゴールに影響を与えません。
+
+</div>
+<div class="code">
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="var">t'</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+   
+<div class="paragraph"> </div>
+
+<span class="inlinecode"><a class="idref" href="Cpdt.DataStruct.html#cfoldCond.t"><span class="id" title="variable">t</span></a></span>の最終の改訂版は、証明を終了します。
+   
+</div>
+<div class="code">
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Ltac</span> <span class="id" title="var">t''</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">repeat</span> (<span class="id" title="keyword">match</span> <span class="id" title="keyword">goal</span> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| [ |- <span class="id" title="keyword">context</span>[<span class="id" title="keyword">match</span> ?<span class="id" title="var">E</span> <span class="id" title="keyword">with</span> <a class="idref" href="Cpdt.MoreDep.html#NConst"><span class="id" title="constructor">NConst</span></a> <span class="id" title="var">_</span> ⇒ <span class="id" title="var">_</span> | <span class="id" title="var">_</span> ⇒ <span class="id" title="var">_</span> <span class="id" title="keyword">end</span>] ] ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">dep_destruct</span> <span class="id" title="var">E</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| [ |- <span class="id" title="notation">(</span><span class="id" title="keyword">if</span> ?<span class="id" title="var">E</span> <span class="id" title="keyword">then</span> <span class="id" title="var">_</span> <span class="id" title="keyword">else</span> <span class="id" title="var">_</span><span class="id" title="notation">)</span> <span class="id" title="notation">=</span> <span class="id" title="var">_</span> ] ⇒ <span class="id" title="tactic">destruct</span> <span class="id" title="var">E</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| [ |- <span class="id" title="keyword">context</span>[<span class="id" title="keyword">match</span> <a class="idref" href="Cpdt.MoreDep.html#pairOut"><span class="id" title="definition">pairOut</span></a> ?<span class="id" title="var">E</span> <span class="id" title="keyword">with</span> <span class="id" title="constructor">Some</span> <span class="id" title="var">_</span> ⇒ <span class="id" title="var">_</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="constructor">None</span> ⇒ <span class="id" title="var">_</span> <span class="id" title="keyword">end</span>] ] ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">dep_destruct</span> <span class="id" title="var">E</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">end</span>; <span class="id" title="var">crush</span>).<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="var">t''</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="var">t''</span>.<br/>
+<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+最終的なタクティクを採用し、それを証明スクリプトの最初の部分に移して、
+うまく自動化された証明に到達しました。
+ 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Reset</span> <span class="id" title="var">cfold_correct</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Theorem</span> <a name="cfold_correct"><span class="id" title="lemma">cfold_correct</span></a> : <span class="id" title="keyword">∀</span> <span class="id" title="var">t</span> (<span class="id" title="var">e</span> : <a class="idref" href="Cpdt.MoreDep.html#exp"><span class="id" title="inductive">exp</span></a> <a class="idref" href="Cpdt.Large.html#t"><span class="id" title="variable">t</span></a>), <a class="idref" href="Cpdt.MoreDep.html#expDenote"><span class="id" title="definition">expDenote</span></a> <a class="idref" href="Cpdt.Large.html#e"><span class="id" title="variable">e</span></a> <span class="id" title="notation">=</span> <a class="idref" href="Cpdt.MoreDep.html#expDenote"><span class="id" title="definition">expDenote</span></a> (<a class="idref" href="Cpdt.MoreDep.html#cfold"><span class="id" title="definition">cfold</span></a> <a class="idref" href="Cpdt.Large.html#e"><span class="id" title="variable">e</span></a>).<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">induction</span> <span class="id" title="var">e</span>; <span class="id" title="var">crush</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">repeat</span> (<span class="id" title="keyword">match</span> <span class="id" title="keyword">goal</span> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| [ |- <span class="id" title="keyword">context</span>[<span class="id" title="keyword">match</span> ?<span class="id" title="var">E</span> <span class="id" title="keyword">with</span> <a class="idref" href="Cpdt.MoreDep.html#NConst"><span class="id" title="constructor">NConst</span></a> <span class="id" title="var">_</span> ⇒ <span class="id" title="var">_</span> | <span class="id" title="var">_</span> ⇒ <span class="id" title="var">_</span> <span class="id" title="keyword">end</span>] ] ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">dep_destruct</span> <span class="id" title="var">E</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| [ |- <span class="id" title="notation">(</span><span class="id" title="keyword">if</span> ?<span class="id" title="var">E</span> <span class="id" title="keyword">then</span> <span class="id" title="var">_</span> <span class="id" title="keyword">else</span> <span class="id" title="var">_</span><span class="id" title="notation">)</span> <span class="id" title="notation">=</span> <span class="id" title="var">_</span> ] ⇒ <span class="id" title="tactic">destruct</span> <span class="id" title="var">E</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| [ |- <span class="id" title="keyword">context</span>[<span class="id" title="keyword">match</span> <a class="idref" href="Cpdt.MoreDep.html#pairOut"><span class="id" title="definition">pairOut</span></a> ?<span class="id" title="var">E</span> <span class="id" title="keyword">with</span> <span class="id" title="constructor">Some</span> <span class="id" title="var">_</span> ⇒ <span class="id" title="var">_</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="constructor">None</span> ⇒ <span class="id" title="var">_</span> <span class="id" title="keyword">end</span>] ] ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">dep_destruct</span> <span class="id" title="var">E</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">end</span>; <span class="id" title="var">crush</span>).<br/>
+<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+よい自動化された証明を作った後でさえも、
+それらを無効にすることができる仕様の変更に対処する必要があります。
+タクティックのひとつずつ(single-tactic)によって、
+対話的に証明を進めること(step through)は、一般的に不可能です。
+コマンド <span class="inlinecode"><span class="id" title="keyword">Debug</span></span> <span class="inlinecode"><span class="id" title="keyword">On</span></span> を使用すると、
+タクティクの実行(step through)のポイントを進めることができますが、
+デバッカは直感に反して停止したいポイントを選択する傾向があり、
+ポイントごとの出力は非常に冗長です。
+したがって、Coqのほとんどのユーザーはこれを便利だとは気づきません。
+以前使用していたスクリプトで何が壊れているのかを理解するにはどうすればよいでしょうか？
+
+<div class="paragraph"> </div>
+
+
+<div class="paragraph"> </div>
+
+例は、有用なアプローチを示すのに役立ちます。
+不適切な書き換え(rewrite)のためのヒントを追加してしまった場合、
+<span class="inlinecode"><a class="idref" href="Cpdt.Large.html#reassoc_correct"><span class="id" title="lemma">reassoc_correct</span></a></span>の証明で何が起きたかを考えてみましょう。
+
+</div>
+<div class="code">
+
+<br/>
 <span class="id" title="keyword">Reset</span> <span class="id" title="var">reassoc_correct</span>.<br/>
+
+<br/>
 <span class="id" title="keyword">Theorem</span> <a name="confounder"><span class="id" title="lemma">confounder</span></a> : <span class="id" title="keyword">∀</span> <span class="id" title="var">e1</span> <span class="id" title="var">e2</span> <span class="id" title="var">e3</span>,<br/>
 &nbsp;&nbsp;<a class="idref" href="Cpdt.Large.html#eval"><span class="id" title="definition">eval</span></a> <a class="idref" href="Cpdt.Large.html#e1"><span class="id" title="variable">e1</span></a> <span class="id" title="notation">×</span> <a class="idref" href="Cpdt.Large.html#eval"><span class="id" title="definition">eval</span></a> <a class="idref" href="Cpdt.Large.html#e2"><span class="id" title="variable">e2</span></a> <span class="id" title="notation">×</span> <a class="idref" href="Cpdt.Large.html#eval"><span class="id" title="definition">eval</span></a> <a class="idref" href="Cpdt.Large.html#e3"><span class="id" title="variable">e3</span></a> <span class="id" title="notation">=</span> <a class="idref" href="Cpdt.Large.html#eval"><span class="id" title="definition">eval</span></a> <a class="idref" href="Cpdt.Large.html#e1"><span class="id" title="variable">e1</span></a> <span class="id" title="notation">×</span> <span class="id" title="notation">(</span><a class="idref" href="Cpdt.Large.html#eval"><span class="id" title="definition">eval</span></a> <a class="idref" href="Cpdt.Large.html#e2"><span class="id" title="variable">e2</span></a> <span class="id" title="notation">+</span> 1 <span class="id" title="notation">-</span> 1<span class="id" title="notation">)</span> <span class="id" title="notation">×</span> <a class="idref" href="Cpdt.Large.html#eval"><span class="id" title="definition">eval</span></a> <a class="idref" href="Cpdt.Large.html#e3"><span class="id" title="variable">e3</span></a>.<br/>
 &nbsp;&nbsp;<span class="id" title="var">crush</span>.<br/>
@@ -1674,23 +1860,11 @@ MLの中で関連性(analogues)がないと望ましくない結果をもたら�
 MLのように、モジュール・システムは、大規模な開発を構築する効果的な方法を提供します。
 MLとは異なり、Coqモジュールは表現力を追加せず、
 依存型のレコードのフィールド(inhabitant)として任意のモジュールを実装することができます。
-
-<div class="paragraph"> </div>
-
 多くの場合、依存レコードよりも使いやすくするセカンド・クラス(second-class nature)のモジュールです。
-
-<div class="paragraph"> </div>
-
 モジュールは非常に限定された方法でしか使用できないので、上記の例が示すように、
 特別なコマンドと編集モードで便利なモジュールコーディングをサポートする方が簡単です。
-
-<div class="paragraph"> </div>
-
 レコードの同形(isomorphic)の実装は、
 モジュールのサブタイプ化やモジュールのフィールドのインポートなどの利便性の欠如に悩まされていました。
-
-<div class="paragraph"> </div>
-
 一方、すべてのモジュール値は静的に決定されなければならないので、モジュールは、例えば、特定の関数パラメータに基づいて、通常の関数の定義内で計算されないことがあります。
  
 </div>
@@ -1792,15 +1966,9 @@ Makefileは、
 <span class="inlinecode"><span class="id" title="keyword">Require</span></span> コマンドは、
 名前付きモジュールを含む<tt>.vo</tt>ファイルを見つけ、
 モジュールがメモリにロードされていることを確認します。
-
-<div class="paragraph"> </div>
-
 <span class="inlinecode"><span class="id" title="keyword">Import</span></span> コマンドは、
 名前付きモジュールのすべてのトップレベルの定義を現在の名前空間にロードし、
 対応する<tt>.vo</tt>ファイルを持たないローカルなモジュールで使用できます。
-
-<div class="paragraph"> </div>
-
 別のコマンド、<span class="inlinecode"><span class="id" title="keyword">Load</span></span> は、
 名前付きファイルの内容をそのまま挿入するためのものです。
 証明スクリプトを再実行するのを避け、

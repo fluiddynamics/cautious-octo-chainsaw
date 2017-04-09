@@ -169,7 +169,7 @@ Prolog などの言語に組み入れられた
 
 関係の定義では、同じ等式は証明するのにより多くのステップをとりますが、
 そのプロセスは完全に機械的です。
-例えば、simple-minded な手動の証明探索の戦略を考えよう。
+例えば、単純な手動の証明探索の戦略を考えてみましょう。
 後でエラーメッセージの表示された手順は、最終的なスクリプトから省略されます。
 
 </div>
@@ -293,9 +293,6 @@ Error: Impossible to unify "plusR 0 ?27 ?27" with "plusR 1 3 4".
 <div class="paragraph"> </div>
 
 この場合は、<span class="inlinecode"><span class="id" title="tactic">auto</span></span> は進捗をするのに十分ではありません。
-
-<div class="paragraph"> </div>
-
 単一の候補のステップは、可能な証明木の無限のスペースに導くかもしれないので、
 <span class="inlinecode"><span class="id" title="tactic">auto</span></span> は考慮するべき最大の木の深さをパラメータとして与えられるようになっています。
 ディフォルトの深さは 5 で、ゴールを証明するために深さ 6 が必要ならそのように設定します。
@@ -349,9 +346,6 @@ Error: Impossible to unify "plusR 0 ?27 ?27" with "plusR 1 3 4".
 論理プログラミングのふたつのキーとなるコンポーネントは、
  <i>backtracking</i> バックトラッキングと
  <i>unification</i> ユニフィケーションです。
-
-<div class="paragraph"> </div>
-
 これらの技法を実際に見るために、さらに単純(silly)な例を考えます。
 ここでは、候補となる証明のステップが反射的で、量化子を具体化します。
 (quantifier instantiation)
@@ -436,8 +430,8 @@ Error: Impossible to unify "plusR 0 ?27 ?27" with "plusR 1 3 4".
 
 以前とおなじように、手作業で量化子の具体化を推測しようとしますが、ここではそれは必要ありません。
 <span class="inlinecode"><span class="id" title="tactic">apply</span></span> の代わりに、推測を延期したいそれらのパラメータの代わりに
-プレースホルダー  <i>unification variables</i> 
-ユニフィケーション変数をつかう(proceeds with) <span class="inlinecode"><span class="id" title="tactic">eapply</span></span> を使用します。
+プレースホルダー・ユニフィケーション変数  <i>unification variables</i>
+を使って進める <span class="inlinecode"><span class="id" title="tactic">eapply</span></span> を使用します。
  
 </div>
 <div class="code">
@@ -534,7 +528,7 @@ Error: Impossible to unify "plusR 0 ?27 ?27" with "plusR 1 3 4".
 この証明は、論理プログラミングが、関数プログラミングと比べて、
 証明探索を単純化する最初の例を与えます。
 一般に、関数型プログラムは、単に一方方向に実行されることを意味し、
-関数は入力と出力の重なりのない集合(disjoint sets)です。
+関数は入力と出力の素集合(disjoint sets、交わりを持たない集合)を持ちます。
 最後の例では、特定の出力を生じさせる入力を推定するために、
 論理型プログラムを後ろ向きに効率的に実行しました。
 他の入力の未知の値を推測するために、同じことが働きます。
@@ -559,13 +553,7 @@ Error: Impossible to unify "plusR 0 ?27 ?27" with "plusR 1 3 4".
 
 正しい補助的な事実を証明するために、具体的な関数プログラムについて、上で論理プログラムにしたのと同じ方法で、
 理由づけすることができます。
-
-<div class="paragraph"> </div>
-
 <span class="inlinecode"><a class="idref" href="Cpdt.LogicProg.html#plusR"><span class="id" title="inductive">plusR</span></a></span> のコンストラクタが、<span class="inlinecode"><a class="idref" href="Cpdt.InductiveTypes.html#plus"><span class="id" title="definition">plus</span></a></span> についての補題を自然に翻訳することを証明しましょう。
-
-<div class="paragraph"> </div>
-
 最初に、左辺または右辺がワイルドカードとマッチする等式を証明するライブラリ関数を見つけるための
 コマンドである <span class="inlinecode"><span class="id" title="keyword">SearchRewrite</span></span> コマンドを使って、
 それらの補題が、既に標準ライブラリで証明されていることを見つけることができます。
@@ -589,7 +577,7 @@ Error: Impossible to unify "plusR 0 ?27 ?27" with "plusR 1 3 4".
 <div class="paragraph"> </div>
 
 コマンド <span class="inlinecode"><span class="id" title="keyword">Hint</span></span> <span class="inlinecode"><span class="id" title="keyword">Immediate</span></span> は、
-<span class="inlinecode"><span class="id" title="tactic">auto</span></span> と <span class="inlinecode"><span class="id" title="tactic">eauto</span></span> が、この補題を証明木の任意の葉の候補として考慮するように依頼します。
+<span class="inlinecode"><span class="id" title="tactic">auto</span></span> と <span class="inlinecode"><span class="id" title="tactic">eauto</span></span> がこの補題を証明木の任意の葉の候補として考慮するように依頼します。
 
 </div>
 <div class="code">
@@ -604,7 +592,7 @@ Error: Impossible to unify "plusR 0 ?27 ?27" with "plusR 1 3 4".
 
 <div class="paragraph"> </div>
 
-<span class="inlinecode"><a class="idref" href="Cpdt.LogicProg.html#PlusS"><span class="id" title="constructor">PlusS</span></a></span> に対応するものを証明します。
+<span class="inlinecode"><a class="idref" href="Cpdt.LogicProg.html#PlusS"><span class="id" title="constructor">PlusS</span></a></span> に対応する <span class="inlinecode"><a class="idref" href="Cpdt.LogicProg.html#plusS"><span class="id" title="lemma">plusS</span></a></span> を証明します。
 
 </div>
 <div class="code">
@@ -639,7 +627,7 @@ Error: Impossible to unify "plusR 0 ?27 ?27" with "plusR 1 3 4".
 
 <div class="paragraph"> </div>
 
-適切なヒントを登録したので、これまでの例を通常の機能追加<span class="inlinecode"><a class="idref" href="Cpdt.InductiveTypes.html#plus"><span class="id" title="definition">plus</span></a></span>で再現できます。
+適切なヒントを登録したので、これまでの例を通常の関数<span class="inlinecode"><a class="idref" href="Cpdt.InductiveTypes.html#plus"><span class="id" title="definition">plus</span></a></span>の追加で再現できます。
 
 </div>
 <div class="code">
@@ -702,14 +690,11 @@ Error: Impossible to unify "plusR 0 ?27 ?27" with "plusR 1 3 4".
 <div class="paragraph"> </div>
 
 もし、 <span class="inlinecode"><a class="idref" href="Cpdt.InductiveTypes.html#plus"><span class="id" title="definition">plus</span></a></span> への入力を論理プログラムに関連する入力として考えるなら、
-新しいルール <span class="inlinecode"><span class="id" title="var">plus0</span></span> は曖昧さを導きいれます。
+新しいルール <span class="inlinecode"><span class="id" title="var">plus0</span></span> は曖昧さを導き入れます。
 例えば、和 <span class="inlinecode">0</span> <span class="inlinecode">+</span> <span class="inlinecode">0</span> は、我々の注目するオペランドに依存して、
 <span class="inlinecode"><span class="id" title="var">plus_0_n</span></span> と <span class="inlinecode"><span class="id" title="var">plus0</span></span> のどちらにもマッチします。
-
-<div class="paragraph"> </div>
-
-この曖昧さは潜在的な探索木の数を増やし、証明探索を遅くし、
-意味的には問題を供さないが、実際に自動化した証明につながります。
+この曖昧さは潜在的な探索木の数を増やし、証明探索を遅くしますが、
+意味的には問題はないので、実際に自動化した証明を導きます。
  
 </div>
 <div class="code">
@@ -726,7 +711,7 @@ Error: Impossible to unify "plusR 0 ?27 ?27" with "plusR 1 3 4".
 
 <div class="paragraph"> </div>
 
-可能な証明木のスペースを広げるヒントを追加することが、どれだけ損害を被ることになるでしょうか？
+可能な証明木のスペースを広げるヒントを追加することで、どれだけ損害を被ることになるでしょうか？
 古典的なものは、このライブラリの定理で具体的にしたように、
 等式についての推移性(transitivity)の無制限な使用から来ています。
  
@@ -753,7 +738,7 @@ Error: Impossible to unify "plusR 0 ?27 ?27" with "plusR 1 3 4".
 <div class="paragraph"> </div>
 
 ヒントはセクションのスコープ上にあるので、
-不幸なヒントの選択の効果を含むためにセクションに入ります。
+不幸なヒントの選択の効果を含むセクションに入りましょう。
 
 </div>
 <div class="code">
@@ -932,6 +917,8 @@ Finished transaction in 0. secs (0.004u,0.s)
 
 </div>
 <div class="code">
+
+<br/>
 <span class="id" title="keyword">Abort</span>.<br/>
 
 <br/>
@@ -1014,7 +1001,7 @@ Finished transaction in 0. secs (0.004001u,0.s)
 </div>
 
 <div class="doc">
-<a name="lab75"></a><h1 class="section">拘束されていない値を探す</h1>
+<a name="lab75"></a><h1 class="section">制約された値を探す</h1>
 
 <div class="paragraph"> </div>
 
@@ -1107,7 +1094,7 @@ Finished transaction in 0. secs (0.004001u,0.s)
 （ここで、単に <span class="inlinecode"><a class="idref" href="Cpdt.LogicProg.html#length_S"><span class="id" title="lemma">length_S</span></a></span> と同じコマンドを使うのが便利なので、
 <span class="inlinecode"><a class="idref" href="Cpdt.LogicProg.html#length_O"><span class="id" title="lemma">length_O</span></a></span> を <span class="inlinecode"><span class="id" title="keyword">Hint</span></span> <span class="inlinecode"><span class="id" title="keyword">Immediate</span></span> ではなく <span class="inlinecode"><span class="id" title="keyword">Hint</span></span> <span class="inlinecode"><span class="id" title="keyword">Resolve</span></span> で登録しています。
 <span class="inlinecode"><span class="id" title="keyword">Resolve</span></span> と <span class="inlinecode"><span class="id" title="keyword">Immediate</span></span> は、前提のない定理をヒント
-にするなら同じ意味を持ちます。
+にするなら同じ意味を持ちます。）
 
 </div>
 <div class="code">
@@ -1133,7 +1120,7 @@ Coqは、証明探索の途中で導入された幾つかのユニフィケー�
 決定することなしに、証明を終えたことに文句をいいます。
 型 <span class="inlinecode"><a class="idref" href="Cpdt.InductiveTypes.html#nat"><span class="id" title="inductive">nat</span></a></span> の <i>任意</i> の値（たとば 0）をどちらの変数にも差し込むことができますから、
 このエラーメッセージは少し馬鹿げて(silly)います！
-しかし、より複雑な型では、それらの値(inhabitants)を見つけることは、
+しかし、より複雑な型では、それらの具体的な値(inhabitants)を見つけることは、
 一般的に定理証明と同じくらい複雑かもしれません。
 
 <div class="paragraph"> </div>
@@ -1167,9 +1154,6 @@ Proof: ex_intro (fun ls : list nat =&gt; length ls = 2)
 </div>
 
 <div class="doc">
-
-<div class="paragraph"> </div>
-
 そのリストのふたつの要素を表わす、ふたつのユニフィケーション変数があります。
 しかしながら、リストの長さはデータの値と独立です。
 証明探索はユニフィケーションによって適切なデータの要素を自然に見つけ出すので、
@@ -1280,7 +1264,7 @@ Proof: ex_intro (fun ls : list nat =&gt; length ls = 2)
 
 <div class="paragraph"> </div>
 
-最後に、カスタムヒントを登録するためのコマンド
+最後に、特別仕立てのヒント(custom hint)を登録するためのコマンド
 <span class="inlinecode"><span class="id" title="keyword">Hint</span></span> <span class="inlinecode"><span class="id" title="keyword">Extern</span></span> を見ます。
 これは、証明探索の間にゴールに対してマッチするパターンを提供します。
 ひとたび、パターンがマッチしたら、タクティク（矢印 <span class="inlinecode">⇒</span> の右辺で与えられた) が試みられます。
@@ -1321,12 +1305,9 @@ Proof: ex_intro (fun ls : list nat =&gt; length ls = 2)
 
 <div class="paragraph"> </div>
 
-証明の項を印刷することは（で）、見つかったなんの不思議もない(unsurprising)リストを示します。
+証明の項を印刷することで、見つかったなんの不思議もない(unsurprising)リストを示します。
 ここに、どのリストが使用されるのかが明白でない例があります。
 <span class="inlinecode"><span class="id" title="tactic">eauto</span></span> が選んだリストがどれか判りますか？
-
-<div class="paragraph"> </div>
-
  
 </div>
 <div class="code">
@@ -1336,6 +1317,8 @@ Proof: ex_intro (fun ls : list nat =&gt; length ls = 2)
 &nbsp;&nbsp;<span class="id" title="notation">∧</span> <a class="idref" href="Cpdt.LogicProg.html#sum"><span class="id" title="definition">sum</span></a> <a class="idref" href="Cpdt.LogicProg.html#ls"><span class="id" title="variable">ls</span></a> <span class="id" title="notation">=</span> 42.<br/>
 &nbsp;&nbsp;<span class="id" title="tactic">eauto</span> 15.<br/>
 <span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
 
 <br/>
 
@@ -1778,31 +1761,16 @@ Ltac プログラミング言語において、
 <span class="inlinecode"><span class="id" title="keyword">Hint</span></span> <span class="inlinecode"><span class="id" title="keyword">Immediate</span></span> <span class="inlinecode"><span class="id" title="var">lemma</span></span> は、
 補題を適用し、仮説を打ち消して(discharging)、
 ただちに目標をひとつの証明のステップで解くように依頼します。
-
-<div class="paragraph"> </div>
-
 <span class="inlinecode"><span class="id" title="keyword">Resolve</span></span> <span class="inlinecode"><span class="id" title="var">lemma</span></span> は、
 同じことをしますが、ネストされた証明検索の対象となる新しい前提を追加するかもしれません。
-
-<div class="paragraph"> </div>
-
 <span class="inlinecode"><span class="id" title="keyword">Constructors</span></span> <span class="inlinecode"><a class="idref" href="Cpdt.ProgLang.html#type"><span class="id" title="inductive">type</span></a></span> は、
 <span class="inlinecode"><span class="id" title="keyword">Resolve</span></span> のように動作し、帰納的なすべてのコンストラクタに適用されます。
-
-<div class="paragraph"> </div>
-
 <span class="inlinecode"><span class="id" title="keyword">Unfold</span></span> <span class="inlinecode"><a class="idref" href="Cpdt.ProgLang.html#HigherOrder.ident"><span class="id" title="definition">ident</span></a></span> は、
 証明のゴールの先頭に現れるときに <span class="inlinecode"><a class="idref" href="Cpdt.ProgLang.html#HigherOrder.ident"><span class="id" title="definition">ident</span></a></span> を展開(unfolding)することを試みます。
-
-<div class="paragraph"> </div>
-
 これらの <span class="inlinecode"><span class="id" title="keyword">Hint</span></span> コマンドのそれぞれに接尾辞を付けて、
 指定されたデータベースのみにヒントを追加することができます。たとえば、
 <span class="inlinecode"><span class="id" title="keyword">Hint</span></span> <span class="inlinecode"><span class="id" title="keyword">Resolve</span></span> <span class="inlinecode"><span class="id" title="var">lemma</span></span> <span class="inlinecode">:</span> <span class="inlinecode"><span class="id" title="var">my_db</span></span> で、ヒントを特定のデータベースに追加したなら、
 例えば <span class="inlinecode"><span class="id" title="tactic">auto</span></span> <span class="inlinecode"><span class="id" title="keyword">with</span></span> <span class="inlinecode"><span class="id" title="var">my_db</span></span> のときだけに使われるでしょう。
-
-<div class="paragraph"> </div>
-
 <span class="inlinecode"><span class="id" title="tactic">auto</span></span> の追加引数は、<span class="inlinecode"><span class="id" title="tactic">auto</span></span> <span class="inlinecode">8</span> や <span class="inlinecode"><span class="id" title="tactic">auto</span></span> <span class="inlinecode">8</span> <span class="inlinecode"><span class="id" title="keyword">with</span></span> <span class="inlinecode"><span class="id" title="var">my_db</span></span> のように、
 深さ優先で検索する証明木の最大の深さを指定します。デフォルトの深さは5です。
 
@@ -2086,9 +2054,6 @@ rewrite ヒントは、デフォルトではデォフォルトデータベース
 この、新しいヒントが証明探索を遅くするかもしれない、
 <span class="inlinecode"><span class="id" title="tactic">auto</span></span> の状況と対比される rewrite ヒントの "非単調性(non-monotonicity)" は、
 古い証明を "壊す(break)" ことは決してありません。
-
-<div class="paragraph"> </div>
-
 キーとなる違いは、
 <span class="inlinecode"><span class="id" title="tactic">autorewrite</span></span> は、ゴールを解くことなしに変形するかもしれないのに対して、
 <span class="inlinecode"><span class="id" title="tactic">auto</span></span> は、ゴールと解くか、または、それを変えないかのどちらかです。

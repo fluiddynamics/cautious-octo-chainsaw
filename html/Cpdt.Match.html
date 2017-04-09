@@ -67,21 +67,12 @@ Ltac の <span class="inlinecode"><span class="id" title="keyword">match</span><
 
 <span class="inlinecode"><span class="id" title="tactic">intuition</span></span> タクティクは、
 ゴールの命題論理的構造を簡略化(simplifies)します。
-
-<div class="paragraph"> </div>
-
 <span class="inlinecode"><span class="id" title="tactic">congruence</span></span> タクティクは、
 等式と合同閉包(congruence closure)のルールに加え、帰納型のコンストラクタの属性を適用します。
-
-<div class="paragraph"> </div>
-
 <span class="inlinecode"><span class="id" title="tactic">omega</span></span> タクティクは、あなたの求めに応じて(depending on whom you ask)、
 quantifier-free linear arithmetic 量化子のない線形算術、または、
 Presburger arithmetic プレスバーガー算術と呼ばれる
 理論に対する完全な決定手続きを提供します。
-
-<div class="paragraph"> </div>
-
 すなわち <span class="inlinecode"><span class="id" title="tactic">omega</span></span> は、
 その原始式(atomic formulas)が、自然数または整数を基本的な比較演算の対象とし、
 そのオペランドが定数、変数、加算および減算から構成された、
@@ -116,9 +107,6 @@ The <i>setoid</i> の手法(facility)は、
 <span class="inlinecode"><span class="id" title="tactic">rewrite</span></span> のようなタクティクによって理解される
 新しい等価関係(equivalence relations)を
 登録することを可能にします。
-
-<div class="paragraph"> </div>
-
 たとえば <span class="inlinecode"><span class="id" title="keyword">Prop</span></span> は、"if and only if" の等価関係を setoid として登録されています。
 新しい setoid を登録する能力は、
 すべての推論(reasoning)が、
@@ -132,9 +120,6 @@ The <i>setoid</i> の手法(facility)は、
 
 Coq マニュアルを熟読することで学ぶことのできる、
 組み込みの「ブラックボックス」な自動化タクティクがあります。
-
-<div class="paragraph"> </div>
-
 Coqの本当の約束事は、Ltacを使って、
 問題に特化したタクティクのコーディングのなかにあります。
  
@@ -285,7 +270,7 @@ Coqの本当の約束事は、Ltacを使って、
 
 <div class="paragraph"> </div>
 
-多くの決定性の手続きは 「<span class="inlinecode"><span class="id" title="tactic">repeat</span></span> <span class="inlinecode"><span class="id" title="keyword">match</span></span> ループ」によって Ltac で記述されます。
+多くの決定性の手続きは 「<span class="inlinecode"><span class="id" title="tactic">repeat</span></span> <span class="inlinecode"><span class="id" title="keyword">match</span></span> ループ」によって Ltac で記述することができます。
 たとえば、<span class="inlinecode"><span class="id" title="tactic">tauto</span></span> のサブセットの機能を実装することができます。
  
 </div>
@@ -321,7 +306,22 @@ Coqの本当の約束事は、Ltacを使って、
 
 <div class="paragraph"> </div>
 
-（\index{natural deduction}~\cite{TAPLNatDed}\index{tactics!specialize}
+（自然演繹 natural deduction の意味において）
+いくつかの結合子についての導入(introduction)のルールを実装することもまた自明です。
+除去(elimination)のルールを実装することはもう少しの作業です。
+<span class="inlinecode"><span class="id" title="tactic">destruct</span></span>に仮説の名前を付ける必要があるからです。
+
+<div class="paragraph"> </div>
+
+最後のルールは、
+仮説を与えられた引数の集合（量化された変数、または、含意による局所的仮説のため）
+に特化したバージョンに置き換える <span class="inlinecode"><span class="id" title="tactic">specialize</span></span> タクティクを使って
+三段論法(modus ponens)を実装します。
+慣例によって、
+<span class="inlinecode"><span class="id" title="tactic">specialize</span></span> への引数が一連の引数に対する仮説 <span class="inlinecode"><a class="idref" href="Cpdt.GeneralRec.html#thunk_eq_coind.H"><span class="id" title="variable">H</span></a></span> の適用である場合、そ
+の特殊化の結果が <span class="inlinecode"><a class="idref" href="Cpdt.GeneralRec.html#thunk_eq_coind.H"><span class="id" title="variable">H</span></a></span> に置き換えられます。
+ 他の項については、結果は <span class="inlinecode"><span class="id" title="tactic">generalize</span></span> と同じです。
+ 
 </div>
 <div class="code">
 
@@ -353,8 +353,8 @@ Coqの本当の約束事は、Ltacを使って、
 
 <div class="paragraph"> </div>
 
-マッチはMLのように動作すると想定するのは魅力的です。 
-実際、その動作にはいくつかの重要な違いがあります。
+<span class="inlinecode"><span class="id" title="keyword">match</span></span> はMLのように動作すると想定するのは魅力的です。 
+実際に、その動作にはいくつかの重要な違いがあります。
 ひとつは、変数やコンストラクタに制限されることなく、パターンに任意の式を含めることです。 
 もうひとつは、同じ変数が複数回現れることがあり、暗黙に等値の制約を含むことです。
 
@@ -364,7 +364,7 @@ Coqの本当の約束事は、Ltacを使って、
 <div class="paragraph"> </div>
 
 他のふたつの違いは、他のものよりはるかに重要です。
-<span class="inlinecode"><span class="id" title="keyword">match</span></span> 構文は、<i>失敗によるバックトラッキングの意味</i> を持っています。 
+<span class="inlinecode"><span class="id" title="keyword">match</span></span> 構文は、 <i>失敗によるバックトラッキングの意味</i> を持っています。 
 MLでは、パターンマッチングは、一致させる最初のパターンを見つけてから、
 その本体を実行することによって動作します。 
 本体が例外を発生させた場合、全体の一致は同じ例外を発生させます。
@@ -404,10 +404,7 @@ Coqでは、次のパターンを取り戻して試してみます。これも�
 <div class="paragraph"> </div>
 
 この例では、失敗が <span class="inlinecode"><span class="id" title="keyword">match</span></span> 内の別のパターンにどのように移動するかを示しています。
-失敗はまた、単一のパターンにマッチする異なる方法を見つける試みを引き起こします。
-
-<div class="paragraph"> </div>
-
+失敗はまた、<i>単一のパターンにマッチする異なる方法を見つける試み</i>を引き起こします。
 別の例を考えてみましょう。
  
 </div>
@@ -487,9 +484,6 @@ Coq は <span class="inlinecode"><a class="idref" href="Cpdt.Large.html#slow.H1"
 パターン・マッチングにに組み込まれている等価性検査(equality checking)を使用して、
 命題に正確に一致する仮説があるかどうかを調べます。もしそうなら、
 <span class="inlinecode"><span class="id" title="tactic">fail</span></span> タクティクを使用します。 
-
-<div class="paragraph"> </div>
-
 引数がなければ、期待通りに、<span class="inlinecode"><span class="id" title="tactic">fail</span></span> は通常のタクティクの失敗を通知します。
 <span class="inlinecode"><span class="id" title="tactic">fail</span></span> に引数 <span class="inlinecode"><a class="idref" href="Cpdt.MoreDep.html#dec_star.dec_star''.n"><span class="id" title="variable">n</span></a></span> が渡されると、
 <span class="inlinecode"><a class="idref" href="Cpdt.MoreDep.html#dec_star.dec_star''.n"><span class="id" title="variable">n</span></a></span> は、バックトラック探索の囲む条件(case)を通して外側に向かってカウントするように使用されます。
@@ -504,16 +498,10 @@ Coq は <span class="inlinecode"><a class="idref" href="Cpdt.Large.html#slow.H1"
 
 第2の条件(case)は、<span class="inlinecode"><a class="idref" href="Cpdt.ProgLang.html#Forall.P"><span class="id" title="variable">P</span></a></span> が仮説と一致しないときに使用され、
 <span class="inlinecode"><a class="idref" href="Cpdt.ProgLang.html#Forall.P"><span class="id" title="variable">P</span></a></span> が連言(conjunction)であるかどうかをチェックします。
-
-<div class="paragraph"> </div>
-
 他の簡略化(simplification)では連言(conjunction)をその成分の式(component formula)
 に分割することがあるため、
 これらの成分の少なくともひとつも表現されていない
 ことを確認する必要があります。
-
-<div class="paragraph"> </div>
-
 これを達成するために、 <span class="inlinecode"><span class="id" title="tactic">first</span></span> タクティカルを適用します。
 これはタクティクのリストを取り、
 それらのひとつが失敗しないまで リストを続けます。
@@ -526,11 +514,20 @@ Coq は <span class="inlinecode"><a class="idref" href="Cpdt.Large.html#slow.H1"
 
 <span class="inlinecode">?<a class="idref" href="Cpdt.MoreDep.html#split.P1"><span class="id" title="variable">P1</span></a></span> <span class="inlinecode">∧</span> <span class="inlinecode">?<a class="idref" href="Cpdt.MoreDep.html#split.P2"><span class="id" title="variable">P2</span></a></span> の場合のボディ は、
 到達すれば完全に成功するか完全に失敗するかを保証します。
+ワイルドカードの場合、<span class="inlinecode"><a class="idref" href="Cpdt.ProgLang.html#Forall.P"><span class="id" title="variable">P</span></a></span> は連言ではありませんから、
+<span class="inlinecode"><span class="id" title="tactic">idtac</span></span> を使用します。
+これは、何もしないことで成功する効果があるため、単独で適用することは愚かなタクティクです。
+それにもかかわらず、<span class="inlinecode"><span class="id" title="tactic">idtac</span></span> は、ここで見ているような場合に便利な代用品(placeholder)です。
 
 <div class="paragraph"> </div>
 
-ワイルドカードの場合、<span class="inlinecode"><a class="idref" href="Cpdt.ProgLang.html#Forall.P"><span class="id" title="variable">P</span></a></span> は連言ではありませんから、
 
+<div class="paragraph"> </div>
+
+存在しないことのチェックを実装したことによって、
+入力として証明項をとり、結論がまだ存在しない場合だけ、新しい仮説としてその結論を加え、
+さもなければ失敗するタクティクを作ることは簡単です。
+ 
 </div>
 <div class="code">
 
@@ -656,9 +653,6 @@ Ltacの有用な <span class="inlinecode"><a class="idref" href="Cpdt.ProgLang.h
 
 かろうじて <span class="inlinecode"><span class="id" title="var">completer</span></span> の定義における微妙な落とし穴を避けていました。
 慣れていない目には、オリジナルよりも魅力的に見える別の定義を試してみましょう。
-
-<div class="paragraph"> </div>
-
 （2番目の <span class="inlinecode"><span class="id" title="keyword">match</span></span> の場合を少し変更して、
 これまでに行使されていなかったLtacの動作の微妙な部分を処理するのに
 十分スマートなタクティクにしました）。
@@ -670,7 +664,11 @@ Ltacの有用な <span class="inlinecode"><a class="idref" href="Cpdt.ProgLang.h
 <span class="id" title="keyword">Ltac</span> <span class="id" title="var">completer'</span> :=<br/>
 &nbsp;&nbsp;<span class="id" title="tactic">repeat</span> <span class="id" title="keyword">match</span> <span class="id" title="keyword">goal</span> <span class="id" title="keyword">with</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| [ |- <span class="id" title="var">_</span> <span class="id" title="notation">∧</span> <span class="id" title="var">_</span> ] ⇒ <span class="id" title="tactic">constructor</span><br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| [ <span class="id" title="var">H</span> : ?<span class="id" title="var">P</span> <span class="id" title="notation">∧</span> ?<span class="id" title="var">Q</span> |- <span class="id" title="var">_</span> ] ⇒ <span class="id" title="tactic">destruct</span> <span class="id" title="var">H</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| [ <span class="id" title="var">H</span> : ?<span class="id" title="var">P</span> <span class="id" title="notation">∧</span> ?<span class="id" title="var">Q</span> |- <span class="id" title="var">_</span> ] ⇒ <span class="id" title="tactic">destruct</span> <span class="id" title="var">H</span>;<br/>
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">repeat</span> <span class="id" title="keyword">match</span> <span class="id" title="keyword">goal</span> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| [ <span class="id" title="var">H'</span> : <span class="id" title="var">P</span> <span class="id" title="notation">∧</span> <span class="id" title="var">Q</span> |- <span class="id" title="var">_</span> ] ⇒ <span class="id" title="tactic">clear</span> <span class="id" title="var">H'</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">end</span><br/>
 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| [ <span class="id" title="var">H</span> : ?<span class="id" title="var">P</span> <span class="id" title="notation">→</span> <span class="id" title="var">_</span>, <span class="id" title="var">H'</span> : ?<span class="id" title="var">P</span> |- <span class="id" title="var">_</span> ] ⇒ <span class="id" title="tactic">specialize</span> (<span class="id" title="var">H</span> <span class="id" title="var">H'</span>) <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br/>
@@ -682,6 +680,17 @@ Ltacの有用な <span class="inlinecode"><a class="idref" href="Cpdt.ProgLang.h
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">end</span>.<br/>
 
 <br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+他の唯一の違いは、未使用のユニフィケーション変数 <span class="inlinecode">?<a class="idref" href="Cpdt.Large.html#slow.Q"><span class="id" title="variable">Q</span></a></span> をワイルドカードに置き換えた三段論法
+(modus ponens) のルールにあります。 このバージョンで再び例を試してみましょう：
+ 
+</div>
+<div class="code">
 
 <br/>
 <span class="id" title="keyword">Section</span> <a name="firstorder'"><span class="id" title="section">firstorder'</span></a>.<br/>
@@ -713,15 +722,14 @@ Ltacの有用な <span class="inlinecode"><a class="idref" href="Cpdt.ProgLang.h
 
 証明できていたゴールを証明できないものに変形(reducing)することで、
 量化された定理は、<span class="inlinecode"><a class="idref" href="Cpdt.MoreDep.html#insert.x"><span class="id" title="variable">x</span></a></span>ではなく<span class="inlinecode"><a class="idref" href="Cpdt.Predicates.html#y"><span class="id" title="variable">y</span></a></span>で具体化されてしまいます。
-
-<div class="paragraph"> </div>
-
 <span class="inlinecode"><span class="id" title="var">completer'</span></span> のための最後の <span class="inlinecode"><span class="id" title="keyword">match</span></span> の条件は、
 適切な仮説とともに量化子を具体化するだけに注意深くしています。
 なぜ間違った選択が行われたのですか？
      
 </div>
 <div class="code">
+
+<br/>
 &nbsp;&nbsp;<span class="id" title="keyword">Abort</span>.<br/>
 <span class="id" title="keyword">End</span> <a class="idref" href="Cpdt.Match.html#firstorder'"><span class="id" title="section">firstorder'</span></a>.<br/>
 
@@ -733,7 +741,7 @@ Ltacの有用な <span class="inlinecode"><a class="idref" href="Cpdt.ProgLang.h
 <div class="paragraph"> </div>
 
 いくつかの例が問題を説明しているはずです。ここでは、
-<span class="inlinecode"><span class="id" title="keyword">match</span></span>ベースの証明がうまくいくのを見ています：
+<span class="inlinecode"><span class="id" title="keyword">match</span></span>にもとづく証明がうまくいくのを見ています：
  
 </div>
 <div class="code">
@@ -784,12 +792,6 @@ User error: No matching clauses for match goal
 <div class="paragraph"> </div>
 
 問題は、ユニフィケーション変数にローカルに束縛された変数が含まれないことです。
-
-<div class="paragraph"> </div>
-
-
-<div class="paragraph"> </div>
-
 この場合、<span class="inlinecode">?<a class="idref" href="Cpdt.ProgLang.html#Forall.P"><span class="id" title="variable">P</span></a></span> はローカルな量化変数 <span class="inlinecode"><a class="idref" href="Cpdt.MoreDep.html#insert.x"><span class="id" title="variable">x</span></a></span> を含む <span class="inlinecode"><a class="idref" href="Cpdt.MoreDep.html#insert.x"><span class="id" title="variable">x</span></a></span> <span class="inlinecode">=</span> <span class="inlinecode"><a class="idref" href="Cpdt.MoreDep.html#insert.x"><span class="id" title="variable">x</span></a></span> に束縛される必要があります。
 以前のバージョンでワイルドカードを使用することで、この制限は回避されました。
 なぜこの制限が <span class="inlinecode"><span class="id" title="var">completer</span></span> タクティクの振る舞いに影響を与えるのかを理解するために、
@@ -816,12 +818,6 @@ Coq 8.1以前では、このような回避策はありません。
 
 どのCoqバージョンを使用していても、この制限に注意することが重要です。
 すでに示唆したように、その制限は <span class="inlinecode"><span class="id" title="var">completer'</span></span> の驚くべき振る舞いの背後にある原因です。
-
-<div class="paragraph"> </div>
-
-
-<div class="paragraph"> </div>
-
 私たちは間違って量化された事実を三段論法と突き合わせ、
 適切に一致する仮説が利用可能であり、
 誤った量化子の具体化が選択された異なる行動につながるというチェックを回避します。
@@ -889,6 +885,9 @@ Ltacの構文はタクティクの記述のために最適化されているの�
 <pre>
 Error: The reference ls' was not found in the current environment
 </pre>
+
+<div class="paragraph"> </div>
+
 この時点で、Ltacでは、
 パターン変数の名前の先頭に疑問符を付ける必要があることを覚えておいてください。
 
@@ -964,9 +963,6 @@ Gallinaの非終端記号の構文解析を「エスケープ」するために�
 
 特定の項に、等号でセットされた(set equal to)、新しい変数でもって、証明のコンテキストを拡張する
 <span class="inlinecode"><span class="id" title="tactic">pose</span></span> タクティクを使用します。
-
-<div class="paragraph"> </div>
-
 <span class="inlinecode"><span class="id" title="tactic">pose</span></span> <span class="inlinecode"><a class="idref" href="Cpdt.MoreDep.html#dec_star.dec_star''.n"><span class="id" title="variable">n</span></a></span> の代わりに <span class="inlinecode"><span class="id" title="tactic">idtac</span></span> <span class="inlinecode"><a class="idref" href="Cpdt.MoreDep.html#dec_star.dec_star''.n"><span class="id" title="variable">n</span></a></span> を使用することもできました。
 これは、コンテキストを変更せずに結果を出力します。
 
@@ -1192,21 +1188,12 @@ Error: variable n should be bound to a term.
 </div>
 
 <div class="doc">
-
-<div class="paragraph"> </div>
-
 ここで何がうまくいかないのでしょうか？
 答えは、Ltacの、純粋に関数プログラミング言語と命令的プログラミング言語の両方としての
-二重状態( dual status)と関係しています。
-
-<div class="paragraph"> </div>
-
+二重状態 (dual status) と関係しています。
 基本的なプログラミング言語は純粋に関数的ですが、
 タクティクスクリプトはそのようなプログラムによって返される「データ型」のひとつで、
 Coqは証明状態を変更する命令的なセマンティクスを使ってそのようなスクリプトを実行します。
-
-<div class="paragraph"> </div>
-
  Haskell の
  モナド・プログラミング(monadic programming)に
 精通している読者は、類似点を認識しているかもしれません。
@@ -1214,9 +1201,6 @@ Coqは証明状態を変更する命令的なセマンティクスを使って�
 <i>命令型言語におけるプログラムのコード</i>
 (the code of programs in an imperative language) を
 返す純粋なプログラムと考えることができます。
-
-<div class="paragraph"> </div>
-
 一部の帯域外(out-of-band)なメカニズムは、
 これらの派生プログラムを実行する責任を負います。
 このようにして、Haskellは純粋なままで、通常の入出力の副作用などをサポートします。
@@ -1594,18 +1578,9 @@ Ltacで解決するのがはるかに簡単です。
 木を走査するとき、<span class="inlinecode"><span class="id" title="var">search_prem</span></span> は上記の補題のいくつかを適用して、
 異なる部分式(subformula)をゴールの頭部にもっていくことで、
 ゴールを書き換えます。
-
-<div class="paragraph"> </div>
-
 すなわち、
 その前提が、いくつかの<span class="inlinecode"><a class="idref" href="Cpdt.Large.html#slow.Q"><span class="id" title="variable">Q</span></a></span>に対して、<span class="inlinecode"><a class="idref" href="Cpdt.ProgLang.html#Forall.P"><span class="id" title="variable">P</span></a></span> <span class="inlinecode">∧</span> <span class="inlinecode"><a class="idref" href="Cpdt.Large.html#slow.Q"><span class="id" title="variable">Q</span></a></span>のかたちに再配置されるところで、
 含意の前提のそれぞれの部分式 <span class="inlinecode"><a class="idref" href="Cpdt.ProgLang.html#Forall.P"><span class="id" title="variable">P</span></a></span> に対して、<span class="inlinecode"><a class="idref" href="Cpdt.ProgLang.html#Forall.P"><span class="id" title="variable">P</span></a></span> を 「have a turn」しようとします。
-
-<div class="paragraph"> </div>
-
-
-<div class="paragraph"> </div>
-
 タクティク <span class="inlinecode"><span class="id" title="var">tac</span></span> はこのかたちでゴールを見ることを期待し、
 前提の最初の連言に注意を集中するでしょう。
  
@@ -1640,19 +1615,10 @@ Ltacで解決するのがはるかに簡単です。
 前提が連言で始まる場合は、各連言で<span class="inlinecode"><span class="id" title="var">search</span></span>手続きを呼び出します。 
 <span class="inlinecode"><span class="id" title="var">search</span></span> <span class="inlinecode"><a class="idref" href="Cpdt.ProgLang.html#Forall.P"><span class="id" title="variable">P</span></a></span> の呼び出しは、ある <span class="inlinecode"><a class="idref" href="Cpdt.Large.html#slow.Q"><span class="id" title="variable">Q</span></a></span> のための前提が <span class="inlinecode"><a class="idref" href="Cpdt.ProgLang.html#Forall.P"><span class="id" title="variable">P</span></a></span> <span class="inlinecode">∧</span> <span class="inlinecode"><a class="idref" href="Cpdt.Large.html#slow.Q"><span class="id" title="variable">Q</span></a></span> の形式であるという
 不変性を期待し維持します。
-
-<div class="paragraph"> </div>
-
 <span class="inlinecode"><span class="id" title="var">tac</span></span>が常に失敗したときに永久にループするのを避けるために、
 一種の再帰の尺度として減少する、<span class="inlinecode"><a class="idref" href="Cpdt.ProgLang.html#Forall.P"><span class="id" title="variable">P</span></a></span>を明示的に渡します。
-
-<div class="paragraph"> </div>
-
 2番目の<span class="inlinecode"><span class="id" title="keyword">match</span></span>の場合は、制御を<span class="inlinecode"><span class="id" title="var">search</span></span>に渡す前に、
 この不変量を実現するために可換性(commutativity)の補題を呼び出します。
-
-<div class="paragraph"> </div>
-
 最終的な<span class="inlinecode"><span class="id" title="keyword">match</span></span> の場合では <span class="inlinecode"><span class="id" title="var">tac</span></span> を直接適用しようとしますが、
 それが失敗すると、余分な<span class="inlinecode"><span class="id" title="inductive">True</span></span>結合を追加してゴールの形を変え、
 <span class="inlinecode"><span class="id" title="var">tac</span></span>をもう一度呼び出します。
@@ -1777,27 +1743,16 @@ Ltacで解決するのがはるかに簡単です。
 <div class="paragraph"> </div>
 
 今や、最終的な<span class="inlinecode"><span class="id" title="var">matcher</span></span>タクティクは簡単です。
-
-<div class="paragraph"> </div>
-
 最初に、すべての変数をスコープに <span class="inlinecode"><span class="id" title="tactic">intro</span></span> し、
 単純な前提の単純化を試み、
 <span class="inlinecode"><span class="id" title="inductive">False</span></span>を見つけたら証明を完成させ、
 見つかった存在量化子を取り除きます。
-
-<div class="paragraph"> </div>
-
 その後、結論を検索します。
-
-<div class="paragraph"> </div>
-
 <span class="inlinecode"><span class="id" title="inductive">True</span></span> の連言を取り除き、
 ユニフィケーション変数を導入することによって、束縛変数のための存在量化子を取り除き、
 一致する前提を探して取り除きます。
-
-<div class="paragraph"> </div>
-
-最後に、それ以上の進展がなければ、ゴールが自明かどうかをみて、<span class="inlinecode"><a class="idref" href="Cpdt.Match.html#imp_True"><span class="id" title="lemma">imp_True</span></a></span> によって解くことができます。
+最後に、それ以上の進展がなければ、ゴールが自明かどうかをみて、
+<span class="inlinecode"><a class="idref" href="Cpdt.Match.html#imp_True"><span class="id" title="lemma">imp_True</span></a></span> によって解くことができます。
 それぞれの場合において、簡単にするために、<span class="inlinecode"><span class="id" title="tactic">apply</span></span> の代わりに、
 より安価なユニフィケーション・アルゴリズムである
 <span class="inlinecode"><span class="id" title="tactic">simple</span></span> <span class="inlinecode"><span class="id" title="tactic">apply</span></span> タクティクを使います。
@@ -2314,9 +2269,6 @@ Gallinaでは、含意は単に<span class="inlinecode"><span class="id" title="
 したがって、新しい統一変数を選択するのではなく、
 ユーザーが指定した戦術<span class="inlinecode"><span class="id" title="var">tac</span></span>を適用します。
 <span class="inlinecode"><span class="id" title="var">tac</span></span>が<span class="inlinecode"><a class="idref" href="Cpdt.Generic.html#ok.T"><span class="id" title="variable">T</span></a></span>を証明するのに失敗した場合、
-
-<div class="paragraph"> </div>
-
 デフォルトの量化の処理を続けるのではなく、
 具体化を中止します。また、
 
@@ -2375,9 +2327,6 @@ Gallinaでは、含意は単に<span class="inlinecode"><span class="id" title="
 
 まだ<span class="inlinecode"><a class="idref" href="Cpdt.ProgLang.html#Forall.P"><span class="id" title="variable">P</span></a></span>の事実を知らない変数について<span class="inlinecode"><a class="idref" href="Cpdt.Large.html#slow.Q"><span class="id" title="variable">Q</span></a></span>仮説を見つけて適用しようとするタクティクで
 <span class="inlinecode"><span class="id" title="var">insterKeep</span></span>を呼び出すことによってゴールを証明することができます。
-
-<div class="paragraph"> </div>
-
 Coqの証明エンジンで、
 ファーストクラスのタクティクの引数が、
 <span class="inlinecode"><span class="id" title="keyword">match</span></span>で始まらなければならないという奇妙な制限を回避するために、
@@ -2437,9 +2386,6 @@ Coqの証明エンジンで、
 <span class="inlinecode"><span class="id" title="tactic">instantiate</span></span> タクティクは
 探索的な証明(exploratory proving)のためには便利かもしれませんが、
 変化する定理には適応しにくい非常に脆い証明スクリプトにつながります。
-
-<div class="paragraph"> </div>
-
 実在すると判っている項に値を割り当てるために使用できるタクティクを持つことは、しばしば有用です。
 婉曲な(roundabout)実装技術を採用することで、この機能を一般化するタクティクを作ることができます。
 特に、我々の戦術<span class="inlinecode"><span class="id" title="var">equate</span></span>は、2つの項が等しいことを主張します。
