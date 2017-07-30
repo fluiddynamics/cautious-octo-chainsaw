@@ -207,7 +207,7 @@ Coqにはとても魅力的な性質が多く備わっていますので，こ�
 
 公然のことですが，ACL2とHOLでは依存型は使えません．
 PVSとTwelfはCoqの依存型言語のそれぞれ別の真部分集合をサポートします．
-Twelfの型言語はbare-bonesに制限されています．つまり単形のラムダ計算です．
+Twelfの型言語はbare-bonesに制限されています．つまり単相ラムダ計算です．
 そのため型の内部での計算に重大な制約が置かれます．
 この制約はTwelfが証明を表現したり証明したりするアプローチの健全性を議論するときに重要です．
 
@@ -331,7 +331,10 @@ Coqはプログラムと証明項を同じ構文クラスで表現します（�
 
 <div class="paragraph"> </div>
 
-<a name="lab8"></a><h1 class="section">Why Not a Different Dependently Typed Language?</h1>
+
+<div class="paragraph"> </div>
+
+<a name="lab8"></a><h1 class="section">他の依存型の言語じゃない理由</h1>
 
 <div class="paragraph"> </div>
 
@@ -350,7 +353,10 @@ On the other hand, Agda, Epigram, and similar tools have less implementation bag
 
 <div class="paragraph"> </div>
 
-<a name="lab9"></a><h1 class="section">Engineering with a Proof Assistant</h1>
+
+<div class="paragraph"> </div>
+
+<a name="lab9"></a><h1 class="section">証明支援器を使ったエンジニアリング</h1>
 
 <div class="paragraph"> </div>
 
@@ -369,18 +375,28 @@ If I do that job well, then this book should be of interest even to people who h
 
 <div class="paragraph"> </div>
 
-<a name="lab10"></a><h1 class="section">Prerequisites</h1>
+
+<div class="paragraph"> </div>
+
+<a name="lab10"></a><h1 class="section">前提知識</h1>
 
 <div class="paragraph"> </div>
 
 
 <div class="paragraph"> </div>
 
-I try to keep the required background knowledge to a minimum in this book.  I will assume familiarity with the material from usual discrete math and logic courses taken by undergraduate computer science majors, and I will assume that readers have significant experience programming in one of the ML dialects, in Haskell, or in some other, closely related language.  Experience with only dynamically typed functional languages might lead to befuddlement in some places, but a reader who has come to understand Scheme deeply will probably be fine.
 
 <div class="paragraph"> </div>
 
-My background is in programming languages, formal semantics, and program verification.  I sometimes use examples from that domain.  As a reference on these topics, I recommend <i>Types and Programming Languages</i> , by Benjamin C. Pierce; however, I have tried to choose examples so that they may be understood without background in semantics.
+私はこの本を読む上で必要な背景知識を最小限に抑えようとしています。
+私は、情報科学専攻の学部生が習う通常の離散数学と論理学を理解していること、そしてMLの方言かHaskellかその他の関連言語についてのプログラミング経験があることを仮定します。
+動的型付きの関数型言語の経験だけでは理解出来なくて困る部分もあるかもしれません。Schemeについての深い理解があればおそらく大丈夫です。
+
+<div class="paragraph"> </div>
+
+私のバックグラウンドはプログラミング言語、形式意味論、そしてプログラム検証です。
+それらの分野からの例を使うことがあります。
+参考文献として <i>Type and Programming Languages</i>  (訳注:和訳は「型システム入門 オーム社」)をお勧めします。しかし、なるべく意味論の背景なしに理解できるように例を選んでいます。
 
 <div class="paragraph"> </div>
 
@@ -472,7 +488,7 @@ Coqにあらかじめあるタクティクは十分高レベルな自動化を�
 
 <div class="paragraph"> </div>
 
-次の章の最初では、皆さんがCoqとProof Generalをインストールした状態であることを仮定します。本書のコードはCoqバージョン8.4pl5と8.5beta2でテストされています。部分的には他のバージョンで動くかもしれませんが、本書のソースはより以前のバージョンではビルドに失敗すると予想されます。
+次の章の最初では、皆さんがCoqとProof Generalをインストールした状態であることを仮定します。本書のコードはCoqバージョン8.4pl6、8.5pl3、8.6でテストされています。部分的には他のバージョンで動くかもしれませんが、本書のソースはより以前のバージョンではビルドに失敗すると予想されます。
 
 <div class="paragraph"> </div>
 
